@@ -1,0 +1,14 @@
+{
+    "env": {
+        "NEXT_PUBLIC_REST_API_ENDPOINT": "https://edotofamilyapi.onrender.com/api",
+        "NEXT_PUBLIC_FEEXPAY_PUBLIC_KEY": "fp_Rlc2cEDcLcuQag0je0cFm5ScAXWeNcONELFD6PCfN3L568xikDRVUJCdAV42Mjwh",
+        "NEXT_PUBLIC_FEEXPAY_STORE_ID": "672b15e3c8365bbb9b3ed029"
+    },
+    "build": {
+        "env": {
+            "NEXT_PUBLIC_REST_API_ENDPOINT": "https://galileecommerceshopapi-3.onrender.com/api",
+            "NEXT_PUBLIC_FEEXPAY_PUBLIC_KEY": "fp_Rlc2cEDcLcuQag0je0cFm5ScAXWeNcONELFD6PCfN3L568xikDRVUJCdAV42Mjwh",
+            "NEXT_PUBLIC_FEEXPAY_STORE_ID": "672b15e3c8365bbb9b3ed029"
+        }
+    }
+}
