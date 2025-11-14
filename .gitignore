@@ -1,0 +1,25 @@
+# Node
+node_modules/
+
+# Next.js build
+.next/
+out/
+.next.cache/
+
+# Env
+.env
+.env.local
+.env.production
+.env.development
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,92 @@
+apparement tu te perd parfois voici ce qu'on a dejà fait // /services/authService.js
+import { apiRequest } from "../lib/api";
+
+export const authService = {
+    /** 🔹 Créer un compte utilisateur */
+    async register(userData) {
+        return apiRequest("/register", {
+            method: "POST",
+            body: JSON.stringify(userData),
+        });
+    },
+
+    /** 🔹 Connexion classique (email + password) */
+    async login(email, password) {
+        const data = await apiRequest("/token", {
+            method: "POST",
+            body: JSON.stringify({ email, password }),
+        });
+
+        if (data?.access_token) {
+            localStorage.setItem("token", data.access_token);
+            localStorage.setItem("user", JSON.stringify(data.user || {}));
+        }
+
+        return data;
+    },
+
+    /** 🔹 Connexion via Google, Facebook, etc. */
+    async socialLogin(provider, token) {
+        return apiRequest("/social-login-token", {
+            method: "POST",
+            body: JSON.stringify({ provider, token }),
+        });
+    },
+
+    /** 🔹 Connexion via OTP */
+    async otpLogin(phone, otp) {
+        return apiRequest("/otp-login", {
+            method: "POST",
+            body: JSON.stringify({ phone, otp }),
+        });
+    },
+
+    /** 🔹 Déconnexion */
+    async logout() {
+        await apiRequest("/logout", { method: "POST" });
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+    },
+
+    /** 🔹 Mot de passe oublié : envoi du code */
+    async forgotPassword(email) {
+        return apiRequest("/forget-password", {
+            method: "POST",
+            body: JSON.stringify({ email }),
+        });
+    },
+
+    /** 🔹 Vérification du code de réinitialisation */
+    async verifyForgetPasswordToken(email, token) {
+        return apiRequest("/verify-forget-password-token", {
+            method: "POST",
+            body: JSON.stringify({ email, token }),
+        });
+    },
+
+    /** 🔹 Réinitialisation du mot de passe */
+    async resetPassword(email, token, newPassword) {
+        return apiRequest("/reset-password", {
+            method: "POST",
+            body: JSON.stringify({ email, token, password: newPassword }),
+        });
+    },
+
+    /** 🔹 Changer le mot de passe depuis un compte connecté */
+    async changePassword(currentPassword, newPassword) {
+        return apiRequest("/change-password", {
+            method: "POST",
+            body: JSON.stringify({ currentPassword, newPassword }),
+        });
+    },
+
+    /** 🔹 Récupération du profil utilisateur connecté */
+    async me() {
+        return apiRequest("/me", { method: "GET" });
+    },
+
+    /** 🔹 Vérification d’email (généralement redirigé par ton NestJS) */
+    async verifyEmail(token) {
+        return apiRequest(`/verify-email?token=${token}`, { method: "GET" });
+    },
+};  maintenant on veux les utilisé avec la gestion des differents cas possible de retour des appels
