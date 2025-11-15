@@ -4,12 +4,13 @@ import FooterLogo from "./FooterLogo"
 export default function Layout({ children }) {
   let pathname = usePathname() || ""
 
-  // Vérifie si on est sur la page d’accueil
+  // Vérifie si on est sur la page d’accueil 
   const isHomePage =
     pathname === "/login" ||
     pathname === "/register" ||
     pathname.startsWith("/category") ||
     pathname.startsWith("/product");
+   pathname === "/admin/add-pickup-point";
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">

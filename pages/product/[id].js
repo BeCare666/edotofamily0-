@@ -96,7 +96,9 @@ export default function ProductDetails() {
             if (!order?.tracking_number) throw new Error("Erreur création commande");
 
             // ✅ Directement ouvrir le modal Feexpay
+            console.log("Ouverture modal Feexpay pour la commande :", order.id);
             setPaymentData({
+                orderId: order.id,
                 publicKey: process.env.NEXT_PUBLIC_FEEXPAY_PUBLIC_KEY,
                 reference: order.tracking_number,
                 amount: order.total,

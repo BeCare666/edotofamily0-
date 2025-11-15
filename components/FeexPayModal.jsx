@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation"
 export default function FeexPayModal({ payment, onClose }) {
+    const router = useRouter()
     useEffect(() => {
         if (!payment) return;
 
-        //console.log("📌 FeexPayModal payment data :", payment);
+        console.log("📌 FeexPayModal payment data :", payment.orderId);
 
         // Injecte le bon SDK FEEXPAY
         const script = document.createElement("script");
@@ -37,32 +39,66 @@ export default function FeexPayModal({ payment, onClose }) {
                 currency: "XOF",
 
                 callback: async (response) => {
-                    console.log("FeexPay success :", response);
-                    //response.status === "SUCCESSFUL"
-                    if (response) {
-                        try {
-                            await fetch(`${API_BASE_URL}/payments/feexpay/complete`, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    transaction_id: `tx_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
-                                    custom_id: payment.reference // ta ref interne ou tracking number
-                                })
-                            });
-                        } catch (err) {
-                            console.error("Erreur paiement:", err);
-                            alert("Une erreur est survenue lors de la commande.");
-                        }
+                    console.log("FeexPay callback:", response);
 
-
-                    } else {
-                        console.error("❌ Paiement échoué ou annulé.");
+                    // Vérifier que FeexPay confirme vraiment le paiement
+                    if (response?.status !== "SUCCESSFUL") {
+                        console.error("Paiement FeexPay non conclu :", response);
+                        toast.error("Le paiement n’a pas été confirmé par FeexPay.");
                         return;
                     }
 
+                    try {
+                        const res = await fetch(`${API_BASE_URL}/payments/feexpay/complete`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                transaction_id: response.transaction_id,
+                                custom_id: payment.reference,
+                                feexpay_response: response
+                            })
+                        });
 
-                    onClose?.();
-                },
+                        const data = await res.json().catch(() => ({}));
+                        console.log("Complete API response:", res.status, data);
+
+                        /** 🔥 Cas 1 : Tout a fonctionné */
+                        if (res.ok && data.processed) {
+                            toast.success("Paiement validé 🎉 Votre commande est confirmée.");
+                            onClose?.();
+                            router.push(`/orders/${payment.orderId}`)
+                            return;
+                        }
+
+                        /** 🔥 Cas 2 : Paiement OK mais finalisation incomplète → PENDING */
+                        if (res.ok && !data.processed && data.pendingPaymentId) {
+                            toast.success(
+                                `Paiement reçu ✔️\nFinalisation en attente (#${data.pendingPaymentId}).`
+                            );
+                            onClose?.();
+                            router.push(`/orders/${payment.orderId}`)
+                            return;
+                        }
+
+                        /** ❌ Cas 3 : Erreur backend **/
+                        console.error("Erreur backend lors de la finalisation:", data);
+                        toast.error(
+                            "Le paiement a été capturé, mais une erreur interne a empêché la finalisation. Contactez le support."
+                        );
+                        onClose?.();
+                        router.push(`/orders/${payment.orderId}`)
+
+                    } catch (err) {
+                        /** ❌ Cas 4 : Erreur réseau */
+                        console.error("Erreur réseau / exception:", err);
+                        toast.error(
+                            "Erreur réseau. Si le paiement a été débité, contactez le support."
+                        );
+                        onClose?.();
+                    }
+                }
+
+
 
                 //error_callback_url: "https://tonsite.com/erreur",
                 //callback_url: "https://tonsite.com/success",

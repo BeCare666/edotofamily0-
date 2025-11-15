@@ -9,6 +9,24 @@ export const authService = {
 
         return res
     },
+    async registerPickUpPoint(name, email, password) {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/register-pick-up-point`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name, email, password }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || "Erreur lors de la création du point de retrait.");
+
+            return data;
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    },
     async login(email, password) {
         const res = await apiRequest("/token", {
             method: "POST",
