@@ -16,7 +16,9 @@ import {
   Truck,
   CheckCircle,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 
+const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 /**
  * Category page — JavaScript (no TypeScript)
  * - Appelle: GET /products/corridor avec les query params attendus
@@ -45,7 +47,11 @@ export default function CategoryPage() {
   const [sortBy, setSortBy] = useState("relevance"); // relevance|price-asc|price-desc|newest
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
-
+  const [product, setProduct] = useState(null);
+  const [paymentData, setPaymentData] = useState(null);
+  const [passOrder, setPassOrder] = useState(false);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [loadingButton, setLoadingButton] = useState(null);
   // Data
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
@@ -82,6 +88,7 @@ export default function CategoryPage() {
   /* === USE THIS useEffect (robuste) === */
   useEffect(() => {
     // IMPORTANT: router must be in scope (const router = useRouter(); above)
+
     if (!router) return;
 
     // Wait for router to be ready (avoids undefined slug on first render)
@@ -230,8 +237,71 @@ export default function CategoryPage() {
     console.log("Navigating to product:", p);
     router.push(`/product/${p.raw.slug}`);
   };
+  const handlePayment = async (p) => {
 
+    const id = p.raw.slug;
+    const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
+    try {
+      const res = await fetch(`${API_BASE_URL}/products/${id}`);
+      const data = await res.json();
+      console.log("Initiating payment for product:", data);
+      setProduct(data);
+      if (!data) {
+        alert("Produit introuvable.");
+        return;
+      }
+      await handleOrder(data);
+    } catch (e) {
+      console.error("Erreur chargement produit:", e);
+    } finally {
+      setLoading(false);
+    }
+
+  }
+  const handleOrder = async (product) => {
+    setPassOrder(true);
+    console.log("Creating order for product:", product);
+    if (!product) return;
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
+      const token = localStorage.getItem("token")
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+      const res = await fetch(`${API_BASE_URL}/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          products: [{ product_id: product.id, order_quantity: 1, unit_price: product.price, subtotal: product.price }],
+          total: product.price,
+          payment_gateway: "FEEXPAY",
+        }),
+      });
+
+      const order = await res.json();
+      console.log("✅ Commande créée :", order);
+      if (!order?.tracking_number) throw new Error("Erreur création commande");
+
+      // ✅ Directement ouvrir le modal Feexpay
+      setPaymentData({
+        publicKey: process.env.NEXT_PUBLIC_FEEXPAY_PUBLIC_KEY,
+        reference: order.tracking_number,
+        amount: order.total,
+        currency: "XOF",
+      });
+      setPassOrder(false);
+      setIsPaymentOpen(true);
+    } catch (err) {
+      console.error("Erreur commande/paiement:", err);
+      alert("Une erreur est survenue lors de la commande.");
+    }
+  };
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-b from-white to-[#fbf8fc] py-10 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Top row */}
@@ -389,10 +459,13 @@ export default function CategoryPage() {
                   </button>
 
                   <button
-                    onClick={() => handlePayment(p)}
+                    onClick={() => {
+                      setLoadingButton(p.id);     // p.id = l'identifiant du pass
+                      handlePayment(p);
+                    }}
                     className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#FF6EA9] to-[#4AB3F4] text-white shadow-md hover:shadow-lg hover:opacity-90 transition-all"
                   >
-                    💳 Payer
+                    {loadingButton === p.id ? "En cours ..." : "💳 Payer"}
                   </button>
                 </div>
 
@@ -435,7 +508,14 @@ export default function CategoryPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
       </motion.button>
+
+
     </div>
+          {/* ✅ Modal Feexpay */}
+      {isPaymentOpen && (
+        <FeexPayModal payment={paymentData} onClose={() => setIsPaymentOpen(false)} />
+      )}
+    </>
   );
 }
 

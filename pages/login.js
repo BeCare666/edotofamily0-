@@ -48,7 +48,7 @@ export default function LoginPage() {
             const message =
                 err.message?.includes("valider votre email")
                     ? "Veuillez d’abord valider votre adresse email."
-                    : err.message?.includes("incorrect")
+                    : err.message?.includes("Session expirée")
                         ? "Email ou mot de passe incorrect."
                         : err.message || "Une erreur est survenue."
 

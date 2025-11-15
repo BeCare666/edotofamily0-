@@ -16,14 +16,15 @@ export default function FooterLogo() {
       <DrawerMenu isOpen={openMenu} onClose={() => setOpenMenu(false)} />
       <CalendlyDrawer isOpen={openCalendly} onClose={() => setOpenCalendly(false)} />
 
-      {/* --- Floating Button Group (bottom-right) --- */}
-      <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-10">
+      {/* --- Floating Button Group (bottom-right) <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-10">--- */}
+
+      <div className="fixed bottom-[35px] left-1/2 transform -translate-x-1/2 flex flex-row items-center gap-3 z-10">
         {/* --- Calendly Button --- */}
         <motion.button
           onClick={() => setOpenCalendly(true)}
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.95 }}
-          className="w-[56px] h-[56px] rounded-full bg-white/80 backdrop-blur-xl shadow-lg border border-white/60 flex items-center justify-center hover:shadow-2xl transition-all"
+          className="w-[56px] h-[56px] rounded-full bg-white  backdrop-blur-xl shadow-lg border border-[#FF6EA9]/30 flex items-center justify-center hover:shadow-2xl transition-all"
         >
           <Image
             src={CalendarIcon}
@@ -37,7 +38,7 @@ export default function FooterLogo() {
           onClick={() => setOpenMenu(true)}
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.95 }}
-          className="w-[56px] h-[56px] rounded-full bg-white/80 backdrop-blur-xl shadow-lg border border-white/60 flex items-center justify-center hover:shadow-2xl transition-all"
+          className="w-[56px] h-[56px] rounded-full bg-white backdrop-blur-xl shadow-lg border border-[#FF6EA9]/30 flex items-center justify-center hover:shadow-2xl transition-all"
         >
           <Image
             src={Logo}
@@ -45,7 +46,7 @@ export default function FooterLogo() {
             className="w-9 h-9 opacity-80 hover:opacity-100 transition-all"
           />
         </motion.button>
-      </div>
+      </div >
     </>
   );
 }

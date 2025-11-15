@@ -21,7 +21,7 @@ export default function ProductDetails() {
     const [loading, setLoading] = useState(true);
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const [paymentData, setPaymentData] = useState(null);
-
+    const [passOrder, setPassOrder] = useState(false);
     const handleMouseMove = (e) => {
         if (!zoom) return;
         const rect = e.currentTarget.getBoundingClientRect();
@@ -37,6 +37,7 @@ export default function ProductDetails() {
             setLoading(true);
             try {
                 const res = await fetch(`${API_BASE_URL}/products/${id}`);
+                console.log("✅ Produit chargé pour paiement:", `${API_BASE_URL}/products/${id}`, res);
                 const data = await res.json();
                 const images =
                     typeof data.image === "string"
@@ -68,6 +69,7 @@ export default function ProductDetails() {
     };
 
     const handleOrder = async () => {
+        setPassOrder(true);
         if (!product) return;
         try {
             const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
@@ -100,7 +102,7 @@ export default function ProductDetails() {
                 amount: order.total,
                 currency: "XOF",
             });
-
+            setPassOrder(false);
             setIsPaymentOpen(true);
         } catch (err) {
             console.error("Erreur commande/paiement:", err);
@@ -231,15 +233,15 @@ export default function ProductDetails() {
                         <div className="flex flex-wrap gap-4 mt-2">
                             <button
                                 onClick={() => router.back()}
-                                className="flex-1 min-w-[160px] px-5 py-3 rounded-full bg-[#FF6EA9] text-white font-semibold shadow-md hover:shadow-lg hover:opacity-90 transition-all"
+                                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border border-[#FF6EA9] text-[#FF6EA9] hover:bg-[#FF6EA9] hover:text-white transition-all"
                             >
                                 Retour
                             </button>
                             <button
                                 onClick={handleOrder}
-                                className="flex-1 min-w-[160px] px-5 py-3 rounded-full bg-gradient-to-r from-[#FF6EA9] to-[#4AB3F4] text-white font-semibold shadow-md hover:shadow-lg hover:opacity-90 transition-all"
+                                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#FF6EA9] to-[#4AB3F4] text-white shadow-md hover:shadow-lg hover:opacity-90 transition-all"
                             >
-                                💳 Passer La commande
+                                {passOrder ? "Commande en cours ..." : "💳 Passer la commande"}
                             </button>
                         </div>
 

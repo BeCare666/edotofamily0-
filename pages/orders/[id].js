@@ -90,7 +90,7 @@ export default function OrderDetailsPage() {
             <ArrowLeft size={18} className="mr-2" /> Retour
           </button>
           <h1 className="text-2xl font-bold text-[#0F172A]">
-            Détails de la commande
+            Détails
           </h1>
         </div>
 
@@ -154,13 +154,13 @@ export default function OrderDetailsPage() {
                     <div>
                       <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-gray-500">
-                        Qté : {item.quantity} × {Number(item.price || 0).toFixed(2)} €
+                        Qté : {item.quantity} × {Number(item.price || 0).toFixed(2)} FCFA
                       </p>
                     </div>
                   </div>
 
                   <p className="font-semibold text-[#0F172A]">
-                    {(Number(item.price || 0) * Number(item.quantity || 0)).toFixed(2)} €
+                    {(Number(item.price || 0) * Number(item.quantity || 0)).toFixed(2)} FCFA
                   </p>
                 </li>
               ))}
@@ -202,16 +202,16 @@ export default function OrderDetailsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <p className="text-sm text-gray-500">Montant total</p>
-              <p className="font-semibold">{order.total?.toFixed(2)} €</p>
+              <p className="font-semibold">{order.total?.toFixed(2)} FCFA</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Taxe</p>
-              <p className="font-semibold">{order.sales_tax?.toFixed(2)} €</p>
+              <p className="font-semibold">{order.sales_tax?.toFixed(2)} FCFA</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Frais de livraison</p>
               <p className="font-semibold">
-                {order.delivery_fee?.toFixed(2) || "0.00"} €
+                {order.delivery_fee?.toFixed(2) || "0.00"} FCFA
               </p>
             </div>
             <div>

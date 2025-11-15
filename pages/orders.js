@@ -130,7 +130,7 @@ export default function OrdersPage() {
                                 <div className="flex items-center gap-6 mt-4 sm:mt-0">
                                     <div className="text-right">
                                         <p className="text-gray-800 font-semibold">
-                                            {Number(order.total || 0).toFixed(2)} €
+                                            {Number(order.total || 0).toFixed(2)} FCFA
                                         </p>
                                         <div className="text-sm text-gray-500 flex items-center justify-end gap-1">
                                             <CreditCard size={14} />{" "}

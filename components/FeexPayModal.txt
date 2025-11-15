@@ -6,7 +6,7 @@ export default function FeexPayModal({ payment, onClose }) {
     useEffect(() => {
         if (!payment) return;
 
-        //console.log("📌 FeexPayModal payment data :", payment);
+        console.log("📌 FeexPayModal payment data :", payment);
 
         // Injecte le bon SDK FEEXPAY
         const script = document.createElement("script");
@@ -26,7 +26,7 @@ export default function FeexPayModal({ payment, onClose }) {
             const container = document.createElement("div");
             container.id = "render";
             document.body.appendChild(container);
-            const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
+
             window.FeexPayButton.init("render", {
                 token: "fp_NpBZ5JP0ncTGKszqKbYIXs8IYv5vzkhXbx5eZciUCmmc0YMvRGCyVyuUHiV9aMEl",
                 id: "672b15e3c8365bbb9b3ed029",
@@ -38,28 +38,19 @@ export default function FeexPayModal({ payment, onClose }) {
 
                 callback: async (response) => {
                     console.log("FeexPay success :", response);
-                    //response.status === "SUCCESSFUL"
-                    if (response) {
-                        try {
-                            await fetch(`${API_BASE_URL}/payments/feexpay/complete`, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    transaction_id: `tx_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
-                                    custom_id: payment.reference // ta ref interne ou tracking number
-                                })
-                            });
-                        } catch (err) {
-                            console.error("Erreur paiement:", err);
-                            alert("Une erreur est survenue lors de la commande.");
-                        }
-
-
-                    } else {
+                    if (response.status !== "SUCCESS") {
                         console.error("❌ Paiement échoué ou annulé.");
                         return;
                     }
-
+                    const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
+                    await fetch(`${API_BASE_URL}/payments/feexpay/complete`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            transaction_id: response.transaction_id,
+                            custom_id: payment.reference // ta ref interne ou tracking number
+                        })
+                    });
 
                     onClose?.();
                 },
