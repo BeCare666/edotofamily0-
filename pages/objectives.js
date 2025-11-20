@@ -114,7 +114,7 @@ export default function ObjectifsPage() {
       {/* ✨ SECTION SIGNATURE (IMMERSIVE) */}
       <section className="relative w-full h-[70vh] flex items-center justify-center overflow-hidden bg-[#fff7fa]">
         <Image
-          src="/images/woman-soft-bg.avif"
+          src="/images/woman-soft-bg.jpg"
           alt="Vision féminine"
           fill
           className="object-cover opacity-40"
@@ -130,8 +130,8 @@ export default function ObjectifsPage() {
         >
           <Heart size={32} className="text-[#FF6EA9] mx-auto mb-4" />
           <h3 className="text-3xl sm:text-4xl font-semibold text-[#0F172A] leading-snug mb-4">
-            “Chaque soin, chaque produit, chaque mot d’E·Doto
-            est une déclaration d’amour à la féminité.”
+            “Chaque soin, chaque produit, chaque mot d’E·Doto Family
+            est une déclaration d’amour.”
           </h3>
           <p className="text-gray-500">— L’équipe E·Doto Family</p>
         </motion.div>

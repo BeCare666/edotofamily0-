@@ -52,9 +52,9 @@ export default function MissionPage() {
           </h2>
           <p className="text-gray-600 leading-relaxed">
             Apporter à chaque femme et chaque famille un accompagnement de qualité à travers des produits et services
-            centrés sur la **santé sexuelle et reproductive**, la **maternité** et le **bien-être corporel**.
+            centrés sur la santé sexuelle et reproductive, la maternité et le bien-être corporel.
             <br /><br />
-            Nous voulons réconcilier **science, nature et élégance**, pour une expérience de soin douce, sincère et innovante.
+            Nous voulons réconcilier science, nature et élégance, pour une expérience de soin douce, sincère et innovante.
           </p>
         </motion.div>
 
@@ -81,7 +81,7 @@ export default function MissionPage() {
           className="bg-white/60 backdrop-blur-xl border border-[#ffd6e8]/70 rounded-3xl shadow-lg p-6 order-2 md:order-1"
         >
           <img
-            src="/images/vision.avif"
+            src="/images/vision.png"
             alt="Vision E-Doto"
             className="rounded-2xl w-full h-64 object-cover"
           />
@@ -97,9 +97,9 @@ export default function MissionPage() {
             <Leaf className="text-[#FF6EA9]" /> Notre vision
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            Devenir une **référence panafricaine** dans la santé féminine et le bien-être, en combinant **innovation, durabilité et inclusion**.
+            Devenir une référence panafricaine dans la santé sexuelle et le bien-être, en combinant innovation, durabilité et inclusion.
             <br /><br />
-            Nous imaginons un monde où le soin intime et la maternité sont abordés avec **fierté, élégance et savoir**.
+            Nous imaginons un monde où le soin intime et la maternité sont abordés avec fierté, élégance et savoir.
           </p>
         </motion.div>
       </section>
@@ -115,7 +115,7 @@ export default function MissionPage() {
           Nos <span className="text-[#FF6EA9]">engagements</span>.
         </motion.h2>
         <p className="text-gray-600 max-w-2xl mx-auto mb-12">
-          Nous ne sommes pas qu’une marque, nous sommes une **communauté** qui s’engage pour l’éducation, la santé et la confiance féminine.
+          Nous ne sommes pas qu’une marque, nous sommes une communauté qui s’engage pour l’éducation, la santé et la confiance féminine.
         </p>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">

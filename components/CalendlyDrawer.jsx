@@ -1,10 +1,38 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
-
+import { X, LocateFixed } from "lucide-react";
+import SuperCentreSelectorModal from "./SuperCentreSelectorModal";
+import { useEffect, useState } from "react"
+import { useAuthContext } from "../context/AuthContext";
+import { useRouter } from "next/navigation"
 export default function CalendlyDrawerRight({ isOpen, onClose }) {
+const router = useRouter()
+const [showSelector, setShowSelector] = useState(false);
+const [prefill, setPrefill] = useState(null);
+const { user, logout } = useAuthContext();
+useEffect(() => {
+    console.log(isOpen)
+    if (isOpen) {
+         setShowSelector(true);
+        const token = localStorage.getItem("token");
+        if (!token) {
+             router.push('/login')
+            //setShowSelector(true);
+        }
+    }
+}, [isOpen]);
+const handleSelectCentre = (centre) => {
+    setPrefill({
+        name: centre.name,
+        email: centre.email
+    });
+
+    setShowSelector(false);
+};
+
     return (
+        <>
         <AnimatePresence>
             {isOpen && (
                 <>
@@ -58,12 +86,17 @@ export default function CalendlyDrawerRight({ isOpen, onClose }) {
                                 transition={{ delay: 0.1, duration: 0.4 }}
                                 className="w-full h-[550px]  overflow-hidden shadow-inner border border-white/30"
                             >
-                                <iframe
-                                    src="https://calendly.com/edotofamily"
-                                    title="Calendly"
+                               <iframe
+                                    src={
+                                        prefill
+                                            ? `https://calendly.com/edotofamily?name=${encodeURIComponent(
+                                                user.name
+                                            )}&email=${encodeURIComponent(user.email)}`
+                                            : "https://calendly.com/edotofamily"
+                                    }
                                     className="w-full h-full border-0"
-                                    style={{ background: "transparent" }}
                                 />
+
                             </motion.div>
                         </div>
 
@@ -78,10 +111,26 @@ export default function CalendlyDrawerRight({ isOpen, onClose }) {
                             >
                                 Fermer
                             </button>
-                        </div>
+                                            <motion.button
+                onClick={() => setShowSelector(true)}
+                className="fixed bottom-2 right-8 z-50 w-10 h-10 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
+                          flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
+                whileHover={{ rotate: -5 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <LocateFixed className="text-[#FF6EA9]" size={26} />
+              </motion.button>
+                        </div> 
                     </motion.aside>
+                   
                 </>
             )}
         </AnimatePresence>
+          <SuperCentreSelectorModal
+                            isOpen={showSelector}
+                            onClose={() => setShowSelector(false)}
+                            onSelect={handleSelectCentre}
+                    />
+        </>
     );
 }

@@ -66,6 +66,7 @@ export default function FeexPayModal({ payment, onClose }) {
                         if (res.ok && data.processed) {
                             toast.success("Paiement validé 🎉 Votre commande est confirmée.");
                             onClose?.();
+                            window?.FeexPayButton?.close?.();
                             router.push(`/orders/${payment.orderId}`)
                             return;
                         }
@@ -76,6 +77,7 @@ export default function FeexPayModal({ payment, onClose }) {
                                 `Paiement reçu ✔️\nFinalisation en attente (#${data.pendingPaymentId}).`
                             );
                             onClose?.();
+                            window?.FeexPayButton?.close?.();
                             router.push(`/orders/${payment.orderId}`)
                             return;
                         }
@@ -86,6 +88,7 @@ export default function FeexPayModal({ payment, onClose }) {
                             "Le paiement a été capturé, mais une erreur interne a empêché la finalisation. Contactez le support."
                         );
                         onClose?.();
+                        window?.FeexPayButton?.close?.();
                         router.push(`/orders/${payment.orderId}`)
 
                     } catch (err) {
@@ -94,6 +97,7 @@ export default function FeexPayModal({ payment, onClose }) {
                         toast.error(
                             "Erreur réseau. Si le paiement a été débité, contactez le support."
                         );
+                        window?.FeexPayButton?.close?.();
                         onClose?.();
                     }
                 }

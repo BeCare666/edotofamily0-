@@ -6,6 +6,7 @@ import Image from "next/image"
 import Link from "next/link"
 import logo from "../public/logo/logo.png"
 import { useAuthContext } from "../context/AuthContext";
+import GoogleFormDrawer from "./GoogleFormDrawer";
 import toast from "react-hot-toast"
 import {
   Home, Info, Phone, Target, Flag, FileText, Shield,
@@ -26,6 +27,7 @@ const links = [
 
 export default function DrawerMenu({ isOpen, onClose }) {
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [openForm, setOpenForm] = useState(false);
   // const [user, setUser] = useState(false)
   const { user, logout } = useAuthContext();
   console.log("User in DrawerMenu:", user);
@@ -155,9 +157,14 @@ export default function DrawerMenu({ isOpen, onClose }) {
                 </Link>
               </li>
             ))}
+            <p onClick={() => setOpenForm(true)} className="hidden cursor-pointer">💼 Devenir Point de Retrait</p>
           </ul>
         </nav>
-
+        <GoogleFormDrawer
+          isOpen={openForm}
+          onClose={() => setOpenForm(false)}
+          formUrl="https://docs.google.com/forms/d/e/1FAIpQLScY-R5SkFwByPEDyzW7AxVmEoEc2NSTI4RYYtvlp0w0jhEIjg/viewform?usp=publish-editor"
+        />
         {/* FOOTER / RESEAUX SOCIAUX */}
         <div className="mt-10 border-t border-[#ffd6e8]/50 pt-5 text-center">
           <p className="text-xs text-gray-500 mb-3 uppercase tracking-widest">

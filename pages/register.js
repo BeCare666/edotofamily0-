@@ -69,7 +69,7 @@ export default function RegisterPage() {
                 initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
                 animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                 transition={{ duration: 0.7, ease: "easeOut" }}
-                className="relative z-10 bg-white/70 backdrop-blur-2xl border border-white/40 mt-7 px-8 pt-20 pb-10 w-full max-w-md mx-auto"
+                className="relative z-10 bg-white/70 backdrop-blur-2xl border border-white/40 mt-7 px-8 pt-20 pb-10 w-full max-w-md mx-auto rounded-2xl shadow-lg"
             >
                 {/* Logo animé */}
                 <motion.div

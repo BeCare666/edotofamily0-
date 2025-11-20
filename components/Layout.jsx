@@ -8,6 +8,7 @@ export default function Layout({ children }) {
   const isHomePage =
     pathname === "/login" ||
     pathname === "/register" ||
+     pathname === "/pickup-dashboard" ||
     pathname.startsWith("/category") ||
     pathname.startsWith("/product") ||
     pathname.startsWith("/orders") ||

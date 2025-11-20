@@ -129,7 +129,7 @@ export default function ServicesPage() {
             {/* IMAGE SIGNATURE */}
             <section className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden">
                 <Image
-                    src="/images/service-bg.avif"
+                    src="/images/service-bg.jpg"
                     alt="E·Doto Service"
                     fill
                     className="object-cover opacity-40"

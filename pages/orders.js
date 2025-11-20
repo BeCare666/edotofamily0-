@@ -15,20 +15,24 @@ import { motion } from "framer-motion";
 import toast from "react-hot-toast"
 import { authService } from "../services/authService";
 import { useRouter } from "next/navigation";
+
 export default function OrdersPage() {
     const [orders, setOrders] = useState([]);
     const [pagination, setPagination] = useState({});
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
+
+    // 🔍 Search
+    const [search, setSearch] = useState("");
+    const [typing, setTyping] = useState(false);
+
     const router = useRouter()
     const user = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
     useEffect(() => {
-        console.log("first")
         if (!user) {
             router.push("/login")
         }
-        console.log("after")
         fetchOrders(page);
     }, [user, page]);
 
@@ -36,7 +40,6 @@ export default function OrdersPage() {
         setLoading(true);
         try {
             const me = await authService.me();
-            console.log("Profil utilisateur connecté :", me);
             const token = localStorage.getItem("token");
             const res = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/orders?customer_id=${me.id}&page=${page}&limit=5`, {
                 headers: {
@@ -44,7 +47,7 @@ export default function OrdersPage() {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
-            console.log("Réponse des commandes :", res);
+
             const data = await res.json();
             setOrders(
                 (data.data || []).map(o => ({
@@ -57,7 +60,6 @@ export default function OrdersPage() {
             setPagination(data);
         } catch (error) {
             toast.error("Erreur lors du chargement des commandes");
-            console.error(error);
         } finally {
             setLoading(false);
         }
@@ -85,6 +87,46 @@ export default function OrdersPage() {
         <div className="max-w-5xl mx-auto px-4 py-10">
             <h1 className="text-3xl font-bold text-[#0F172A] mb-8">📦 Mes Commandes</h1>
 
+            {/* 🔍 Barre de recherche moderne */}
+            <div className="mb-6 w-full flex justify-center">
+                <div className="
+                    relative w-full max-w-md
+                    bg-white/60 backdrop-blur-xl
+                    border border-gray-200
+                    shadow-sm rounded-2xl
+                    flex items-center px-4 py-3
+                    transition-all duration-300
+                    focus-within:ring-2 focus-within:ring-[#FF6EA9]/40 focus-within:border-[#FF6EA9]
+                ">
+                    {typing ? (
+                        <RefreshCcw className="w-5 h-5 text-[#FF6EA9] animate-spin" />
+                    ) : (
+                        <Package className="w-5 h-5 text-gray-400" />
+                    )}
+
+                    <input
+                        type="text"
+                        placeholder="Rechercher une commande (tracking, OTP...)"
+                        className="ml-3 bg-transparent outline-none w-full placeholder:text-gray-400 text-gray-700"
+                        value={search}
+                        onChange={(e) => {
+                            setTyping(true);
+                            setSearch(e.target.value);
+                            setTimeout(() => setTyping(false), 300);
+                        }}
+                    />
+
+                    {search.length > 0 && (
+                        <button
+                            onClick={() => setSearch("")}
+                            className="absolute right-4 text-gray-400 hover:text-gray-500 transition"
+                        >
+                            <XCircle size={18} />
+                        </button>
+                    )}
+                </div>
+            </div>
+
             {loading ? (
                 <div className="flex justify-center items-center h-60 text-gray-500">
                     <Clock className="animate-spin-slow mr-2" /> Chargement des commandes...
@@ -98,70 +140,76 @@ export default function OrdersPage() {
             ) : (
                 <>
                     <div className="bg-white/70 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-md divide-y divide-gray-100">
-                        {orders.map((order) => (
-                            <motion.div
-                                key={order.id}
-                                whileHover={{ scale: 1.01 }}
-                                onClick={() => router.push(`/orders/${order.id}`)} // 🔥 redirection ici
-                                className="flex items-center cursor-pointer justify-between flex-wrap sm:flex-nowrap p-5 transition-all hover:bg-[#fff5f8] rounded-2xl"
-                            >
-                                {/* Left */}
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-[#FF6EA9]/10 rounded-xl">
-                                        {getStatusIcon(order.order_status)}
-                                    </div>
 
-                                    <div>
-                                        <p className="font-semibold text-[#0F172A]">
-                                            Commande #{order.tracking_number}
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            Passée le{" "}
-                                            {new Date(order.created_at).toLocaleDateString("fr-FR", {
-                                                year: "numeric",
-                                                month: "long",
-                                                day: "numeric",
-                                            })}
-                                        </p>
-                                    </div>
-                                </div>
+                        {orders
+                            .filter((o) => {
+                                const q = search.toLowerCase();
+                                return (
+                                    o.tracking_number?.toLowerCase().includes(q) ||
+                                    o.otp_code?.toString().includes(q)
+                                );
+                            })
+                            .map((order) => (
+                                <motion.div
+                                    key={order.id}
+                                    whileHover={{ scale: 1.01 }}
+                                    onClick={() => router.push(`/orders/${order.id}`)}
+                                    className="flex items-center cursor-pointer justify-between flex-wrap sm:flex-nowrap p-5 transition-all hover:bg-[#fff5f8] rounded-2xl"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-[#FF6EA9]/10 rounded-xl">
+                                            {getStatusIcon(order.order_status)}
+                                        </div>
 
-                                {/* Right */}
-                                <div className="flex items-center gap-6 mt-4 sm:mt-0">
-                                    <div className="text-right">
-                                        <p className="text-gray-800 font-semibold">
-                                            {Number(order.total || 0).toFixed(2)} FCFA
-                                        </p>
-                                        <div className="text-sm text-gray-500 flex items-center justify-end gap-1">
-                                            <CreditCard size={14} />{" "}
-                                            {order.payment_status.replace("payment-", "").replace(/-/g, " ")}
+                                        <div>
+                                            <p className="font-semibold text-[#0F172A]">
+                                                Commande #{order.tracking_number}
+                                            </p>
+                                            <p className="text-sm text-gray-500">
+                                                Passée le{" "}
+                                                {new Date(order.created_at).toLocaleDateString("fr-FR", {
+                                                    year: "numeric",
+                                                    month: "long",
+                                                    day: "numeric",
+                                                })}
+                                            </p>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col items-end">
-                                        <span
-                                            className={`text-sm font-medium capitalize ${order.order_status === "order-completed"
-                                                ? "text-green-600"
-                                                : order.order_status === "order-processing"
-                                                    ? "text-blue-600"
-                                                    : order.order_status === "order-pending"
-                                                        ? "text-amber-600"
-                                                        : order.order_status === "order-cancelled"
-                                                            ? "text-red-600"
-                                                            : "text-gray-600"
-                                                }`}
-                                        >
-                                            {order.order_status.replace("order-", "").replace(/-/g, " ")}
-                                        </span>
-                                    </div>
+                                    <div className="flex items-center gap-6 mt-4 sm:mt-0">
+                                        <div className="text-right">
+                                            <p className="text-gray-800 font-semibold">
+                                                {Number(order.total || 0).toFixed(2)} FCFA
+                                            </p>
+                                            <div className="text-sm text-gray-500 flex items-center justify-end gap-1">
+                                                <CreditCard size={14} />{" "}
+                                                {order.payment_status.replace("payment-", "").replace(/-/g, " ")}
+                                            </div>
+                                        </div>
 
-                                    <ChevronRight className="text-gray-300" size={18} />
-                                </div>
-                            </motion.div>
-                        ))}
+                                        <div className="flex flex-col items-end">
+                                            <span
+                                                className={`text-sm font-medium capitalize ${order.order_status === "order-completed"
+                                                    ? "text-green-600"
+                                                    : order.order_status === "order-processing"
+                                                        ? "text-blue-600"
+                                                        : order.order_status === "order-pending"
+                                                            ? "text-amber-600"
+                                                            : order.order_status === "order-cancelled"
+                                                                ? "text-red-600"
+                                                                : "text-gray-600"
+                                                    }`}
+                                            >
+                                                {order.order_status.replace("order-", "").replace(/-/g, " ")}
+                                            </span>
+                                        </div>
+
+                                        <ChevronRight className="text-gray-300" size={18} />
+                                    </div>
+                                </motion.div>
+                            ))}
                     </div>
 
-                    {/* Pagination */}
                     <div className="flex justify-center mt-8 gap-3">
                         <button
                             onClick={() => page > 1 && setPage(page - 1)}
@@ -186,7 +234,7 @@ export default function OrdersPage() {
                     </div>
                 </>
             )}
-            {/* Bouton retour flottant */}
+
             <motion.button
                 onClick={() => router.back()}
                 className="fixed bottom-8 left-8 z-50 w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
