@@ -65,8 +65,10 @@ export default function FeexPayModal({ payment, onClose }) {
                         /** 🔥 Cas 1 : Tout a fonctionné */
                         if (res.ok && data.processed) {
                             toast.success("Paiement validé 🎉 Votre commande est confirmée.");
-                            onClose?.();
-                            window?.FeexPayButton?.close?.();
+                            // 🔥 Fermer la modal FeexPay correctement
+                            document
+                                .querySelectorAll(".feexpay-modal-overlay.active")
+                                .forEach(el => el.classList.remove("active"));
                             router.push(`/orders/${payment.orderId}`)
                             return;
                         }
@@ -76,8 +78,10 @@ export default function FeexPayModal({ payment, onClose }) {
                             toast.success(
                                 `Paiement reçu ✔️\nFinalisation en attente (#${data.pendingPaymentId}).`
                             );
-                            onClose?.();
-                            window?.FeexPayButton?.close?.();
+                            // 🔥 Fermer la modal FeexPay correctement
+                            document
+                                .querySelectorAll(".feexpay-modal-overlay.active")
+                                .forEach(el => el.classList.remove("active"));
                             router.push(`/orders/${payment.orderId}`)
                             return;
                         }
@@ -87,9 +91,11 @@ export default function FeexPayModal({ payment, onClose }) {
                         toast.error(
                             "Le paiement a été capturé, mais une erreur interne a empêché la finalisation. Contactez le support."
                         );
-                        onClose?.();
-                        window?.FeexPayButton?.close?.();
-                        router.push(`/orders/${payment.orderId}`)
+                        // 🔥 Fermer la modal FeexPay correctement
+                        document
+                            .querySelectorAll(".feexpay-modal-overlay.active")
+                            .forEach(el => el.classList.remove("active"));
+                        router.push(`/orders/${payment.orderId}`);
 
                     } catch (err) {
                         /** ❌ Cas 4 : Erreur réseau */

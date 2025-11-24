@@ -87,19 +87,10 @@ export default function CategoryPage() {
 
   /* === USE THIS useEffect (robuste) === */
   useEffect(() => {
-    // IMPORTANT: router must be in scope (const router = useRouter(); above)
+    if (!router.isReady) return;
 
-    if (!router) return;
-
-    // Wait for router to be ready (avoids undefined slug on first render)
-    if (!router.isReady) {
-      console.log("[products] router not ready yet");
-      return;
-    }
-
+    // --- On extrait categories_id une seule fois ---
     const categories_id = extractCategoriesId(router);
-    console.log("[products] extracted categories_id:", categories_id);
-
     if (!categories_id) {
       console.warn("[products] pas de categories_id trouvé — abort fetch");
       return;
@@ -107,7 +98,6 @@ export default function CategoryPage() {
 
     const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
     if (!API_BASE_URL) {
-      console.error("[products] NEXT_PUBLIC_REST_API_ENDPOINT non défini !");
       setError("Erreur de configuration: API non définie.");
       return;
     }
@@ -117,16 +107,14 @@ export default function CategoryPage() {
     const load = async () => {
       setLoading(true);
       setError(null);
+
       try {
         const params = new URLSearchParams();
         params.set("categories_id", String(categories_id));
         params.set("limit", "100");
         params.set("offset", "0");
 
-        // `query` ici = ton état de recherche (assure-toi qu'il existe dans le scope)
-        if (typeof query === "string" && query.trim()) {
-          params.set("search", query.trim());
-        }
+        if (query.trim()) params.set("search", query.trim());
 
         params.set(
           "orderBy",
@@ -136,6 +124,7 @@ export default function CategoryPage() {
               ? "price"
               : "created_at"
         );
+
         params.set(
           "sortedBy",
           sortBy === "price-asc" ? "asc" : sortBy === "price-desc" ? "desc" : "desc"
@@ -148,34 +137,29 @@ export default function CategoryPage() {
         if (!res.ok) throw new Error(`Erreur serveur ${res.status}`);
 
         const json = await res.json();
-        console.log("[products] API response:", json);
-
         const rows = json?.data ?? json ?? [];
-        setProducts(
-          rows.map((r) => ({
-            id: r.id,
-            name: r.name,
-            price: r.price != null ? Number(r.price) : null,
-            image:
-              r.image && typeof r.image === "string"
-                ? tryParseImage(r.image)
-                : r.image || null,
-            desc: r.description || r.desc || r.short_description || "",
-            benefits: r.benefits || [],
-            is_new: !!r.is_new,
-            popular: !!r.popular,
-            type: r.product_type || r.type || "unknown",
-            shop: r.shop || null,
-            raw: r,
-          }))
-        );
+
+        // --- on map une seule fois ---
+        const parsed = rows.map(r => ({
+          id: r.id,
+          name: r.name,
+          price: Number(r.price) || null,
+          image: r.image ? tryParseImage(r.image) : null,
+          desc: r.description || r.desc || "",
+          benefits: r.benefits || [],
+          is_new: !!r.is_new,
+          popular: !!r.popular,
+          type: r.product_type || r.type || "unknown",
+          shop: r.shop || null,
+          raw: r,
+        }));
+
+        setProducts(parsed);
         setTotal(Number(json?.total ?? json?.count ?? rows.length));
       } catch (err) {
-        if (err.name === "AbortError") {
-          console.log("[products] fetch aborted");
-        } else {
-          console.error("[products] erreur chargement produits:", err);
-          setError("Impossible de charger les produits pour le moment.");
+        if (err.name !== "AbortError") {
+          console.error(err);
+          setError("Impossible de charger les produits.");
         }
       } finally {
         setLoading(false);
@@ -183,9 +167,10 @@ export default function CategoryPage() {
     };
 
     load();
+
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, router.asPath, router.query?.slug, query, sortBy]);
+  }, [router.isReady, query, sortBy]);
+
 
   // helper to parse an image field that might be JSON string or CSV
   function tryParseImage(imgField) {
@@ -402,9 +387,9 @@ export default function CategoryPage() {
               >
                 {/* Image Section */}
                 <div className="relative w-full h-60 overflow-hidden rounded-t-[5px] ">
-                  {p.image?.url ? (
+                  {p.image && p.image[0] ? (
                     <img
-                      src={p.image.url}
+                      src={p.image[0].url}
                       alt={p.name}
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                     />

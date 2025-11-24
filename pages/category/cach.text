@@ -1,0 +1,100 @@
+  useEffect(() => {
+    // IMPORTANT: router must be in scope (const router = useRouter(); above)
+
+    if (!router) return;
+
+    // Wait for router to be ready (avoids undefined slug on first render)
+    if (!router.isReady) {
+      console.log("[products] router not ready yet");
+      return;
+    }
+
+    const categories_id = extractCategoriesId(router);
+    console.log("[products] extracted categories_id:", categories_id);
+
+    if (!categories_id) {
+      console.warn("[products] pas de categories_id trouvé — abort fetch");
+      return;
+    }
+
+    const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
+    if (!API_BASE_URL) {
+      console.error("[products] NEXT_PUBLIC_REST_API_ENDPOINT non défini !");
+      setError("Erreur de configuration: API non définie.");
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams();
+        params.set("categories_id", String(categories_id));
+        params.set("limit", "100");
+        params.set("offset", "0");
+
+        // `query` ici = ton état de recherche (assure-toi qu'il existe dans le scope)
+        if (typeof query === "string" && query.trim()) {
+          params.set("search", query.trim());
+        }
+
+        params.set(
+          "orderBy",
+          sortBy === "relevance"
+            ? "created_at"
+            : sortBy.includes("price")
+              ? "price"
+              : "created_at"
+        );
+        params.set(
+          "sortedBy",
+          sortBy === "price-asc" ? "asc" : sortBy === "price-desc" ? "desc" : "desc"
+        );
+
+        const url = `${API_BASE_URL}/products/corridor?${params.toString()}`;
+        console.log("[products] fetching URL:", url);
+
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`Erreur serveur ${res.status}`);
+
+        const json = await res.json();
+        console.log("[products] API response:", json);
+
+        const rows = json?.data ?? json ?? [];
+        setProducts(
+          rows.map((r) => ({
+            id: r.id,
+            name: r.name,
+            price: r.price != null ? Number(r.price) : null,
+            image:
+              r.image && typeof r.image === "string"
+                ? tryParseImage(r.image)
+                : r.image || null,
+            desc: r.description || r.desc || r.short_description || "",
+            benefits: r.benefits || [],
+            is_new: !!r.is_new,
+            popular: !!r.popular,
+            type: r.product_type || r.type || "unknown",
+            shop: r.shop || null,
+            raw: r,
+          }))
+        );
+        setTotal(Number(json?.total ?? json?.count ?? rows.length));
+      } catch (err) {
+        if (err.name === "AbortError") {
+          console.log("[products] fetch aborted");
+        } else {
+          console.error("[products] erreur chargement produits:", err);
+          setError("Impossible de charger les produits pour le moment.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, router.asPath, router.query?.slug, query, sortBy]);

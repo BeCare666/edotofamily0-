@@ -17,7 +17,7 @@ import {
   LocateFixed,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import toast from "react-hot-toast";
 // 🟣 CONFIG
 const PAGE_SIZE = 6;
 
@@ -42,97 +42,122 @@ export default function OrderDetailsPage() {
     if (id) fetchOrderDetails(id);
   }, [id]);
 
-const fetchOrderDetails = async (id) => {
-  try {
-    setLoading(true);
+  const fetchOrderDetails = async (id) => {
+    try {
+      setLoading(true);
 
-    const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token");
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/orders/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/orders/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+      console.log("viens vois", data)
+
+      setOrder({
+        ...data,
+        products: (data.products || []).map((p) => ({
+          ...p,
+          price: Number(p.price || 0),
+          quantity: Number(p.quantity || 0),
+        })),
+      });
+
+      // ⚠️ C’est bien data.status (et pas data.order_status)
+      if (!data.pickup_point_id && (!data.note || data.note === "")) {
+        // Aucun des deux n'est rempli → OUVRIR modal
+        setShopModalButton(true);
+        fetchPickupPoints();
+        setTimeout(() => setModalOpen(true), 400);
+      } else {
+        // Au moins un existe → FERMER modal
+        setModalOpen(false);
+        setShopModalButton(false);
       }
-    );
 
-    const data = await res.json();
-    console.log("viens vois", data)
-    setOrder({
-      ...data,
-      products: (data.products || []).map((p) => ({
-        ...p,
-        price: Number(p.price || 0),
-        quantity: Number(p.quantity || 0),
-      })),
-    });
 
-    // ⚠️ C’est bien data.status (et pas data.order_status)
-    if (data.pickup_point_id === null) {
-      setShopModalButton(true)
-      fetchPickupPoints();
-      setTimeout(() => setModalOpen(true), 400);
+    } catch (error) {
+      console.error("Erreur:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-  } catch (error) {
-    console.error("Erreur:", error);
-  } finally {
-    setLoading(false);
+
+  const fetchPickupPoints = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/users?role=super_pickuppoint&limit=100`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+      console.log('data', data)
+
+      setPickupPoints(Array.isArray(data.data) ? data.data : []);;
+    } catch (e) {
+      console.error("Erreur:", e);
+    }
+  };
+
+  // function to showOrNo the list pickuppoin
+
+  const setCashselectpickuppointF = async () => {
+    setCashselectpickuppoint(false)
   }
-};
-
-
-const fetchPickupPoints = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/users?role=super_pickuppoint&limit=100`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const data = await res.json();
-    console.log('data', data)
-
-    setPickupPoints(Array.isArray(data.data) ? data.data : []);;
-  } catch (e) {
-    console.error("Erreur:", e);
+  const setCashselectpickuppointFF = async () => {
+    setCashselectpickuppoint(true)
   }
-};
-
-// function to showOrNo the list pickuppoin
-
-const setCashselectpickuppointF = async ( )=>{
-  setCashselectpickuppoint(false)
-}
-const setCashselectpickuppointFF = async ( )=>{
-  setCashselectpickuppoint(true)
-}
   // 🟣 UPDATE pickup point
   const selectPickupPoint = async (pickupPointId) => {
     const token = localStorage.getItem("token");
     console.log('les id', pickupPointId, id)
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/orders/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", 
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          pickup_point_id: pickupPointId,
-          note: customNote || null,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/orders/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            pickup_point_id: pickupPointId,
+            note: customNote || null,
+          }),
+        }
+      );
 
+      const data = await response.json().catch(() => ({}));
+
+      // ❌ Erreur serveur
+      if (!response.ok) {
+        toast.error(data?.message || "Impossible de mettre à jour le point de retrait.");
+        return;
+      }
+
+      // ✔️ Succès
+      toast.success("Point de retrait sélectionné avec succès !");
       setModalOpen(false);
+      //console.log(modalOpen)
       fetchOrderDetails(id);
+      //console.log("voici les datats", order) 
     } catch (e) {
       console.error("Erreur:", e);
+
+      // ❌ Erreur réseau ou crash côté client
+      toast.error("Erreur réseau. Veuillez réessayer.");
     }
   };
 
@@ -209,14 +234,14 @@ const setCashselectpickuppointFF = async ( )=>{
           </div>
           <div className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
             <p className="text-sm text-gray-500">Statut</p>
-           {order?.order_status && (
-            <div className="flex items-center gap-2 mt-1">
-              {getStatusIcon(order.order_status)}
-              <span className="font-semibold capitalize">
-                {order.order_status.replace("order-", "").replace(/-/g, " ")}
-              </span>
-            </div>
-          )}
+            {order?.order_status && (
+              <div className="flex items-center gap-2 mt-1">
+                {getStatusIcon(order.order_status)}
+                <span className="font-semibold capitalize">
+                  {order.order_status.replace("order-", "").replace(/-/g, " ")}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -278,10 +303,10 @@ const setCashselectpickuppointFF = async ( )=>{
             </h2>
             <p className="text-sm text-gray-700 whitespace-pre-line">
               {order.pickup_point
-              ? order.pickup_point.name
-              : order.note
-              ? order.note
-              : "Non spécifiée"}
+                ? order.pickup_point.name
+                : order.note
+                  ? order.note
+                  : "Non spécifiée"}
             </p>
           </div>
           <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
@@ -334,17 +359,17 @@ const setCashselectpickuppointFF = async ( )=>{
       {/* --------------------------------------------------------------------- */}
       {/* BOUTON FLOTTANT POUR RÉOUVRIR MODAL */}
       {/* --------------------------------------------------------------------- */}
-        {shopModalButton && (
-                <motion.button
-                onClick={() => setModalOpen(true)}
-                className="fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
+      {shopModalButton && (
+        <motion.button
+          onClick={() => setModalOpen(true)}
+          className="fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
                           flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
-                whileHover={{ rotate: -5 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <LocateFixed className="text-[#FF6EA9]" size={26} />
-              </motion.button>
-        )}
+          whileHover={{ rotate: -5 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <LocateFixed className="text-[#FF6EA9]" size={26} />
+        </motion.button>
+      )}
 
 
       {/* --------------------------------------------------------------------- */}
@@ -371,89 +396,89 @@ const setCashselectpickuppointFF = async ( )=>{
                   <XCircle size={26} />
                 </button>
               </div>
-            {cashselectpickuppoint && (
-              <>
-                            {/* SEARCH */}
-                          <div className="relative mb-4">
-                            <Search className="absolute left-3 top-3 text-gray-400" size={18} />
-                            <input
-                              type="text"
-                              placeholder="Rechercher un point..."
-                              className="w-full pl-10 pr-3 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-300"
-                              value={search}
-                              onChange={(e) => {
-                                setSearch(e.target.value);
-                                setPage(1);
-                              }}
-                            />
-                          </div>
+              {cashselectpickuppoint && (
+                <>
+                  {/* SEARCH */}
+                  <div className="relative mb-4">
+                    <Search className="absolute left-3 top-3 text-gray-400" size={18} />
+                    <input
+                      type="text"
+                      placeholder="Rechercher un point..."
+                      className="w-full pl-10 pr-3 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-300"
+                      value={search}
+                      onChange={(e) => {
+                        setSearch(e.target.value);
+                        setPage(1);
+                      }}
+                    />
+                  </div>
 
-                          {/* LISTE */}
-                          <div className="max-h-80 overflow-y-auto pr-2">
-                            {pageData.map((p) => (
-                              <div
-                                key={p.id}
-                                className="p-4 border rounded-xl mb-3 hover:border-pink-400 cursor-pointer transition"
-                                onClick={() => selectPickupPoint(p.id)}
-                              >
-                                <p className="font-semibold">{p.name}</p>
-                                <p className="text-sm text-gray-500">{p.address}</p>
-                              </div>
-                            ))}
+                  {/* LISTE */}
+                  <div className="max-h-80 overflow-y-auto pr-2">
+                    {pageData.map((p) => (
+                      <div
+                        key={p.id}
+                        className="p-4 border rounded-xl mb-3 hover:border-pink-400 cursor-pointer transition"
+                        onClick={() => selectPickupPoint(p.id)}
+                      >
+                        <p className="font-semibold">{p.name}</p>
+                        <p className="text-sm text-gray-500">{p.address}</p>
+                      </div>
+                    ))}
 
-                            {pageData.length === 0 && (
-                              <p className="text-center text-gray-500 py-6">Aucun résultat</p>
-                            )}
-                          </div>
+                    {pageData.length === 0 && (
+                      <p className="text-center text-gray-500 py-6">Aucun résultat</p>
+                    )}
+                  </div>
 
-                          {/* PAGINATION */}
-                          <div className="flex justify-between mt-4">
-                            <button
-                              disabled={page === 1}
-                              onClick={() => setPage((p) => p - 1)}
-                              className="px-3 py-1 text-sm border rounded-lg disabled:opacity-30"
-                            >
-                              Précédent
-                            </button>
+                  {/* PAGINATION */}
+                  <div className="flex justify-between mt-4">
+                    <button
+                      disabled={page === 1}
+                      onClick={() => setPage((p) => p - 1)}
+                      className="px-3 py-1 text-sm border rounded-lg disabled:opacity-30"
+                    >
+                      Précédent
+                    </button>
 
-                            <button
-                              disabled={page === totalPages}
-                              onClick={() => setPage((p) => p + 1)}
-                              className="px-3 py-1 text-sm border rounded-lg disabled:opacity-30"
-                            >
-                              Suivant
-                            </button>
-                          </div>
-                        <p className="font-medium mb-2 text-center items-center mt-5 cursor-pointer text-[#FF6EA9]"
-                        onClick={setCashselectpickuppointF}
-                        >Décrire un point personnalisé</p>
-              </>
-            )}
-            {!cashselectpickuppoint && (
-              <>
-                            {/* NOTE PERSO */}
-              <div className="mt-6">
-                <p className="font-medium mb-2 ">Décrire un point personnalisé</p>
-                <textarea
-                  rows={3}
-                  className="w-full border rounded-xl p-3 focus:ring-pink-300 focus:ring-2"
-                  placeholder="Décrire l’endroit ici…"
-                  value={customNote}
-                  onChange={(e) => setCustomNote(e.target.value)}
-                ></textarea>
+                    <button
+                      disabled={page === totalPages}
+                      onClick={() => setPage((p) => p + 1)}
+                      className="px-3 py-1 text-sm border rounded-lg disabled:opacity-30"
+                    >
+                      Suivant
+                    </button>
+                  </div>
+                  <p className="font-medium mb-2 text-center items-center mt-5 cursor-pointer text-[#FF6EA9]"
+                    onClick={setCashselectpickuppointF}
+                  >Décrire un point personnalisé</p>
+                </>
+              )}
+              {!cashselectpickuppoint && (
+                <>
+                  {/* NOTE PERSO */}
+                  <div className="mt-6">
+                    <p className="font-medium mb-2 ">Décrire un point personnalisé</p>
+                    <textarea
+                      rows={3}
+                      className="w-full border rounded-xl p-3 focus:ring-pink-300 focus:ring-2"
+                      placeholder="Décrire l’endroit ici…"
+                      value={customNote}
+                      onChange={(e) => setCustomNote(e.target.value)}
+                    ></textarea>
 
-                <button
-                  onClick={() => selectPickupPoint(null)}
-                  className="mt-3 w-full bg-[#FF6EA9] text-white py-2 rounded-xl hover:bg-[#ff5599]"
-                >
-                  Utiliser ce lieu
-                </button>
-              </div>
-               <p className="font-medium mb-2 text-center items-center text-[#FF6EA9] mt-5 cursor-pointer"
-             onClick={setCashselectpickuppointFF}
-            >Ou sélectionner un point de retrait</p>
-              </>
-            )}
+                    <button
+                      onClick={() => selectPickupPoint(null)}
+                      className="mt-3 w-full bg-[#FF6EA9] text-white py-2 rounded-xl hover:bg-[#ff5599]"
+                    >
+                      Utiliser ce lieu
+                    </button>
+                  </div>
+                  <p className="font-medium mb-2 text-center items-center text-[#FF6EA9] mt-5 cursor-pointer"
+                    onClick={setCashselectpickuppointFF}
+                  >Ou sélectionner un point de retrait</p>
+                </>
+              )}
 
             </motion.div>
           </motion.div>
