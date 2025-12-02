@@ -12,7 +12,7 @@ export const Home: React.FC<HomeProps> = ({ changeView }) => {
     <>
       <Hero />
 
-      {/* Services Section */}
+      {/* Services Section *********/}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
