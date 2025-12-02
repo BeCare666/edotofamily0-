@@ -22,8 +22,8 @@ export default function Layout({ children }) {
       </main>
 
       {/* Footer visible uniquement sur la page d’accueil 
-       <FooterLogo />*/}
-      {!isHomePage && <FooterLogo />}
+       <FooterLogo />
+      {!isHomePage && <FooterLogo />}*/}
     </div>
   )
 }

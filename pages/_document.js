@@ -4,7 +4,7 @@ export default function Document() {
     return (
         <Html lang="fr">
             <Head>
-                {/* Fonts Google correctement placées ici */}
+                {/* Fonts Google correctement placées ici **/}
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
                 { /*link for logo or favicon*/}
@@ -14,7 +14,8 @@ export default function Document() {
                     rel="stylesheet"
                 />
             </Head>
-            <body>
+            <body className="bg-slate-50 text-slate-800 antialiased selection:bg-pink-200 selection:text-pink-900">
+
                 <Main />
                 <NextScript />
             </body>
