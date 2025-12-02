@@ -404,66 +404,84 @@ const ModalPickup = ({
     close();
   };
 
-  return (
-    <AnimatePresence>
-      <motion.div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[300]"
-      initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}>
+return (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[300]">
 
-        <motion.div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-lg"
-        initial={{ scale: 0.9, opacity: 0 }}
-  animate={{ scale: 1, opacity: 1 }}
-  exit={{ scale: 0.9, opacity: 0 }}>
+    <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-lg">
 
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Choisir un point de retrait</h2>
-            <button onClick={close}><XCircle size={26} /></button>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Choisir un point de retrait</h2>
+        <button onClick={close}><XCircle size={26} /></button>
+      </div>
+
+      {!customMode && (
+        <>
+          <input
+            type="text"
+            placeholder="Rechercher..."
+            className="w-full mb-4 p-2 border rounded-xl"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+          />
+
+          <div className="max-h-80 overflow-y-auto pr-2">
+            {pageData.map((p: any) => (
+              <div
+                key={p.id}
+                onClick={() => setSelected(p.id)}
+                className={`p-4 border rounded-xl mb-3 cursor-pointer ${
+                  selected === p.id
+                    ? 'bg-pink-50 border-pink-500'
+                    : 'hover:border-pink-400'
+                }`}
+              >
+                <p className="font-semibold">{p.name}</p>
+                <p className="text-sm text-gray-500">{p.address}</p>
+              </div>
+            ))}
           </div>
 
-          {!customMode && (
-            <>
-              <input
-                type="text"
-                placeholder="Rechercher..."
-                className="w-full mb-4 p-2 border rounded-xl"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-              />
+          <p
+            className="text-center text-[#FF6EA9] mt-5 cursor-pointer"
+            onClick={() => setCustomMode(true)}
+          >
+            Décrire un point personnalisé
+          </p>
+        </>
+      )}
 
-              <div className="max-h-80 overflow-y-auto pr-2">
-                {pageData.map((p: any) => (
-                  <div
-                    key={p.id}
-                    onClick={() => setSelected(p.id)}
-                    className={`p-4 border rounded-xl mb-3 cursor-pointer ${selected === p.id ? 'bg-pink-50 border-pink-500' : 'hover:border-pink-400'}`}
-                  >
-                    <p className="font-semibold">{p.name}</p>
-                    <p className="text-sm text-gray-500">{p.address}</p>
-                  </div>
-                ))}
-              </div>
+      {customMode && (
+        <>
+          <textarea
+            rows={3}
+            className="w-full border rounded-xl p-3"
+            value={customNote}
+            placeholder="Décrire l’endroit..."
+            onChange={(e) => setCustomNote(e.target.value)}
+          />
 
-              <p className="text-center text-[#FF6EA9] mt-5 cursor-pointer" onClick={() => setCustomMode(true)}>Décrire un point personnalisé</p>
-            </>
-          )}
+          <p
+            className="text-center text-[#FF6EA9] mt-5 cursor-pointer"
+            onClick={() => setCustomMode(false)}
+          >
+            Retour
+          </p>
+        </>
+      )}
 
-          {customMode && (
-            <>
-              <textarea rows={3} className="w-full border rounded-xl p-3" value={customNote} placeholder="Décrire l’endroit..." onChange={(e) => setCustomNote(e.target.value)} />
+      {/* Bouton valider */}
+      <button
+        onClick={choosePickup}
+        className="mt-6 w-full bg-slate-900 text-white py-3 rounded-xl"
+      >
+        Confirmer
+      </button>
 
-              <p className="text-center text-[#FF6EA9] mt-5 cursor-pointer" onClick={() => setCustomMode(false)}>Retour</p>
-            </>
-          )}
+    </div>
+  </div>
+);
 
-          {/* BOUTON CONFIRMER */}
-          <button onClick={choosePickup} className="mt-6 w-full bg-slate-900 text-white py-3 rounded-xl">Confirmer</button>
-
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  );
 };
