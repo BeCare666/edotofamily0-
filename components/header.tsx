@@ -327,7 +327,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                                 else if (isCenters) setOpenCalendly(true);
                                 else if (isAbout) router.push("/about");
                                 else if (isHome) router.push("/");
-                                else router.push(item.href); // fallback
+                                else router.push('/'); // fallback
 
                                 setIsMenuOpen(false);
                             };
