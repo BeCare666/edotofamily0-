@@ -406,9 +406,15 @@ const ModalPickup = ({
 
   return (
     <AnimatePresence>
-      <motion.div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[300]">
+      <motion.div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[300]"
+      initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}>
 
-        <motion.div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-lg">
+        <motion.div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-lg"
+        initial={{ scale: 0.9, opacity: 0 }}
+  animate={{ scale: 1, opacity: 1 }}
+  exit={{ scale: 0.9, opacity: 0 }}>
 
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">Choisir un point de retrait</h2>
