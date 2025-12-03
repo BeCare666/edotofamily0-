@@ -4,7 +4,7 @@ import { Heart, Globe, Users, Smile, Shield, MapPin } from 'lucide-react';
 import { ViewState } from '../types';
 import UniversFemme from '../components/UniversFemme';
 import Why from '../components/Why';
-import Impact from '../components/impact';
+import Impact from '../components/Zimpact';
 import Temoignages from '../components/Temoignages';
 import Cta from '../components/Cta';
 import Image from 'next/image';
