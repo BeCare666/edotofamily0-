@@ -1,8 +1,14 @@
 import React from 'react';
 import Hero from '../components/Hero';
-import { Heart, Globe, Users, Smile, Shield } from 'lucide-react';
+import { Heart, Globe, Users, Smile, Shield, MapPin } from 'lucide-react';
 import { ViewState } from '../types';
-
+import UniversFemme from '../components/UniversFemme';
+import Why from '../components/Why';
+import Impact from '../components/impact';
+import Temoignages from '../components/Temoignages';
+import Cta from '../components/Cta';
+import Image from 'next/image';
+import Visions from '../public/images/woman-soft-bg.jpg';
 interface HomeProps {
   changeView: (view: ViewState) => void;
 }
@@ -11,8 +17,13 @@ export const Home: React.FC<HomeProps> = ({ changeView }) => {
   return (
     <>
       <Hero />
+      <UniversFemme />
+      <Why />
+      <Impact />
+      <Temoignages />
 
-      {/* Services Section *********/}
+      <Cta />
+      {/* Services Section  *********/}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -51,8 +62,8 @@ export const Home: React.FC<HomeProps> = ({ changeView }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
-              <img
-                src="https://picsum.photos/800/800?random=1"
+              <Image
+                src={Visions}
                 alt="Femme heureuse"
                 className="rounded-3xl shadow-2xl object-cover w-full h-[500px]"
               />

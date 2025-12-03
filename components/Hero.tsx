@@ -1,13 +1,13 @@
 import React from "react";
 import { Heart, Baby, Sparkles, User, ShieldCheck, Gift, ShoppingBag } from "lucide-react";
 import CalendlyDrawer from "./CalendlyDrawer";
-import {useRouter} from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 const Hero: React.FC = () => {
     const router = useRouter()
     const [openCalendly, setOpenCalendly] = React.useState(false);
     return (
-        <section className="relative overflow-hidden pt-3 pb-24 lg:pt-2 lg:pb-32">
+        <section className="relative overflow-hidden pt-3 lg:pt-2">
             {/* Background Decor */}
             <div className="blob bg-pink-200 w-96 h-96 rounded-full top-0 -left-20 mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
             <div className="blob bg-purple-200 w-96 h-96 rounded-full bottom-0 right-0 mix-blend-multiply filter blur-3xl opacity-30"></div>
@@ -18,29 +18,27 @@ const Hero: React.FC = () => {
                     <div className="text-center lg:text-left space-y-8 relative z-20">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-50 border border-pink-100 text-pink-600 text-sm font-medium">
                             <Sparkles size={16} />
-                            <span>La référence santé féminine en Afrique</span>
+                            <span>La référence de l’accès SSR en Afrique de l’Ouest</span>
                         </div>
 
                         <h1 className="text-3xl lg:text-4xl font-bold leading-tight text-slate-900">
-                        Accès simple et confidentiel aux produits{" "}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
-                            SSR
-                        </span>.
+                            Accès simple, confidentiel et immédiat aux produits{" "}
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
+                                SSR
+                            </span>.
                         </h1>
 
                         <p className="text-sm text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                        E-Doto Family offre aux jeunes un accès discret, sécurisé et sans
-                        jugement aux produits de santé sexuelle et reproductive. Commandez,
-                        choisissez un point de retrait, ou récupérez vos kits SSR gratuits
-                        via nos campagnes partenaires. Simple, serein, confidentiel.
+                            E-Doto Family démocratise l’accès aux produits et services de santé sexuelle et reproductive au Bénin.
+                            Localisez les campagnes gratuites, commandez vos produits en toute discrétion et récupérez-les dans un point de proximité sans jugement, sans stress et en toute confidentialité.
                         </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
 
-                    {/* 🚀 Bouton Campagnes */}
-                    <button
-                        onClick={() => router.push('/campaigns')}
-                        className="
+                            {/* 🚀 Bouton Campagnes */}
+                            <button
+                                onClick={() => router.push('/campaigns')}
+                                className="
                         group relative px-8 py-4 rounded-full font-semibold
                         bg-gradient-to-r from-pink-500 to-pink-600 text-white
                         shadow-[0_4px_14px_rgba(255,0,128,0.35)]
@@ -49,18 +47,18 @@ const Hero: React.FC = () => {
                         transition-all duration-300 ease-out
                         flex items-center gap-3
                         "
-                    >
-                        <Gift className="w-5 h-5 transition-transform group-hover:rotate-12" />
-                        <span>Nos campagnes</span>
+                            >
+                                <Gift className="w-5 h-5 transition-transform group-hover:rotate-12" />
+                                <span>Nos campagnes</span>
 
-                        {/* Light Shine */}
-                        <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
-                    </button>
+                                {/* Light Shine */}
+                                <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
+                            </button>
 
-                    {/* 🛍️ Bouton Produits */}
-                    <button
-                        onClick={() => router.push('/category/categories_id=3')}
-                        className="
+                            {/* 🛍️ Bouton Produits */}
+                            <button
+                                onClick={() => router.push('/category/categories_id=3')}
+                                className="
                         group relative px-8 py-4 rounded-full font-semibold
                         bg-white text-slate-700 border border-slate-200
                         hover:border-pink-300 hover:bg-white/90
@@ -70,20 +68,20 @@ const Hero: React.FC = () => {
                         transition-all duration-300 ease-out
                         flex items-center gap-3
                         "
-                    >
-                        <ShoppingBag className="w-5 h-5 text-pink-500 transition-transform group-hover:-translate-y-0.5" />
-                        <span>Visiter nos produits</span>
+                            >
+                                <ShoppingBag className="w-5 h-5 text-pink-500 transition-transform group-hover:-translate-y-0.5" />
+                                <span>Visiter nos produits</span>
 
-                        {/* Subtle Shine */}
-                        <span className="absolute inset-0 rounded-full bg-pink-100/10 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
-                    </button>
+                                {/* Subtle Shine */}
+                                <span className="absolute inset-0 rounded-full bg-pink-100/10 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
+                            </button>
 
-                    </div>
+                        </div>
 
                     </div>
 
                     {/* Circular Interactive Visual */}
-                    <div className="relative flex items-center justify-center mt-12 lg:mt-0 h-[400px] lg:h-[600px] w-full pause-hover">
+                    <div className="relative flex items-center justify-center h-[400px] lg:h-[600px] w-full pause-hover">
 
                         {/* Static Center Circle */}
                         <div className="absolute z-20 w-48 h-48 lg:w-64 lg:h-64 rounded-full bg-gradient-to-br from-pink-100 to-white shadow-2xl flex items-center justify-center border-4 border-white">
