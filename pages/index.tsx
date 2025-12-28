@@ -9,6 +9,7 @@ import Temoignages from '../components/Temoignages';
 import Cta from '../components/Cta';
 import Image from 'next/image';
 import Visions from '../public/images/woman-soft-bg.jpg';
+import SSRAccessDrawer from "../components/SSRAccessDrawer";
 interface HomeProps {
   changeView: (view: ViewState) => void;
 }
@@ -20,9 +21,9 @@ export const Home: React.FC<HomeProps> = ({ changeView }) => {
       <UniversFemme />
       <Why />
       <Impact />
-      <Temoignages />
+      {/*  <Temoignages />
 
-      <Cta />
+      <Cta />**/}
       {/* Services Section  *********/}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -105,6 +106,7 @@ export const Home: React.FC<HomeProps> = ({ changeView }) => {
           </div>
         </div>
       </section>
+      <SSRAccessDrawer />
     </>
   );
 };

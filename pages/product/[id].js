@@ -6,7 +6,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Star, Truck, CheckCircle, Shield, ArrowLeft } from "lucide-react";
 import dynamic from "next/dynamic";
-
+import OrderProgressBar from "../../components/OrderProgressBar";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 // pour feexpay
 //import("@feexpay/react-sdk").then(console.log);
@@ -261,7 +261,7 @@ export default function ProductDetails() {
                     </motion.div>
                 </div>
             </div>
-
+            {/*  <OrderProgressBar />*/}
             {/* Bouton retour flottant */}
             <motion.button
                 onClick={() => router.back()}

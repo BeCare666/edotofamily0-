@@ -18,10 +18,10 @@ const Hero: React.FC = () => {
                     <div className="text-center lg:text-left space-y-8 relative z-20">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-50 border border-pink-100 text-pink-600 text-sm font-medium">
                             <Sparkles size={16} />
-                            <span>La référence de l’accès SSR en Afrique de l’Ouest</span>
+                            <span>La référence de l’accès SSR en Afrique</span>
                         </div>
 
-                        <h1 className="text-3xl lg:text-4xl font-bold leading-tight text-slate-900">
+                        <h1 className="lg:text-4xl font-bold text-slate-900 w-full">
                             Accès simple, confidentiel et immédiat aux produits{" "}
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
                                 SSR
@@ -38,7 +38,7 @@ const Hero: React.FC = () => {
                             {/* 🚀 Bouton Campagnes */}
                             <button
                                 onClick={() => router.push('/campaigns')}
-                                className="
+                                className="justify-center lg:justify-start
                         group relative px-8 py-4 rounded-full font-semibold
                         bg-gradient-to-r from-pink-500 to-pink-600 text-white
                         shadow-[0_4px_14px_rgba(255,0,128,0.35)]
@@ -58,7 +58,7 @@ const Hero: React.FC = () => {
                             {/* 🛍️ Bouton Produits */}
                             <button
                                 onClick={() => router.push('/category/categories_id=3')}
-                                className="
+                                className=" justify-center lg:justify-start
                         group relative px-8 py-4 rounded-full font-semibold
                         bg-white text-slate-700 border border-slate-200
                         hover:border-pink-300 hover:bg-white/90
@@ -81,7 +81,7 @@ const Hero: React.FC = () => {
                     </div>
 
                     {/* Circular Interactive Visual */}
-                    <div className="relative flex items-center justify-center h-[400px] lg:h-[600px] w-full pause-hover">
+                    <div className="hidden md:flex lg:flex relative flex items-center justify-center h-[400px] lg:h-[600px] w-full pause-hover">
 
                         {/* Static Center Circle */}
                         <div className="absolute z-20 w-48 h-48 lg:w-64 lg:h-64 rounded-full bg-gradient-to-br from-pink-100 to-white shadow-2xl flex items-center justify-center border-4 border-white">

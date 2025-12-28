@@ -139,8 +139,7 @@ export default function OrdersPage() {
                 </div>
             ) : (
                 <>
-                    <div className="bg-white/70 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-md divide-y divide-gray-100">
-
+                    <div className="bg-white/70 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-sm divide-y">
                         {orders
                             .filter((o) => {
                                 const q = search.toLowerCase();
@@ -152,63 +151,69 @@ export default function OrdersPage() {
                             .map((order) => (
                                 <motion.div
                                     key={order.id}
-                                    whileHover={{ scale: 1.01 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    whileHover={{ backgroundColor: "rgba(255,245,248,0.6)" }}
                                     onClick={() => router.push(`/orders/${order.id}`)}
-                                    className="flex items-center cursor-pointer justify-between flex-wrap sm:flex-nowrap p-5 transition-all hover:bg-[#fff5f8] rounded-2xl"
+                                    className="cursor-pointer px-4 py-4 sm:px-6 transition"
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-[#FF6EA9]/10 rounded-xl">
-                                            {getStatusIcon(order.order_status)}
-                                        </div>
+                                    {/* HEADER */}
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="flex items-start gap-3 min-w-0">
+                                            <div className="p-2.5 rounded-xl bg-pink-100 shrink-0">
+                                                {getStatusIcon(order.order_status)}
+                                            </div>
 
-                                        <div>
-                                            <p className="font-semibold text-[#0F172A]">
-                                                Commande #{order.tracking_number}
-                                            </p>
-                                            <p className="text-sm text-gray-500">
-                                                Passée le{" "}
-                                                {new Date(order.created_at).toLocaleDateString("fr-FR", {
-                                                    year: "numeric",
-                                                    month: "long",
-                                                    day: "numeric",
-                                                })}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-6 mt-4 sm:mt-0">
-                                        <div className="text-right">
-                                            <p className="text-gray-800 font-semibold">
-                                                {Number(order.total || 0).toFixed(2)} FCFA
-                                            </p>
-                                            <div className="text-sm text-gray-500 flex items-center justify-end gap-1">
-                                                <CreditCard size={14} />{" "}
-                                                {order.payment_status.replace("payment-", "").replace(/-/g, " ")}
+                                            <div className="min-w-0">
+                                                <p className="font-semibold text-gray-900 truncate">
+                                                    Commande #{order.tracking_number}
+                                                </p>
+                                                <p className="text-xs text-gray-500 mt-0.5">
+                                                    {new Date(order.created_at).toLocaleDateString("fr-FR", {
+                                                        day: "2-digit",
+                                                        month: "long",
+                                                        year: "numeric",
+                                                    })}
+                                                </p>
                                             </div>
                                         </div>
 
+                                        <ChevronRight className="text-gray-300 mt-1 shrink-0" />
+                                    </div>
+
+                                    {/* INFOS BAS */}
+                                    <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-400 text-xs">Montant</span>
+                                            <span className="font-semibold text-gray-900">
+                                                {Number(order.total || 0).toFixed(2)} FCFA
+                                            </span>
+                                        </div>
+
                                         <div className="flex flex-col items-end">
+                                            <span className="text-gray-400 text-xs">Statut</span>
                                             <span
-                                                className={`text-sm font-medium capitalize ${order.order_status === "order-completed"
-                                                    ? "text-green-600"
-                                                    : order.order_status === "order-processing"
-                                                        ? "text-blue-600"
-                                                        : order.order_status === "order-pending"
-                                                            ? "text-amber-600"
-                                                            : order.order_status === "order-cancelled"
-                                                                ? "text-red-600"
-                                                                : "text-gray-600"
+                                                className={`font-medium capitalize
+                            ${order.order_status === "order-completed"
+                                                        ? "text-green-600"
+                                                        : order.order_status === "order-processing"
+                                                            ? "text-blue-600"
+                                                            : order.order_status === "order-pending"
+                                                                ? "text-amber-600"
+                                                                : order.order_status === "order-cancelled"
+                                                                    ? "text-red-600"
+                                                                    : "text-gray-600"
                                                     }`}
                                             >
                                                 {order.order_status.replace("order-", "").replace(/-/g, " ")}
                                             </span>
                                         </div>
-
-                                        <ChevronRight className="text-gray-300" size={18} />
                                     </div>
                                 </motion.div>
                             ))}
                     </div>
+
+
+
 
                     <div className="flex justify-center mt-8 gap-3">
                         <button

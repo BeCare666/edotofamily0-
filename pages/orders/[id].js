@@ -18,6 +18,9 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import OrderProgressBar from "../../components/OrderProgressBar";
+import dynamic from "next/dynamic";
+const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 // 🟣 CONFIG
 const PAGE_SIZE = 6;
 
@@ -31,16 +34,34 @@ export default function OrderDetailsPage() {
   const [shopModalButton, setShopModalButton] = useState(false);
   // 🔥 Modal
   const [modalOpen, setModalOpen] = useState(false);
-
+  const [modalOpenConfirm, setmodalOpenConfirm] = useState(false);
   // 🟣 Pickup points
   const [pickupPoints, setPickupPoints] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [customNote, setCustomNote] = useState("");
+  const [paymentData, setPaymentData] = useState(null);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isShowEndOrders, setIsShowEndOrders] = useState(false);
+  const [isSetData, setIsSetData] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (id) fetchOrderDetails(id);
   }, [id]);
+  useEffect(() => {
+    if (!isSetData || !order) return;
+
+    setPaymentData({
+      orderId: order.id,
+      publicKey: process.env.NEXT_PUBLIC_FEEXPAY_PUBLIC_KEY,
+      reference: order.tracking_number,
+      amount: order.total,
+      currency: "XOF",
+    });
+
+    setIsPaymentOpen(true);
+  }, [isSetData, order]);
 
   const fetchOrderDetails = async (id) => {
     try {
@@ -69,16 +90,29 @@ export default function OrderDetailsPage() {
       });
 
       // ⚠️ C’est bien data.status (et pas data.order_status)
-      if (!data.pickup_point_id && (!data.note || data.note === "")) {
-        // Aucun des deux n'est rempli → OUVRIR modal
+      const hasPickupPoint = Boolean(data.pickup_point_id);
+      const hasNote = Boolean(data.note && data.note.trim() !== "");
+      const isProcessing = data.order_status === "order-processing";
+      const isPendingPayment = data.order_status === "order-pending";
+
+      // 👉 1. Choix du point de retrait
+      if (!hasPickupPoint && isProcessing && !hasNote) {
         setShopModalButton(true);
         fetchPickupPoints();
-        setTimeout(() => setModalOpen(true), 400);
-      } else {
-        // Au moins un existe → FERMER modal
-        setModalOpen(false);
-        setShopModalButton(false);
+        setModalOpen(true);
+        return;
       }
+
+      // 👉 2. Paiement
+      if (isPendingPayment) {
+        setShopModalButton(true);
+        fetchPickupPoints();
+        setIsShowEndOrders(true);
+      }
+
+      // 👉 3. Rien à afficher
+      setModalOpen(false);
+      setShopModalButton(false);
 
 
     } catch (error) {
@@ -88,6 +122,12 @@ export default function OrderDetailsPage() {
     }
   };
 
+  const handleFinalize = () => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    setIsSetData(true);
+  };
 
   const fetchPickupPoints = async () => {
     try {
@@ -148,7 +188,9 @@ export default function OrderDetailsPage() {
       }
 
       // ✔️ Succès
-      toast.success("Point de retrait sélectionné avec succès !");
+      //toast.success("Point de retrait sélectionné avec succès !");
+      router.refresh();
+      setmodalOpenConfirm(true)
       setModalOpen(false);
       //console.log(modalOpen)
       fetchOrderDetails(id);
@@ -388,7 +430,7 @@ export default function OrderDetailsPage() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-lg"
+              className="bg-white  shadow-2xl p-6 w-full max-w-lg"
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Choisir un point de retrait</h2>
@@ -483,7 +525,156 @@ export default function OrderDetailsPage() {
             </motion.div>
           </motion.div>
         )}
+        {modalOpenConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center px-4"
+          >
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 260, damping: 22 }}
+              className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 text-center"
+            >
+              {/* ICON */}
+              <div className="flex justify-center mb-5">
+                <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-12 h-12 text-emerald-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 12l2 2 4-4"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              {/* TITRE */}
+              <h2 className="text-2xl font-bold text-slate-800 mb-3">
+                Point de retrait confirmé
+              </h2>
+
+              {/* MESSAGE */}
+              <p className="text-slate-600 leading-relaxed text-sm">
+                Votre point de retrait{" "}
+                <span className="font-semibold text-slate-800">
+                </span>{" "}
+                a été choisi avec succès.
+                <br />
+                <br />
+                Vous pourrez retirer votre colis à cet endroit en présentant votre
+                <span className="font-semibold text-slate-800"> code OTP</span>.
+              </p>
+
+              {/* ACTION */}
+              <div className="mt-8 flex justify-center">
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="
+            px-6 py-3 rounded-full
+            bg-gradient-to-r from-pink-500 to-pink-600
+            text-white font-semibold
+            shadow-[0_10px_25px_rgba(236,72,153,0.35)]
+            hover:shadow-[0_16px_40px_rgba(236,72,153,0.45)]
+            transition
+          "
+                >
+                  Continuer
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
       </AnimatePresence>
+      {/* ✅ Modal Feexpay */}
+      {isPaymentOpen && (
+        <FeexPayModal payment={paymentData} onClose={() => setIsPaymentOpen(false)} />
+      )}
+      {/*  <OrderProgressBar />*/}
+      {isShowEndOrders && (
+        <div className="fixed bottom-6 inset-x-0 z-50 flex justify-center">
+          <motion.button
+            onClick={handleFinalize}
+            disabled={isSubmitting}
+            className={`
+        inline-flex items-center justify-center gap-3
+        px-7 py-4
+        rounded-full
+        bg-gradient-to-r from-pink-500 to-pink-600
+        text-white font-semibold whitespace-nowrap
+        shadow-[0_12px_30px_rgba(236,72,153,0.35)]
+        transition-all
+        ${isSubmitting
+                ? "opacity-80 cursor-not-allowed"
+                : "hover:shadow-[0_18px_40px_rgba(236,72,153,0.45)]"}
+      `}
+            whileHover={!isSubmitting ? { scale: 1.05 } : undefined}
+            whileTap={!isSubmitting ? { scale: 0.95 } : undefined}
+          >
+            {isSubmitting ? (
+              <>
+                {/* Spinner */}
+                <svg
+                  className="w-5 h-5 animate-spin"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="white"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="white"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  />
+                </svg>
+
+                <span className="text-base leading-none">
+                  Traitement en cours…
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-base leading-none">
+                  Finaliser votre commande
+                </span>
+
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13.5 4.5L21 12l-7.5 7.5M3 12h18"
+                  />
+                </svg>
+              </>
+            )}
+          </motion.button>
+        </div>
+      )}
+
     </main>
   );
 }

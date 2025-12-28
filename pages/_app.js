@@ -11,22 +11,23 @@ const Header = dynamic(() => import("../components/header"), {
   ssr: false,
 });
 export default function MyApp({ Component, pageProps }) {
-   let pathname = usePathname() || ""  
-   const isHomePage =
+  let pathname = usePathname() || ""
+  const isHomePage =
     pathname === "/login" ||
     pathname === "/register" ||
-    pathname === "/forgot-password" 
+    pathname === "/forgot-password" ||
+    pathname === "/succesregister"
   return (
     <AuthProvider>
       <Head>
         <title>e-doto family</title>
       </Head>
       <Layout>
-        {!isHomePage && <Header />} 
+        {!isHomePage && <Header />}
         <Component {...pageProps} />
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       </Layout>
-      {!isHomePage && <Footer />}  
+      {!isHomePage && <Footer />}
     </AuthProvider>
   )
 }

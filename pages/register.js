@@ -29,14 +29,16 @@ export default function RegisterPage() {
 
         try {
             const res = await authService.register(name, email, password)
-            console.log("Réponse d'inscription :", res)
-            setAlert({
-                type: "success",
-                message: res.message || "Inscription réussie ! Vérifie ton email.",
-            })
+            console.log("Réponse d'inscription :", res);
 
-            // Redirection douce après succès
-            setTimeout(() => router.push("/login"), 1800)
+            // Stockage temporaire (session uniquement)
+            sessionStorage.setItem("register_email", email);
+
+            if (res?.verified === true) {
+                sessionStorage.setItem("register_verified", "true");
+            }
+
+            router.push("/succesregister");
         } catch (err) {
             // Gestion fine des erreurs renvoyées par NestJS
             const message =

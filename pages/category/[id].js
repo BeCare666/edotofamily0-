@@ -17,7 +17,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-
+import OrderProgressBar from "../../components/OrderProgressBar";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 /**
  * Category page — JavaScript (no TypeScript)
@@ -269,6 +269,7 @@ export default function CategoryPage() {
 
       const order = await res.json();
       console.log("✅ Commande créée :", order);
+      localStorage.setItem("order_step", "order");
       if (!order?.tracking_number) throw new Error("Erreur création commande");
 
       console.log("Ouverture modal Feexpay pour la commande :", order.id);
@@ -501,6 +502,8 @@ export default function CategoryPage() {
       {isPaymentOpen && (
         <FeexPayModal payment={paymentData} onClose={() => setIsPaymentOpen(false)} />
       )}
+      {/* 📊 Barre de progression commande */}
+      {/*  <OrderProgressBar />*/}
     </>
   );
 }
