@@ -189,7 +189,6 @@ export default function OrderDetailsPage() {
 
       // ✔️ Succès
       //toast.success("Point de retrait sélectionné avec succès !");
-      router.refresh();
       setmodalOpenConfirm(true)
       setModalOpen(false);
       //console.log(modalOpen)
@@ -579,7 +578,7 @@ export default function OrderDetailsPage() {
               {/* ACTION */}
               <div className="mt-8 flex justify-center">
                 <button
-                  onClick={() => setModalOpen(false)}
+                  onClick={() => window.location.reload()}
                   className="
             px-6 py-3 rounded-full
             bg-gradient-to-r from-pink-500 to-pink-600

@@ -2,9 +2,12 @@
 
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+
 export default function FeexPayModal({ payment, onClose }) {
     const router = useRouter()
+    const pathname = usePathname()
     useEffect(() => {
         if (!payment) return;
 
@@ -64,13 +67,20 @@ export default function FeexPayModal({ payment, onClose }) {
 
                         /** 🔥 Cas 1 : Tout a fonctionné */
                         if (res.ok && data.processed) {
-                            toast.success("Paiement validé 🎉 Votre commande est confirmée.");
-                            // 🔥 Fermer la modal FeexPay correctement
-                            document
-                                .querySelectorAll(".feexpay-modal-overlay.active")
-                                .forEach(el => el.classList.remove("active"));
-                            router.push(`/orders/${payment.orderId}`)
-                            return;
+                            //toast.success("Paiement validé 🎉 Votre commande est confirmée.");
+                            const isOrderPage = pathname.startsWith("/orders/");
+                            if (isOrderPage) {
+                                window.location.reload();
+                                return;
+                            } else {
+                                // 🔥 Fermer la modal FeexPay correctement
+                                document
+                                    .querySelectorAll(".feexpay-modal-overlay.active")
+                                    .forEach(el => el.classList.remove("active"));
+                                router.push(`/orders/${payment.orderId}`)
+                                return;
+                            }
+
                         }
 
                         /** 🔥 Cas 2 : Paiement OK mais finalisation incomplète → PENDING */
