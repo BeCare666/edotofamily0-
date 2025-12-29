@@ -29,7 +29,7 @@ import { useRouter } from "next/navigation"
  */
 
 export default function PickupDashboard() {
-    const router = useRouter()
+  const router = useRouter()
   const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT || "";
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
 
@@ -102,7 +102,7 @@ export default function PickupDashboard() {
       //const super_pickuppoint = json.role;
       //if(super_pickuppoint !== "super_pickuppoint"){
       //  router.push('/')
-     // }
+      // }
       setPickupPointId(id);
     } catch (err) {
       console.error("loadMe error:", err);
@@ -149,8 +149,8 @@ export default function PickupDashboard() {
       setOrders(json.data || []);
       // pagination: try to use returned last_page or compute
       const last =
-  json.last_page ??
-  (Math.ceil((json.total || json.count || 0) / limit) || 1);
+        json.last_page ??
+        (Math.ceil((json.total || json.count || 0) / limit) || 1);
       setTotalPages(last);
     } catch (err) {
       console.error("loadOrders error:", err);
@@ -275,8 +275,8 @@ export default function PickupDashboard() {
               <Package className="w-6 h-6 text-pink-600" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Dashboard Point Relais</h1>
-              <div className="text-sm text-gray-500">Point relais ID: <span className="font-medium">{pickupPointId}</span></div>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Dashboard Point de Retrait</h1>
+              <div className="text-sm text-gray-500">Point de Retrait ID: <span className="font-medium">{pickupPointId}</span></div>
             </div>
           </div>
 
@@ -450,11 +450,11 @@ export default function PickupDashboard() {
 
               <div className="mt-6">
                 <label className="text-sm text-gray-600">Saisissez le code OTP</label>
-                <input value={otp} 
-                onChange={(e) => {
-                const value = e.target.value;
-                setOtp(value.slice(0, 6)); // limite à 6 chars max
-                }} placeholder="000000" className="mt-2 w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-300" />
+                <input value={otp}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setOtp(value.slice(0, 6)); // limite à 6 chars max
+                  }} placeholder="000000" className="mt-2 w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-300" />
                 <div className="flex gap-2 mt-4">
                   <button disabled={validating} onClick={() => validateOTP(selectedOrder.id)} className={`flex-1 px-4 py-3 rounded-xl text-white ${validating ? "bg-gray-400" : "bg-black hover:bg-gray-800"} transition`}>
                     {validating ? <span className="inline-flex items-center gap-2"><Loader2 className="animate-spin w-4 h-4" /> Validation...</span> : <span className="inline-flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Valider</span>}

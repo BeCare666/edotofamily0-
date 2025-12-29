@@ -57,7 +57,11 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
         { id: 4, name: "Soins", slug: "soins", icon: "https://img.icons8.com/fluency/48/coal.png" },
         { id: 5, name: "Bien-être", slug: "bien-etre", icon: "https://img.icons8.com/fluency/48/factory.png" }
     ];
+    const handleFinalize = () => {
 
+        const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScY-R5SkFwByPEDyzW7AxVmEoEc2NSTI4RYYtvlp0w0jhEIjg/viewform?usp=publish-editor";
+        window.open(formUrl, "_blank", "noopener,noreferrer")
+    };
     return (
         <>
             <header className="sticky top-0 z-50 w-full glass-card border-b border-pink-100 shadow-sm ">
@@ -207,16 +211,29 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                                             >
                                                 <ShoppingBag size={16} /> Commandes
                                             </button>
+                                            {user?.role === "super_pickuppoint" ? (
+                                                <button
+                                                    onClick={() => {
+                                                        router.push("/pickup-dashboard");
+                                                        setShowUserMenuDesktop(false);
+                                                    }}
+                                                    className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-pink-50 transition text-gray-700"
+                                                >
+                                                    <Star size={16} /> Dashboard
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => {
+                                                        handleFinalize();
+                                                        setShowUserMenuDesktop(false);
+                                                    }}
+                                                    className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-pink-50 transition text-gray-700"
+                                                >
+                                                    <Star size={16} /> Devenir Point de Retrait
+                                                </button>
+                                            )}
 
-                                            <button
-                                                onClick={() => {
-                                                    setOpenForm(true);
-                                                    setShowUserMenuDesktop(false);
-                                                }}
-                                                className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-pink-50 transition text-gray-700"
-                                            >
-                                                <Star size={16} /> Devenir Point de Retrait
-                                            </button>
+
 
                                             {/* Logout */}
                                             <button

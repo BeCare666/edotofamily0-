@@ -49,7 +49,11 @@ export default function DrawerMenu({ isOpen, onClose }) {
       toast.error("Une erreur est survenue lors de la déconnexion")
     }
   }
+  const handleFinalize = () => {
 
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScY-R5SkFwByPEDyzW7AxVmEoEc2NSTI4RYYtvlp0w0jhEIjg/viewform?usp=publish-editor";
+    window.open(formUrl, "_blank", "noopener,noreferrer")
+  };
   return (
     <>
       {/* BACKDROP */}
@@ -116,9 +120,9 @@ export default function DrawerMenu({ isOpen, onClose }) {
                     <Link href="/orders" className="flex items-center gap-2 px-4 py-2 hover:bg-[#fff5fa] transition" onClick={() => setShowUserMenu(false)}>
                       <ShoppingBag size={16} /> Commandes
                     </Link>
-                    <Link href="/partner" className="hidden flex items-center gap-2 px-4 py-2 hover:bg-[#fff5fa] transition" onClick={() => setShowUserMenu(false)}>
+                    {/* <Link href="/partner" className="hidden flex items-center gap-2 px-4 py-2 hover:bg-[#fff5fa] transition" onClick={() => setShowUserMenu(false)}>
                       <Star size={16} /> Devenir un centre
-                    </Link>
+                    </Link>*/}
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2 w-full text-left px-4 py-2 text-[#ff4d8d] hover:bg-[#fff0f5] transition"
@@ -157,7 +161,10 @@ export default function DrawerMenu({ isOpen, onClose }) {
                 </Link>
               </li>
             ))}
-            <p onClick={() => setOpenForm(true)} className="hidden cursor-pointer">💼 Devenir Point de Retrait</p>
+            {user?.role === "super_pickuppoint" ? (
+              <p onClick={router.push("/pickup-dashboard")} className="hidden cursor-pointer">Dashboard</p>
+            ) : ( <p onClick={handleFinalize} className="hidden cursor-pointer">💼 Devenir Point de Retrait</p>)}
+            
           </ul>
         </nav>
         <GoogleFormDrawer
@@ -194,7 +201,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
             © {new Date().getFullYear()} E·Doto — Bien-être féminin.
           </p>
         </div>
-      </motion.aside>
+      </motion.aside >
     </>
   )
 }
