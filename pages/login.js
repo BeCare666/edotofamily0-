@@ -36,10 +36,17 @@ export default function LoginPage() {
 
                 setAlert({ type: "success", message: "Connexion réussie !" })
 
-                // ✅ Redirection
+                // 🔁 récupérer la page d'origine
+                const redirect = localStorage.getItem("redirect_after_login");
+
                 setTimeout(() => {
-                    router.push("/")
-                }, 500)
+                    if (redirect) {
+                        localStorage.removeItem("redirect_after_login");
+                        router.push(redirect);
+                    } else {
+                        router.push("/");
+                    }
+                }, 500);
             } else {
                 throw new Error("Identifiants invalides.")
             }

@@ -75,6 +75,9 @@ export default function ProductDetails() {
             const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
             const token = localStorage.getItem("token")
             if (!token) {
+                if (typeof window !== "undefined") {
+                    localStorage.setItem("redirect_after_login", window.location.pathname);
+                }
                 router.push('/login');
                 return;
             }

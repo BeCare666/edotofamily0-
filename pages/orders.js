@@ -31,6 +31,9 @@ export default function OrdersPage() {
 
     useEffect(() => {
         if (!user) {
+            if (typeof window !== "undefined") {
+                localStorage.setItem("redirect_after_login", window.location.pathname);
+            }
             router.push("/login")
         }
         fetchOrders(page);

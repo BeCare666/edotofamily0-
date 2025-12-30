@@ -87,6 +87,9 @@ export default function PickupDashboard() {
       if (!API) throw new Error("API endpoint not set");
       if (!token) {
         toast.error("Token manquant. Connectez-vous.");
+        if (typeof window !== "undefined") {
+          localStorage.setItem("redirect_after_login", window.location.pathname);
+        }
         router.push('/login')
         setLoading(false);
         return;

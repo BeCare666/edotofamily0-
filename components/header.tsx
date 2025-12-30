@@ -38,6 +38,12 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
             toast.error("Une erreur est survenue lors de la déconnexion")
         }
     }
+    const handleLogin = () => {
+        if (typeof window !== "undefined") {
+            localStorage.setItem("redirect_after_login", window.location.pathname);
+        }
+        router.push("/login");
+    }
     // Determine if header should be visible or styled differently based on view.
     const isAuthPage = currentView === ViewState.LOGIN || currentView === ViewState.REGISTER;
 
@@ -250,7 +256,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                                 </div>
                             ) : (
                                 <button
-                                    onClick={() => router.push("/login")}
+                                    onClick={handleLogin}
                                     className="hidden md:flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
                                 >
                                     <span>Connexion</span>
@@ -446,7 +452,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                                             <>
                                                 <button
                                                     onClick={() => {
-                                                        router.push("/login");
+                                                        handleLogin();
                                                         setShowUserMenu(false);
                                                         setIsMenuOpen(false);
                                                     }}

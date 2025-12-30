@@ -44,7 +44,7 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
   const [pickupPoints, setPickupPoints] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-
+  const [modalOpenConfirm, setmodalOpenConfirm] = useState(false);
   const router = useRouter();
 
   // -----------------------
@@ -84,8 +84,8 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
         {
           headers: token
             ? {
-                Authorization: `Bearer ${token}`
-              }
+              Authorization: `Bearer ${token}`
+            }
             : undefined
         }
       );
@@ -120,6 +120,9 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
     const token = localStorage.getItem('token');
     if (!token) {
       toast.error('Vous devez être connecté.');
+      if (typeof window !== "undefined") {
+        localStorage.setItem("redirect_after_login", window.location.pathname);
+      }
       router.push('/login');
       return;
     }
@@ -161,7 +164,8 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
         return;
       }
 
-      toast.success('Inscription enregistrée. Votre code de retrait vous a été envoyé par email.');
+      //toast.success('Inscription enregistrée. Votre code de retrait vous a été envoyé par email.');
+      setmodalOpenConfirm(true);
       setShowForm(false);
       setShowPickupModal(false);
       // reset selections
@@ -269,6 +273,72 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
         pageData={pageData}
         onChoose={onPickupChosen}
       />
+      {modalOpenConfirm && (
+        <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 text-center animate-fade-in">
+
+            {/* ICON */}
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-11 h-11 text-emerald-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 12l2 2 4-4"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* TITLE */}
+            <h2 className="text-2xl font-bold text-slate-800 mb-3">
+              Demande envoyée avec succès 🎉
+            </h2>
+
+            {/* MESSAGE */}
+            <p className="text-slate-600 text-sm leading-relaxed">
+              Votre demande de <span className="font-semibold text-slate-800">kits gratuits</span> a bien été enregistrée.
+              <br /><br />
+              Veuillez vérifier votre boîte email afin de récupérer votre
+              <span className="font-semibold text-slate-800"> code OTP</span>.
+              <br /><br />
+              Ce code vous permettra de retirer votre colis au point de retrait
+              que vous avez sélectionné.
+            </p>
+
+            {/* ACTION */}
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => setmodalOpenConfirm(false)}
+                className="
+            px-6 py-3 rounded-full
+            bg-gradient-to-r from-pink-500 to-pink-600
+            text-white font-semibold
+            shadow-[0_10px_25px_rgba(236,72,153,0.35)]
+            hover:shadow-[0_16px_40px_rgba(236,72,153,0.45)]
+            transition
+          "
+              >
+                Merci !
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 };
@@ -298,11 +368,11 @@ const ActiveCampaignCard = ({ campaign, onOpen }: any) => (
       <div className="p-8 lg:p-12 flex flex-col justify-center">
         <h2 className="text-3xl font-bold text-slate-900 mb-4">{campaign.location}</h2>
         <p className="text-slate-600 text-lg mb-8 leading-relaxed">{campaign.description}</p>
-        <CampaignStatusCard 
-        title={campaign.title}
-        date_start={campaign.date_start}
-        date_end={campaign.date_end}
-        status={campaign.status}
+        <CampaignStatusCard
+          title={campaign.title}
+          date_start={campaign.date_start}
+          date_end={campaign.date_end}
+          status={campaign.status}
         />
 
         <div className="space-y-4 mb-8 bg-slate-50 p-6 rounded-2xl border border-slate-100">
@@ -404,84 +474,83 @@ const ModalPickup = ({
     close();
   };
 
-return (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[300]">
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[300]">
 
-    <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-lg">
+      <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-lg">
 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Choisir un point de retrait</h2>
-        <button onClick={close}><XCircle size={26} /></button>
-      </div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Choisir un point de retrait</h2>
+          <button onClick={close}><XCircle size={26} /></button>
+        </div>
 
-      {!customMode && (
-        <>
-          <input
-            type="text"
-            placeholder="Rechercher..."
-            className="w-full mb-4 p-2 border rounded-xl"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-          />
+        {!customMode && (
+          <>
+            <input
+              type="text"
+              placeholder="Rechercher..."
+              className="w-full mb-4 p-2 border rounded-xl"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+            />
 
-          <div className="max-h-80 overflow-y-auto pr-2">
-            {pageData.map((p: any) => (
-              <div
-                key={p.id}
-                onClick={() => setSelected(p.id)}
-                className={`p-4 border rounded-xl mb-3 cursor-pointer ${
-                  selected === p.id
+            <div className="max-h-80 overflow-y-auto pr-2">
+              {pageData.map((p: any) => (
+                <div
+                  key={p.id}
+                  onClick={() => setSelected(p.id)}
+                  className={`p-4 border rounded-xl mb-3 cursor-pointer ${selected === p.id
                     ? 'bg-pink-50 border-pink-500'
                     : 'hover:border-pink-400'
-                }`}
-              >
-                <p className="font-semibold">{p.name}</p>
-                <p className="text-sm text-gray-500">{p.address}</p>
-              </div>
-            ))}
-          </div>
+                    }`}
+                >
+                  <p className="font-semibold">{p.name}</p>
+                  <p className="text-sm text-gray-500">{p.address}</p>
+                </div>
+              ))}
+            </div>
 
-          <p
-            className="text-center text-[#FF6EA9] mt-5 cursor-pointer"
-            onClick={() => setCustomMode(true)}
-          >
-            Décrire un point personnalisé
-          </p>
-        </>
-      )}
+            <p
+              className="text-center text-[#FF6EA9] mt-5 cursor-pointer"
+              onClick={() => setCustomMode(true)}
+            >
+              Décrire un point personnalisé
+            </p>
+          </>
+        )}
 
-      {customMode && (
-        <>
-          <textarea
-            rows={3}
-            className="w-full border rounded-xl p-3"
-            value={customNote}
-            placeholder="Décrire l’endroit..."
-            onChange={(e) => setCustomNote(e.target.value)}
-          />
+        {customMode && (
+          <>
+            <textarea
+              rows={3}
+              className="w-full border rounded-xl p-3"
+              value={customNote}
+              placeholder="Décrire l’endroit..."
+              onChange={(e) => setCustomNote(e.target.value)}
+            />
 
-          <p
-            className="text-center text-[#FF6EA9] mt-5 cursor-pointer"
-            onClick={() => setCustomMode(false)}
-          >
-            Retour
-          </p>
-        </>
-      )}
+            <p
+              className="text-center text-[#FF6EA9] mt-5 cursor-pointer"
+              onClick={() => setCustomMode(false)}
+            >
+              Retour
+            </p>
+          </>
+        )}
 
-      {/* Bouton valider */}
-      <button
-        onClick={choosePickup}
-        className="mt-6 w-full bg-slate-900 text-white py-3 rounded-xl"
-      >
-        Confirmer
-      </button>
+        {/* Bouton valider */}
+        <button
+          onClick={choosePickup}
+          className="mt-6 w-full bg-slate-900 text-white py-3 rounded-xl"
+        >
+          Confirmer
+        </button>
 
+      </div>
     </div>
-  </div>
-);
+  );
 
 };
