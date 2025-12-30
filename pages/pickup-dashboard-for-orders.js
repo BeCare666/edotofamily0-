@@ -28,7 +28,11 @@ import { useRouter } from "next/navigation"
  *
  * Usage: <PickupDashboard />
  */
+import dynamic from "next/dynamic";
 
+const PickupDashboard = dynamic(() => Promise.resolve(Dashboard), {
+  ssr: false,
+});
 export default function PickupDashboard() {
   const router = useRouter()
   const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT || "";
