@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -17,9 +17,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
-const PickupDashboard = dynamic(() => Promise.resolve(Dashboard), {
-  ssr: false,
-});
+
 export default function PickupDashboard() {
   const router = useRouter();
   const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT || "";
@@ -54,7 +52,7 @@ export default function PickupDashboard() {
 
   const [newCount, setNewCount] = useState(0);
   const [open, setOpen] = useState(false);
-  const ref = useRef < HTMLDivElement > (null);
+  const ref = useRef(null);
 
   // Fermer le menu si clic à l’extérieur
   useEffect(() => {
@@ -72,14 +70,14 @@ export default function PickupDashboard() {
     "Content-Type": "application/json",
   });
 
-  const buildUrl = (path, params = {}) => {
-    const u = new URL(`${API}${path}`, window.location.origin);
-    Object.entries(params).forEach(([k, v]) => {
-      if (v !== undefined && v !== null && v !== "")
-        u.searchParams.append(k, String(v));
-    });
-    return u.toString();
-  };
+  //const buildUrl = (path, params = {}) => {
+  //const u = new URL(`${API}${path}`, window.location.origin);
+  //Object.entries(params).forEach(([k, v]) => {
+  //  if (v !== undefined && v !== null && v !== "")
+  //u.searchParams.append(k, String(v));
+  //});
+  //  return u.toString();
+  //};
 
   // =========================
   // NORMALIZE
@@ -369,7 +367,7 @@ export default function PickupDashboard() {
 
                       <button
                         onClick={() => {
-                          router.push("/pickup-dashboard-forr-orders");
+                          router.push("/pickup-dashboard-for-orders");
                           setOpen(false);
                         }}
                         className="w-full text-left px-4 py-3 hover:bg-pink-50 text-gray-700 text-sm"
