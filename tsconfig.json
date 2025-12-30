@@ -23,7 +23,8 @@
     "**/*.tsx",
     "pages/login.jsx",
     "pages/login.js",
-    "pages/succesregister.js"
+    "pages/succesregister.js",
+    "pages/pickup-dashboard.js"
   ],
   "exclude": [
     "node_modules"
