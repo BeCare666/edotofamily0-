@@ -7,24 +7,22 @@ import {
   Loader2,
   Hash,
   User,
-  CheckCircle,
   X,
   Clock,
   BellRing,
   ChevronDown, LayoutDashboard,
+  CheckCircle, XCircle
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-
 
 export default function PickupDashboard() {
   const router = useRouter();
   const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT || "";
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : "";
-
-  const MODE = "orders";
+  console.log("Token:", token);
+  const MODE = "campaign";
 
   const [me, setMe] = useState(null);
 
@@ -53,6 +51,9 @@ export default function PickupDashboard() {
   const [newCount, setNewCount] = useState(0);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  useEffect(() => {
+    loadMe();
+  }, []);
 
   // Fermer le menu si clic à l’extérieur
   useEffect(() => {
@@ -109,6 +110,7 @@ export default function PickupDashboard() {
 
       const json = await res.json();
       setMe(json);
+      loadCampaigns();
     } catch {
       toast.error("Impossible de charger le profil");
     } finally {
@@ -206,14 +208,26 @@ export default function PickupDashboard() {
         console.log("data", data);
 
         // Filtrer les commandes par pickup_point_id de l'utilisateur
-        const filtered = (data || []).filter(
+        let filtered = (data || []).filter(
           (c) => Number(c.pickup_center) === Number(me?.id)
-
-
         );
-        console.log("me", me)
-        console.log("oders xc", filtered.map(normalize))
-        setOrders(filtered.map(normalize));
+
+        // Normaliser les commandes
+        const normalizedOrders = filtered.map(normalize);
+
+        // Trier : en attente en haut, complétées en bas
+        normalizedOrders.sort((a, b) => {
+          if (a.order_status === "order-completed" && b.order_status !== "order-completed") {
+            return 1; // a en bas
+          }
+          if (a.order_status !== "order-completed" && b.order_status === "order-completed") {
+            return -1; // b en bas
+          }
+          return 0; // ordre inchangé si mêmes statuts
+        });
+
+        console.log("orders triées", normalizedOrders);
+        setOrders(normalizedOrders);
         setTotalPages(1);
       } catch (err) {
         console.error(err);
@@ -224,6 +238,7 @@ export default function PickupDashboard() {
     },
     [selectedCampaignId, page, me]
   );
+
 
 
   // =========================
@@ -261,10 +276,7 @@ export default function PickupDashboard() {
   // =========================
   // EFFECTS
   // =========================
-  useEffect(() => {
-    loadMe();
-    loadCampaigns();
-  }, []);
+
 
   useEffect(() => {
     if (!selectedCampaignId) return;
@@ -447,11 +459,27 @@ export default function PickupDashboard() {
                         </div>
                         <div className="text-sm text-gray-600 mt-1 flex items-center gap-2"><User className="w-4 h-4 text-gray-400" /> {order.customer_name || "-"}</div>
                         <div className="text-xs text-gray-400 mt-1">OTP: {order.otp_code ? "Présent" : "Non défini"}</div>
+                        {order.order_status === "order-completed" ? (
+                          <>
+                            <div className="flex items-center">
+                              <CheckCircle className="w-6 h-6 text-green-600" />
+                              <span className="text-green-600 font-medium ml-2"> validée</span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex items-center">
+                              <XCircle className="w-6 h-6 text-red-600" />
+                              <span className="text-red-600 font-medium ml-2">Non validée</span>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 justify-end">
                       <div className="text-right mr-2">
+
                         <div className="text-sm text-gray-600">{(Number(order.total) || 0).toLocaleString()} FCFA</div>
                         <div className="text-xs text-gray-500 mt-0.5">{order.payment_status?.replace("payment-", "").replace(/-/g, " ")}</div>
                       </div>
@@ -514,8 +542,7 @@ export default function PickupDashboard() {
                       <div className="font-medium">{selectedOrder.otp_code ? "Présent" : "Non défini"}</div>
                     </div>
                   </div>
-
-                  <div className="mt-6">
+                  {selectedOrder.order_status !== "order-completed" && (<div className="mt-6">
                     <label className="text-sm text-gray-600">Saisissez le code OTP</label>
                     <input value={otp}
                       onChange={(e) => {
@@ -531,7 +558,8 @@ export default function PickupDashboard() {
                     </div>
 
                     <p className="text-xs text-gray-400 mt-3">Vous ne pouvez valider que les commandes appartenant à votre point retrait.</p>
-                  </div>
+                  </div>)}
+
                 </motion.div>
               </motion.div>
             )}

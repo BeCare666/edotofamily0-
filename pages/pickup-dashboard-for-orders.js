@@ -11,7 +11,7 @@ import {
   X,
   Clock,
   BellRing,
-  ChevronDown, LayoutDashboard,
+  ChevronDown, LayoutDashboard, XCircle
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation"
@@ -154,21 +154,34 @@ export default function PickupDashboard() {
     try {
       if (!pickupPointId) return;
       setFetchingOrders(true);
+
       const url = buildUrl("/orders", {
         pickup_point_id: pickupPointId,
         limit,
         page: p,
         search: debouncedSearch || undefined,
       });
+
       const res = await fetch(url, { headers: authHeaders() });
       if (!res.ok) throw new Error("Erreur commandes");
+
       const json = await res.json();
-      setOrders(json.data || []);
-      // pagination: try to use returned last_page or compute
+      let ordersList = json.data || [];
+
+      // Trier : en attente en haut, complétées en bas
+      ordersList.sort((a, b) => {
+        if (a.order_status === "order-completed" && b.order_status !== "order-completed") return 1;
+        if (a.order_status !== "order-completed" && b.order_status === "order-completed") return -1;
+        return 0;
+      });
+
+      setOrders(ordersList);
+
+      // Pagination : utiliser last_page si disponible
       const last =
-        json.last_page ??
-        (Math.ceil((json.total || json.count || 0) / limit) || 1);
+        json.last_page ?? (Math.ceil((json.total || json.count || 0) / limit) || 1);
       setTotalPages(last);
+
     } catch (err) {
       console.error("loadOrders error:", err);
       toast.error("Impossible de charger les commandes");
@@ -431,6 +444,21 @@ export default function PickupDashboard() {
                     </div>
                     <div className="text-sm text-gray-600 mt-1 flex items-center gap-2"><User className="w-4 h-4 text-gray-400" /> {order.customer_name || "-"}</div>
                     <div className="text-xs text-gray-400 mt-1">OTP: {order.otp_code ? "Présent" : "Non défini"}</div>
+                    {order.order_status === "order-completed" ? (
+                      <>
+                        <div className="flex items-center">
+                          <CheckCircle className="w-6 h-6 text-green-600" />
+                          <span className="text-green-600 font-medium ml-2"> validée</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center">
+                          <XCircle className="w-6 h-6 text-red-600" />
+                          <span className="text-red-600 font-medium ml-2">Non validée</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -498,8 +526,7 @@ export default function PickupDashboard() {
                   <div className="font-medium">{selectedOrder.otp_code ? "Présent" : "Non défini"}</div>
                 </div>
               </div>
-
-              <div className="mt-6">
+              {selectedOrder.order_status !== "order-completed" && (<div className="mt-6">
                 <label className="text-sm text-gray-600">Saisissez le code OTP</label>
                 <input value={otp}
                   onChange={(e) => {
@@ -515,7 +542,8 @@ export default function PickupDashboard() {
                 </div>
 
                 <p className="text-xs text-gray-400 mt-3">Vous ne pouvez valider que les commandes appartenant à votre point retrait.</p>
-              </div>
+              </div>)}
+
             </motion.div>
           </motion.div>
         )}
