@@ -10,6 +10,7 @@ export default function PourquoiEDoto() {
         "Pour accompagner les jeunes avec des solutions discrètes",
         "Pour renforcer les chaînes communautaires de proximité",
         "Pour rendre la SSR aussi facile qu’acheter un forfait mobile",
+        "Pour bâtir un réseau solidaire où chaque jeune trouve soutien et dignité.",
     ];
 
     const [visibleItems, setVisibleItems] = useState<boolean[]>(Array(items.length).fill(false));

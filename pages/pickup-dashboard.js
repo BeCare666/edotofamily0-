@@ -109,6 +109,7 @@ export default function PickupDashboard() {
       });
 
       const json = await res.json();
+      //console.log("Profil utilisateur:", json);
       setMe(json);
       loadCampaigns();
     } catch {
@@ -176,9 +177,10 @@ export default function PickupDashboard() {
 
 
       );
+      console.log("filtered for stats", filtered);
       const total = filtered.length;
-      const completed = data.filter((r) => r.picked_up).length;
-
+      const completed = filtered.filter((r) => r.picked_up).length;
+      console.log("stats", { total, completed });
       setStats({
         total,
         completed,

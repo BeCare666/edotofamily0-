@@ -1,6 +1,7 @@
 import { apiRequest } from "../lib/api"
-
+import { useRouter } from "next/navigation"
 export const authService = {
+
     async register(name, email, password) {
         const res = await apiRequest("/register", {
             method: "POST",
@@ -51,9 +52,11 @@ export const authService = {
     },
 
     async logout() {
+        //const router = useRouter();
         await apiRequest("/logout", { method: "POST" });
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        //router.push("/login");
     },
     forgetPassword: (email) =>
         apiRequest("/forget-password", {
