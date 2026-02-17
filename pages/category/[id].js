@@ -264,8 +264,8 @@ export default function CategoryPage() {
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          products: [{ product_id: product.id, order_quantity: 1, unit_price: product.price, subtotal: product.price }],
-          total: product.price,
+          products: [{ product_id: product.id, order_quantity: 1, unit_price: product.sale_price, subtotal: product.sale_price }],
+          total: product.sale_price,
           payment_gateway: "FEEXPAY",
         }),
       });
@@ -385,6 +385,7 @@ export default function CategoryPage() {
                 Chargement des produits…
               </div>
             ) : filtered.slice(0, visibleCount).map((p, i) => (
+              
               <article
                 key={p.id || i}
                 className="group relative bg-white/90 backdrop-blur-xl rounded-t-[5px] shadow-sm hover:shadow-2xl border border-gray-100 transition-all duration-300 overflow-hidden"
@@ -429,13 +430,13 @@ export default function CategoryPage() {
 
                   {/* Prix */}
                   <div className="flex items-baseline gap-3 mb-3">
-                    {p.oldPrice && (
+                    {p.raw.sale_price && (
                       <span className="text-sm text-gray-400 line-through">
-                        {formatPrice(p.oldPrice)} FCFA
+                        {formatPrice(p.raw.price)} FCFA
                       </span>
                     )}
                     <span className="text-lg font-bold text-[#FF6EA9]">
-                      {formatPrice(p.price)} FCFA
+                      {formatPrice(p.raw.sale_price )} FCFA
                     </span>
                   </div>
 

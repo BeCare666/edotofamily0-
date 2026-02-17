@@ -88,12 +88,12 @@ export default function ProductDetails() {
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    products: [{ product_id: product.id, order_quantity: 1, unit_price: product.price, subtotal: product.price }],
-                    total: product.price,
+                    products: [{ product_id: product.id, order_quantity: 1, unit_price: product.sale_price, subtotal: product.sale_price }],
+                    total: product.sale_price,
                     payment_gateway: "FEEXPAY",
                 }),
             });
-
+           //console.log("product", products)
             const order = await res.json();
             console.log("✅ Commande créée :", order);
             if (!order?.tracking_number) throw new Error("Erreur création commande");
@@ -202,7 +202,7 @@ export default function ProductDetails() {
                             <h1 className="text-2xl font-semibold text-[#0F172A] mb-2">
                                 {product.name}
                             </h1>
-                            <div className="flex items-center gap-2 text-[#FF6EA9]">
+                            <div className="flex items-center gap-2 text-[#FF6EA9] hidden">
                                 {[...Array(4)].map((_, i) => (
                                     <Star key={i} size={16} fill="#FF6EA9" stroke="none" />
                                 ))}
@@ -224,13 +224,13 @@ export default function ProductDetails() {
                         </div>
 
                         <div className="flex items-baseline gap-3">
-                            {product.oldPrice && (
+                            {product.sale_price && (
                                 <span className="text-gray-400 line-through text-sm">
-                                    {formatPrice(product.oldPrice)} FCFA
+                                    {formatPrice(product.price)} FCFA
                                 </span>
                             )}
                             <span className="text-3xl font-bold text-[#FF6EA9]">
-                                {formatPrice(product.price)} FCFA
+                                {formatPrice(product.sale_price)} FCFA
                             </span>
                         </div>
 
