@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { HeartPulse, Stethoscope, Baby, Flower2, Sparkles, HandHeart, ShieldCheck, Droplet } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 export default function ServicesPage() {
     const router = useRouter()
     return (
@@ -38,7 +39,7 @@ export default function ServicesPage() {
                     transition={{ delay: 0.4, duration: 1 }}
                     className="mt-6 text-gray-600 max-w-2xl mx-auto text-lg"
                 >
-                    E·Doto vous accompagne à chaque étape de votre bien-être : de la santé intime à la maternité,
+                    E·Doto Family vous accompagne à chaque étape de votre bien-être : de la santé intime à la maternité,
                     avec élégance, innovation et douceur.
                 </motion.p>
             </section>
@@ -102,14 +103,14 @@ export default function ServicesPage() {
                         Une expérience <span className="text-[#FF6EA9]">sensorielle</span> du soin.
                     </h2>
                     <p className="text-gray-600 text-lg mb-10">
-                        Chez E·Doto, chaque service est une immersion dans un univers doux et lumineux,
+                        Chez E·Doto Family, chaque service est une immersion dans un univers doux et lumineux,
                         où le corps et l’esprit se rencontrent dans un équilibre harmonieux.
                     </p>
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         className="px-8 py-3 rounded-full bg-[#FF6EA9] text-white font-semibold shadow-md hover:bg-[#ff589d] transition-all"
                     >
-                        Découvrir nos centres partenaires
+                        <Link href="/category/categories_id=3"> Visiter nos produits</Link>
                     </motion.button>
                 </motion.div>
 

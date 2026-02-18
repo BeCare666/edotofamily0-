@@ -43,7 +43,14 @@ export enum ViewState {
     ORDER_HISTORY = 'ORDER_HISTORY',
     CENTER_DETAIL = 'CENTER_DETAIL',
     FAQ = 'FAQ',
-    LEGAL = 'LEGAL'
+    LEGAL = 'LEGAL',
+    SERVICES = 'SERVICES',
+    CONTACT = 'CONTACT',
+    MISSION = 'MISSION',
+    OBJECTIVES = 'OBJECTIVES',
+    TERMS = 'TERMS',
+    PRIVACY = 'PRIVACY'
+
 }
 
 export interface Campaign {

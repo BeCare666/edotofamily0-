@@ -84,7 +84,7 @@ export default function OrderDetailsPage() {
         ...data,
         products: (data.products || []).map((p) => ({
           ...p,
-          price: Number(p.price || 0),
+          subtotal: Number(p.subtotal || 0),
           quantity: Number(p.quantity || 0),
         })),
       });
@@ -193,7 +193,7 @@ export default function OrderDetailsPage() {
       setModalOpen(false);
       //console.log(modalOpen)
       fetchOrderDetails(id);
-      //console.log("voici les datats", order) 
+      console.log("voici les datats", order)
     } catch (e) {
       console.error("Erreur:", e);
 
@@ -317,13 +317,13 @@ export default function OrderDetailsPage() {
                     <div>
                       <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-gray-500">
-                        Qté : {item.quantity} × {item.price.toFixed(2)} FCFA
+                        Qté : {item.quantity} × {item.subtotal.toFixed(2) / item.quantity} FCFA
                       </p>
                     </div>
                   </div>
 
                   <p className="font-semibold text-[#0F172A]">
-                    {(item.price * item.quantity).toFixed(2)} FCFA
+                    {item.subtotal.toFixed(2)} FCFA
                   </p>
                 </li>
               ))}

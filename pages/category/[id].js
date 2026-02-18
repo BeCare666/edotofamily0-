@@ -52,6 +52,9 @@ export default function CategoryPage() {
   const [passOrder, setPassOrder] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [loadingButton, setLoadingButton] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   // Data
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
@@ -235,7 +238,11 @@ export default function CategoryPage() {
         alert("Produit introuvable.");
         return;
       }
-      await handleOrder(data);
+      //await handleOrder(data);
+      // 🔥 On ouvre le modal au lieu d'appeler handleOrder
+      setSelectedProduct(data);
+      setQuantity(1);
+      setIsOrderModalOpen(true);
     } catch (e) {
       console.error("Erreur chargement produit:", e);
     } finally {
@@ -243,7 +250,7 @@ export default function CategoryPage() {
     }
 
   }
-  const handleOrder = async (product) => {
+  const handleOrder = async (product, quantity) => {
     setPassOrder(true);
     console.log("Creating order for product:", product);
     if (!product) return;
@@ -264,8 +271,8 @@ export default function CategoryPage() {
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          products: [{ product_id: product.id, order_quantity: 1, unit_price: product.sale_price, subtotal: product.sale_price }],
-          total: product.sale_price,
+          products: [{ product_id: product.id, order_quantity: quantity, unit_price: product.sale_price, subtotal: product.sale_price * quantity }],
+          total: product.sale_price * quantity,
           payment_gateway: "FEEXPAY",
         }),
       });
@@ -385,7 +392,7 @@ export default function CategoryPage() {
                 Chargement des produits…
               </div>
             ) : filtered.slice(0, visibleCount).map((p, i) => (
-              
+
               <article
                 key={p.id || i}
                 className="group relative bg-white/90 backdrop-blur-xl rounded-t-[5px] shadow-sm hover:shadow-2xl border border-gray-100 transition-all duration-300 overflow-hidden"
@@ -436,7 +443,7 @@ export default function CategoryPage() {
                       </span>
                     )}
                     <span className="text-lg font-bold text-[#FF6EA9]">
-                      {formatPrice(p.raw.sale_price )} FCFA
+                      {formatPrice(p.raw.sale_price)} FCFA
                     </span>
                   </div>
 
@@ -490,7 +497,7 @@ export default function CategoryPage() {
         {/* Bouton retour flottant */}
         <motion.button
           onClick={() => router.back()}
-          className="fixed bottom-8 left-8 z-50 w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
+          className="fixed bottom-8 left-8 z-[9999] w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
                          flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
           whileHover={{ rotate: -5 }}
           whileTap={{ scale: 0.9 }}
@@ -508,6 +515,75 @@ export default function CategoryPage() {
       )}
       {/* 📊 Barre de progression commande */}
       {/*  <OrderProgressBar />*/}
+      {isOrderModalOpen && selectedProduct && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[999] p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative animate-in fade-in zoom-in-95">
+
+            {/* Close */}
+            <button
+              onClick={() => setIsOrderModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+
+            {/* Product Info */}
+            <div className="flex items-center gap-4 mb-6">
+
+              <div>
+                <h3 className="font-semibold text-lg">
+                  {selectedProduct.name}
+                </h3>
+                <p className="text-pink-600 font-bold">
+                  {selectedProduct.sale_price} XOF
+                </p>
+              </div>
+            </div>
+
+            {/* Quantity Selector */}
+            <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4 mb-6">
+
+              <button
+                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
+              >
+                -
+              </button>
+
+              <span className="text-xl font-semibold">
+                {quantity}
+              </span>
+
+              <button
+                onClick={() => setQuantity((prev) => prev + 1)}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
+              >
+                +
+              </button>
+            </div>
+
+            {/* Total */}
+            <div className="flex justify-between mb-6">
+              <span className="text-gray-600">Total :</span>
+              <span className="font-bold text-lg text-pink-600">
+                {selectedProduct.sale_price * quantity} XOF
+              </span>
+            </div>
+
+            {/* Confirm Button */}
+            <button
+              onClick={() => {
+                setIsOrderModalOpen(false);
+                handleOrder(selectedProduct, quantity);
+              }}
+              className="w-full bg-pink-600 text-white py-3 rounded-xl font-medium hover:bg-pink-700 transition"
+            >
+              Confirmer la commande
+            </button>
+
+          </div>
+        </div>
+      )}
     </>
   );
 }

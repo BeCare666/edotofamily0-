@@ -10,9 +10,10 @@ import GoogleFormDrawer from "./GoogleFormDrawer";
 import toast from "react-hot-toast"
 import {
   Home, Info, Phone, Target, Flag, FileText, Shield,
-  User, LogOut, ShoppingBag, Star, Briefcase
+  User, LogOut, ShoppingBag, Star, Briefcase, Gift
 } from "lucide-react"
 import { FaFacebookF, FaLinkedinIn, FaTwitter, FaTiktok, FaInstagram } from "react-icons/fa"
+import { useRouter } from "next/navigation"
 
 const links = [
   { label: "Accueil", href: "/", icon: <Home size={18} /> },
@@ -28,6 +29,8 @@ const links = [
 export default function DrawerMenu({ isOpen, onClose }) {
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [openForm, setOpenForm] = useState(false);
+  const [openShop, setOpenShop] = useState(false)
+  const router = useRouter()
   // const [user, setUser] = useState(false)
   const { user, logout } = useAuthContext();
   console.log("User in DrawerMenu:", user);
@@ -38,9 +41,21 @@ export default function DrawerMenu({ isOpen, onClose }) {
   //     setUser(true)
   //   }
   // }, [])
-
+  const categories = [
+    { id: 1, name: "Fertilité", slug: "fertilite", icon: "https://img.icons8.com/fluency/48/product.png" },
+    { id: 2, name: "Grossesse", slug: "grossesse", icon: "https://img.icons8.com/?size=48&id=s3Jrlqy6yqSl&format=png" },
+    { id: 3, name: "Intimité", slug: "intimite", icon: "https://img.icons8.com/fluency/48/car.png" },
+    { id: 5, name: "Bien-être", slug: "bien-etre", icon: "https://img.icons8.com/fluency/48/factory.png" }
+  ];
   const toggleUserMenu = () => setShowUserMenu((p) => !p)
-
+  const HandleGotoShop = (id) => {
+    router.push(`/category/categories_id=${id}`)
+    onClose() // ferme le drawer après clic
+  }
+  const HandleGotoCampagnes = () => {
+    router.push(`/campaigns`)
+    onClose() // ferme le drawer après clic
+  }
   const handleLogout = async () => {
     try {
       await logout()
@@ -49,6 +64,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
       toast.error("Une erreur est survenue lors de la déconnexion")
     }
   }
+
   const handleFinalize = () => {
 
     const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScY-R5SkFwByPEDyzW7AxVmEoEc2NSTI4RYYtvlp0w0jhEIjg/viewform?usp=publish-editor";
@@ -148,6 +164,58 @@ export default function DrawerMenu({ isOpen, onClose }) {
         {/* LIENS DE NAVIGATION */}
         <nav className="flex-1 overflow-y-auto scrollbar-none">
           <ul className="space-y-3">
+            <li className="w-full">
+              <button
+                onClick={() => setOpenShop((prev) => !prev)}
+                className={`flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-medium transition-all
+              ${openShop
+                    ? "bg-pink-50 text-pink-600 ring-1 ring-pink-200"
+                    : "text-gray-800 bg-white/40 hover:bg-[#FF6EA9]/10"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <ShoppingBag size={18} />
+                  Boutique
+                </div>
+                <span className="text-xs">{openShop ? "▲" : "▼"}</span>
+              </button>
+
+              {/* CATÉGORIES */}
+              {openShop && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-2 ml-4 space-y-1"
+                >
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => HandleGotoShop(cat.id)}
+                      className="flex items-center gap-3 w-full px-4 py-2 rounded-lg text-sm text-gray-700 bg-white hover:bg-gray-50 transition"
+                    >
+                      <img src={cat.icon} className="w-5 h-5" alt={cat.name} />
+                      {cat.name}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </li>
+            <li className="w-full">
+              <button
+                onClick={HandleGotoCampagnes}
+                className={`flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-medium transition-all
+              ${openShop
+                    ? "bg-pink-50 text-pink-600 ring-1 ring-pink-200"
+                    : "text-gray-800 bg-white/40 hover:bg-[#FF6EA9]/10"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Gift size={18} />
+                  Campagnes
+                </div>
+              </button>
+            </li>
             {links.map((link) => (
               <li key={link.href}>
                 <Link
@@ -163,8 +231,8 @@ export default function DrawerMenu({ isOpen, onClose }) {
             ))}
             {user?.role === "super_pickuppoint" ? (
               <p onClick={router.push("/pickup-dashboard")} className="hidden cursor-pointer">Dashboard</p>
-            ) : ( <p onClick={handleFinalize} className="hidden cursor-pointer">💼 Devenir Point de Retrait</p>)}
-            
+            ) : (<p onClick={handleFinalize} className="hidden cursor-pointer">💼 Devenir Point de Retrait</p>)}
+
           </ul>
         </nav>
         <GoogleFormDrawer

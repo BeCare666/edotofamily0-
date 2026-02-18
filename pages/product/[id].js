@@ -22,6 +22,8 @@ export default function ProductDetails() {
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const [paymentData, setPaymentData] = useState(null);
     const [passOrder, setPassOrder] = useState(false);
+    const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+    const [quantity, setQuantity] = useState(1);
     const handleMouseMove = (e) => {
         if (!zoom) return;
         const rect = e.currentTarget.getBoundingClientRect();
@@ -67,39 +69,55 @@ export default function ProductDetails() {
         if (p == null) return "—";
         return Math.round(p).toLocaleString("fr-FR");
     };
-
-    const handleOrder = async () => {
-        setPassOrder(true);
+    const openOrderModal = () => {
         if (!product) return;
+        setQuantity(1);
+        setIsOrderModalOpen(true);
+    };
+    const handleOrder = async (quantity) => {
+        setPassOrder(true);
+
+        if (!product || quantity < 1) return;
+
         try {
             const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
-            const token = localStorage.getItem("token")
+            const token = localStorage.getItem("token");
+
             if (!token) {
                 if (typeof window !== "undefined") {
                     localStorage.setItem("redirect_after_login", window.location.pathname);
                 }
-                router.push('/login');
+                router.push("/login");
                 return;
             }
+
+            const totalAmount = product.sale_price * quantity;
+
             const res = await fetch(`${API_BASE_URL}/orders`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    products: [{ product_id: product.id, order_quantity: 1, unit_price: product.sale_price, subtotal: product.sale_price }],
-                    total: product.sale_price,
+                    products: [
+                        {
+                            product_id: product.id,
+                            order_quantity: quantity,
+                            unit_price: product.sale_price,
+                            subtotal: totalAmount,
+                        },
+                    ],
+                    total: totalAmount,
                     payment_gateway: "FEEXPAY",
                 }),
             });
-           //console.log("product", products)
-            const order = await res.json();
-            console.log("✅ Commande créée :", order);
-            if (!order?.tracking_number) throw new Error("Erreur création commande");
 
-            // ✅ Directement ouvrir le modal Feexpay
-            console.log("Ouverture modal Feexpay pour la commande :", order.id);
+            const order = await res.json();
+
+            if (!order?.tracking_number)
+                throw new Error("Erreur création commande");
+
             setPaymentData({
                 orderId: order.id,
                 publicKey: process.env.NEXT_PUBLIC_FEEXPAY_PUBLIC_KEY,
@@ -107,11 +125,13 @@ export default function ProductDetails() {
                 amount: order.total,
                 currency: "XOF",
             });
-            setPassOrder(false);
+
             setIsPaymentOpen(true);
         } catch (err) {
             console.error("Erreur commande/paiement:", err);
             alert("Une erreur est survenue lors de la commande.");
+        } finally {
+            setPassOrder(false);
         }
     };
 
@@ -243,7 +263,7 @@ export default function ProductDetails() {
                                 Retour
                             </button>
                             <button
-                                onClick={handleOrder}
+                                onClick={openOrderModal}
                                 className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#FF6EA9] to-[#4AB3F4] text-white shadow-md hover:shadow-lg hover:opacity-90 transition-all"
                             >
                                 {passOrder ? "Commande en cours ..." : "💳 Passer la commande"}
@@ -293,7 +313,64 @@ export default function ProductDetails() {
             {isPaymentOpen && (
                 <FeexPayModal payment={paymentData} onClose={() => setIsPaymentOpen(false)} />
             )}
+            {isOrderModalOpen && (
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[999] p-4">
+                    <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
 
+                        <button
+                            onClick={() => setIsOrderModalOpen(false)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                        >
+                            ✕
+                        </button>
+
+                        <h3 className="text-lg font-semibold mb-4">
+                            Choisir la quantité
+                        </h3>
+
+                        {/* Quantity Selector */}
+                        <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4 mb-6">
+                            <button
+                                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                                className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
+                            >
+                                -
+                            </button>
+
+                            <span className="text-xl font-semibold">
+                                {quantity}
+                            </span>
+
+                            <button
+                                onClick={() => setQuantity((prev) => prev + 1)}
+                                className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
+                            >
+                                +
+                            </button>
+                        </div>
+
+                        {/* Total */}
+                        <div className="flex justify-between mb-6">
+                            <span>Total :</span>
+                            <span className="font-bold text-pink-600">
+                                {product.sale_price * quantity} XOF
+                            </span>
+                        </div>
+
+                        {/* Confirm */}
+                        <button
+                            onClick={() => {
+                                setIsOrderModalOpen(false);
+                                handleOrder(quantity);
+                            }}
+                            className="w-full bg-pink-600 text-white py-3 rounded-xl font-medium hover:bg-pink-700 transition"
+                        >
+                            Confirmer la commande
+                        </button>
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

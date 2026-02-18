@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { ShoppingBag, Menu, X, Home, MapPin, Info, User, Gift, Phone, Target, Flag, FileText, Shield, LogOut, Star, Briefcase } from 'lucide-react';
+import { ShoppingBag, Menu, X, Home, MapPin, Info, CheckCircle, User, Gift, Phone, Target, Flag, FileText, Shield, LogOut, Star, Briefcase } from 'lucide-react';
 import { ViewState } from '../types';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from "../context/AuthContext";
@@ -8,6 +8,7 @@ import logo from "../public/logo/logo.png";
 import toast from "react-hot-toast"
 import GoogleFormDrawer from "./GoogleFormDrawer";
 import CalendlyDrawer from "./CalendlyDrawer";
+import DrawerMenu from "./DrawerMenu";
 import Image from "next/image"
 interface HeaderProps {
     currentView: ViewState;
@@ -22,6 +23,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
     const [openShopMobile, setOpenShopMobile] = React.useState(false);
     const [showUserMenu, setShowUserMenu] = React.useState(false);
     const [showUserMenuDesktop, setShowUserMenuDesktop] = React.useState(false);
+    const [showUserMenuDesktopx, setShowUserMenuDesktopx] = React.useState(false);
     const [openForm, setOpenForm] = React.useState(false);
     const [openCalendly, setOpenCalendly] = React.useState(false);
     const router = useRouter();
@@ -53,14 +55,20 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
         { label: 'Accueil', view: ViewState.HOME, icon: Home },
         { label: 'Boutique', view: ViewState.SHOP, icon: ShoppingBag },
         { label: 'Campagnes', view: ViewState.CAMPAIGNS, icon: Gift },
-        { label: 'Centres SSR', view: ViewState.CENTERS, icon: MapPin },
+        //{ label: 'Centres SSR', view: ViewState.CENTERS, icon: MapPin },
         { label: 'A propos', view: ViewState.ABOUT, icon: Info },
+        { label: "Services", view: ViewState.SERVICES, icon: Briefcase },
+        { label: "Contact", view: ViewState.CONTACT, icon: Phone },
+        { label: "Notre mission", view: ViewState.MISSION, icon: Target },
+        { label: "Nos objectifs", view: ViewState.OBJECTIVES, icon: Flag },
+        { label: "Termes et conditions", view: ViewState.TERMS, icon: FileText },
+        { label: "Politique de confidentialité", view: ViewState.PRIVACY, icon: Shield },
     ];
-    //{ id: 1, name: "Fertilité", slug: "fertilite", icon: "https://img.icons8.com/fluency/48/product.png" },
+    //{ id: 4, name: "Soins", slug: "soins", icon: "https://img.icons8.com/fluency/48/coal.png" },
     const categories = [
+        { id: 1, name: "Fertilité", slug: "fertilite", icon: "https://img.icons8.com/fluency/48/product.png" },
         { id: 2, name: "Grossesse", slug: "grossesse", icon: "https://img.icons8.com/?size=48&id=s3Jrlqy6yqSl&format=png" },
         { id: 3, name: "Intimité", slug: "intimite", icon: "https://img.icons8.com/fluency/48/car.png" },
-        { id: 4, name: "Soins", slug: "soins", icon: "https://img.icons8.com/fluency/48/coal.png" },
         { id: 5, name: "Bien-être", slug: "bien-etre", icon: "https://img.icons8.com/fluency/48/factory.png" }
     ];
     const handleFinalize = () => {
@@ -70,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
     };
     return (
         <>
-            <header className="sticky top-0 z-50 w-full glass-card border-b border-pink-100 shadow-sm ">
+            <header className="sticky top-0 z-40 w-full glass-card border-b border-pink-100 shadow-sm ">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20">
                         {/* Logo */}
@@ -87,79 +95,144 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                         </div>
 
                         {/* Desktop Nav */}
-                        <nav className="hidden md:flex space-x-4 lg:space-x-8">
-                            {navItems.map((item) => {
+                        <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
 
-                                const isShop = item.view === ViewState.SHOP;
-                                const isCampaigns = item.view === ViewState.CAMPAIGNS;
-                                const isCenters = item.view === ViewState.CENTERS;
-                                const isAbout = item.view === ViewState.ABOUT;
-                                const isHome = item.view === ViewState.HOME;
+                            {/* ACCUEIL */}
+                            <button
+                                onClick={() => router.push("/")}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 
+      ${currentView === ViewState.HOME
+                                        ? "bg-pink-50 text-pink-600 ring-1 ring-pink-200"
+                                        : "text-slate-600 hover:text-pink-500 hover:bg-pink-50/50"
+                                    }`}
+                            >
+                                <Home size={16} />
+                                Accueil
+                            </button>
 
-                                // ----------- 🚀 CAS SPÉCIAL : SHOP -------------
-                                if (isShop) {
-                                    return (
-                                        <div key={item.label} className="relative">
-                                            <button
-                                                onClick={() => setOpenShop((prev) => !prev)}
-                                                className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200
-                                                ${openShop
-                                                        ? "bg-pink-50 text-pink-600 ring-1 ring-pink-200"
-                                                        : "text-slate-600 hover:text-pink-500 hover:bg-pink-50/50"
-                                                    }`}
-                                            >
-                                                <item.icon size={16} />
-                                                {item.label}
-                                                <span className="text-xs">{openShop ? "▲" : "▼"}</span>
-                                            </button>
+                            {/* BOUTIQUE */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setOpenShop((prev) => !prev)}
+                                    className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200
+        ${openShop
+                                            ? "bg-pink-50 text-pink-600 ring-1 ring-pink-200"
+                                            : "text-slate-600 hover:text-pink-500 hover:bg-pink-50/50"
+                                        }`}
+                                >
+                                    <ShoppingBag size={16} />
+                                    Boutique
+                                    <span className="text-xs">{openShop ? "▲" : "▼"}</span>
+                                </button>
 
-                                            {openShop && (
-                                                <div className="absolute mt-2 w-56 bg-white shadow-lg border rounded-xl z-50">
-                                                    <ul className="divide-y divide-gray-100">
-                                                        {categories.map((cat) => (
-                                                            <li
-                                                                key={cat.id}
-                                                                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50"
-                                                                onClick={() => {
-                                                                    HandleGotoShop(cat.id);
-                                                                    setOpenShop(false);
-                                                                }}
-                                                            >
-                                                                <img src={cat.icon} className="w-6 h-6" alt={cat.name} />
-                                                                <span className="text-gray-700 font-medium">{cat.name}</span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                }
+                                {openShop && (
+                                    <div className="absolute mt-2 w-56 bg-white shadow-lg border rounded-xl z-50">
+                                        <ul className="divide-y divide-gray-100">
+                                            {categories.map((cat) => (
+                                                <li
+                                                    key={cat.id}
+                                                    className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50"
+                                                    onClick={() => {
+                                                        HandleGotoShop(cat.id);
+                                                        setOpenShop(false);
+                                                    }}
+                                                >
+                                                    <img src={cat.icon} className="w-6 h-6" alt={cat.name} />
+                                                    <span className="text-gray-700 font-medium">{cat.name}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
 
-                                // ----------- 🚀 ROUTER POUR LES AUTRES ITEMS -------------
-                                const handleRoute = () => {
-                                    if (isCampaigns) router.push("/campaigns");
-                                    else if (isCenters) setOpenCalendly(true);
-                                    else if (isAbout) router.push("/about");
-                                    else if (isHome) router.push("/");
-                                    else setView(item.view);
-                                };
+                            {/* CAMPAGNES */}
+                            <button
+                                onClick={() => router.push("/campaigns")}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 
+      ${currentView === ViewState.CAMPAIGNS
+                                        ? "bg-pink-50 text-pink-600 ring-1 ring-pink-200"
+                                        : "text-slate-600 hover:text-pink-500 hover:bg-pink-50/50"
+                                    }`}
+                            >
+                                <Gift size={16} />
+                                Campagnes
+                            </button>
 
-                                return (
-                                    <button
-                                        key={item.label}
-                                        onClick={handleRoute}
-                                        className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 
-                                    ${currentView === item.view
-                                                ? "bg-pink-50 text-pink-600 ring-1 ring-pink-200"
-                                                : "text-slate-600 hover:text-pink-500 hover:bg-pink-50/50"
-                                            }`}
-                                    >
-                                        <item.icon size={16} />
-                                        {item.label}
-                                    </button>
-                                );
-                            })}
+                            {/* A PROPOS + DROPDOWN */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowUserMenuDesktopx((prev) => !prev)}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium text-slate-600 hover:text-pink-500 hover:bg-pink-50/50 transition-all duration-200"
+                                >
+                                    <Info size={16} />
+                                    À propos
+                                    <span className="text-xs">{showUserMenuDesktopx ? "▲" : "▼"}</span>
+                                </button>
+
+                                {showUserMenuDesktopx && (
+                                    <div className="absolute mt-2 w-64 bg-white shadow-xl border border-pink-100 rounded-xl overflow-hidden z-50">
+
+                                        <button
+                                            onClick={() => { router.push("/about"); setShowUserMenuDesktopx(false); }}
+                                            className="w-full flex items-center gap-3 text-left px-4 py-3 hover:bg-pink-50 transition"
+                                        >
+                                            <Info size={16} />
+                                            À propos
+                                        </button>
+
+                                        <button
+                                            onClick={() => { router.push("/services"); setShowUserMenuDesktopx(false); }}
+                                            className="w-full flex items-center gap-3 text-left px-4 py-3 hover:bg-pink-50 transition"
+                                        >
+                                            <Briefcase size={16} />
+                                            Services
+                                        </button>
+
+                                        <button
+                                            onClick={() => { router.push("/contact"); setShowUserMenuDesktopx(false); }}
+                                            className="w-full flex items-center gap-3 text-left px-4 py-3 hover:bg-pink-50 transition"
+                                        >
+                                            <Phone size={16} />
+                                            Contact
+                                        </button>
+
+                                        <button
+                                            onClick={() => { router.push("/mission"); setShowUserMenuDesktopx(false); }}
+                                            className="w-full flex items-center gap-3 text-left px-4 py-3 hover:bg-pink-50 transition"
+                                        >
+                                            <Target size={16} />
+                                            Notre mission
+                                        </button>
+
+                                        <button
+                                            onClick={() => { router.push("/objectives"); setShowUserMenuDesktopx(false); }}
+                                            className="w-full flex items-center gap-3 text-left px-4 py-3 hover:bg-pink-50 transition"
+                                        >
+                                            <CheckCircle size={16} />
+                                            Nos objectifs
+                                        </button>
+
+                                        <button
+                                            onClick={() => { router.push("/terms"); setShowUserMenuDesktopx(false); }}
+                                            className="w-full flex items-center gap-3 text-left px-4 py-3 hover:bg-pink-50 transition"
+                                        >
+                                            <FileText size={16} />
+                                            Termes et conditions
+                                        </button>
+
+                                        <button
+                                            onClick={() => { router.push("/privacy"); setShowUserMenuDesktopx(false); }}
+                                            className="w-full flex items-center gap-3 text-left px-4 py-3 hover:bg-pink-50 transition"
+                                        >
+                                            <Shield size={16} />
+                                            Politique de confidentialité
+                                        </button>
+
+                                    </div>
+                                )}
+                            </div>
+
                         </nav>
 
 
@@ -290,7 +363,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
 
                 {/* Mobile Menu */}
                 {isMenuOpen && (
-                    <div className="md:hidden absolute top-20 left-0 w-full bg-white/95 backdrop-blur-md border-b border-pink-100 shadow-xl animate-fade-in h-screen z-50">
+                    <div className="hidden absolute top-20 left-0 w-full bg-white/95 backdrop-blur-md border-b border-pink-100 shadow-xl animate-fade-in h-screen z-50">
                         <div className="px-4 pt-2 pb-6 space-y-2">
 
                             {navItems.map((item) => {
@@ -488,6 +561,10 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                 formUrl="https://docs.google.com/forms/d/e/1FAIpQLScY-R5SkFwByPEDyzW7AxVmEoEc2NSTI4RYYtvlp0w0jhEIjg/viewform?usp=publish-editor"
             />
             <CalendlyDrawer isOpen={openCalendly} onClose={() => setOpenCalendly(false)} />
+            <DrawerMenu
+                isOpen={isMenuOpen}
+                onClose={() => setIsMenuOpen(false)}
+            />
         </>
     );
 };
