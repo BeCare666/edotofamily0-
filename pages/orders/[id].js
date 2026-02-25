@@ -68,6 +68,11 @@ export default function OrderDetailsPage() {
       setLoading(true);
 
       const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Vous devez être connecté pour voir les détails de la commande.");
+        router.push("/login");
+        return;
+      }
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/orders/${id}`,
         {
@@ -411,7 +416,17 @@ export default function OrderDetailsPage() {
           <LocateFixed className="text-[#FF6EA9]" size={26} />
         </motion.button>
       )}
-
+      <motion.button
+        onClick={() => router.back()}
+        className="fixed bottom-5 left-4 z-[9999] w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
+             flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
+        whileHover={{ rotate: -5 }}
+        whileTap={{ scale: 0.9 }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#FF6EA9" className="w-7 h-7">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </motion.button>
 
       {/* --------------------------------------------------------------------- */}
       {/* MODAL PICKUP */}

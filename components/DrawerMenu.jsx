@@ -217,7 +217,8 @@ export default function DrawerMenu({ isOpen, onClose }) {
               </button>
             </li>
             {links.map((link) => (
-              <li key={link.href}>
+              <li key={link.href}
+                onClick={onClose}>
                 <Link
                   href={link.href}
                   className="group flex items-center gap-3 px-4 py-3 rounded-xl text-gray-800 bg-white/40 hover:bg-[#FF6EA9]/10 backdrop-blur-sm transition-all hover:shadow-sm"

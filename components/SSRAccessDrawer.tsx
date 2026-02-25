@@ -35,19 +35,17 @@ const SSRAccessDrawer = () => {
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${
-          open
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${open
+          ? "opacity-100 pointer-events-auto"
+          : "opacity-0 pointer-events-none"
+          }`}
         onClick={() => setOpen(false)}
       />
 
       {/* Drawer */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-50 transition-transform duration-500 ease-out ${
-          open ? "translate-y-0" : "translate-y-full"
-        }`}
+        className={`fixed bottom-0 left-0 right-0 z-50 transition-transform duration-500 ease-out ${open ? "translate-y-0" : "translate-y-full"
+          }`}
       >
         <div className="relative bg-white rounded-t-3xl shadow-2xl border border-slate-100 px-6 pt-6 pb-8">
           <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-300" />
@@ -76,17 +74,17 @@ const SSRAccessDrawer = () => {
                 setOpen(false);
                 router.push("/category/categories_id=3");
               }}
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-slate-200 bg-white hover:border-pink-300 hover:shadow-lg transition-all"
+              className="group flex items-center gap-4 p-5 rounded-2xl border border-slate-200 bg-green-600 hover:border-pink-300 hover:shadow-lg transition-all"
             >
               <div className="p-3 rounded-xl bg-pink-100 text-pink-600">
                 <ShoppingBag />
               </div>
 
               <div className="text-left">
-                <p className="font-semibold text-slate-800">
+                <p className="font-semibold text-slate-800 text-white">
                   Visiter nos produits
                 </p>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-500 text-white">
                   Commandez en toute discrétion
                 </p>
               </div>

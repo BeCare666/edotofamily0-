@@ -114,7 +114,7 @@ export default function CategoryPage() {
       try {
         const params = new URLSearchParams();
         params.set("categories_id", String(categories_id));
-        params.set("limit", "100");
+        params.set("limit", "20");
         params.set("offset", "0");
 
         if (query.trim()) params.set("search", query.trim());
@@ -172,7 +172,7 @@ export default function CategoryPage() {
     load();
 
     return () => controller.abort();
-  }, [router.isReady, query, sortBy]);
+  }, [router.isReady, router.asPath, query, sortBy]);
 
 
   // helper to parse an image field that might be JSON string or CSV
@@ -400,10 +400,14 @@ export default function CategoryPage() {
                 {/* Image Section */}
                 <div className="relative w-full h-60 overflow-hidden rounded-t-[5px] ">
                   {p.image && p.image[0] ? (
-                    <img
+                    <Image
                       src={p.image[0].url}
                       alt={p.name}
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      sizes="(max-width: 640px) 100vw,
+         (max-width: 1024px) 50vw,
+         33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
                     <div className="flex items-center justify-center w-full h-full bg-gray-50 text-gray-300">
