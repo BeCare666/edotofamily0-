@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+"use client";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import { ViewState } from '../types';
 import {
   Calendar,
@@ -427,14 +429,20 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
         {showCampaignModal && (
 
           <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-lg flex items-center justify-center z-[200]"
+            {...{
+              className:
+                "fixed inset-0 bg-black/60 backdrop-blur-lg flex items-center justify-center z-[200]",
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
 
             <motion.div
-              className="bg-slate-900 text-white w-full max-w-2xl rounded-3xl p-8"
+              {...{
+                className:
+                  "bg-slate-900 text-white w-full max-w-2xl rounded-3xl p-8",
+              }}
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
