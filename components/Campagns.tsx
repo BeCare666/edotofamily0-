@@ -9,13 +9,15 @@ import {
   ArrowRight,
   X,
   Search,
-  XCircle
+  XCircle,
+  Layers
 } from 'lucide-react';
 import { Campaign } from '../types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import CampaignStatusCard from './CampaignStatusCard'
+import CampaignStatusCard from './CampaignStatusCard';
+
 // ========= IMPORTANT =========
 // This file is a single self-contained React component (TSX) for Next.js
 // It expects these environment vars: NEXT_PUBLIC_REST_API_ENDPOINT
@@ -46,7 +48,72 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
   const [page, setPage] = useState(1);
   const [modalOpenConfirm, setmodalOpenConfirm] = useState(false);
   const router = useRouter();
-
+  const [city, setCity] = useState<string | null>(null);
+  const [detectedCity, setDetectedCity] = useState<string | null>(null);
+  const [showGeoModal, setShowGeoModal] = useState(false);
+  const [showGeoModalNoData, setShowGeoModalNoData] = useState(false);
+  const [showCityDrawer, setShowCityDrawer] = useState(false);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [citySearch, setCitySearch] = useState("");
+  const [activeCount, setActiveCount] = useState<number>(0);
+  const [showCampaignModal, setShowCampaignModal] = useState(false);
+  const [activeCampaignsCity, setActiveCampaignsCity] = useState<Campaign[]>([]);
+  const beninCities = [
+    "Abomey",
+    "Abomey-Calavi",
+    "Adjohoun",
+    "Adjarra",
+    "Agbangnizoun",
+    "Allada",
+    "Aplahoué",
+    "Avrankou",
+    "Banikoara",
+    "Bantè",
+    "Bassila",
+    "Bembèrèkè",
+    "Bohicon",
+    "Bonou",
+    "Boukoumbé",
+    "Cotonou",
+    "Cobly",
+    "Dangbo",
+    "Dassa-Zoumè",
+    "Dogbo",
+    "Djougou",
+    "Glazoué",
+    "Ifangni",
+    "Kalalé",
+    "Kandi",
+    "Kétou",
+    "Klouékanmè",
+    "Kouandé",
+    "Lalo",
+    "Lokossa",
+    "Malanville",
+    "Matéri",
+    "Natitingou",
+    "Nikki",
+    "Ouèssè",
+    "Ouidah",
+    "Parakou",
+    "Pobè",
+    "Porto-Novo",
+    "Pèrèrè",
+    "Sakété",
+    "Savalou",
+    "Savè",
+    "Sèmè-Kpodji",
+    "Sinendé",
+    "Tanguiéta",
+    "Tchaourou",
+    "Toffo",
+    "Togba",
+    "Toucountouna",
+    "Toviklin",
+    "Za-Kpota",
+    "Zè",
+    "Zogbodomey"
+  ];
   // -----------------------
   // Fetch campaigns
   // -----------------------
@@ -60,8 +127,8 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
 
       const active = await activeRes.json();
       const upcoming = await upcomingRes.json();
-
-      setActiveCampaign(active || null);
+      console.log("les actives", active);
+      setActiveCampaignsCity(active);
       setUpcomingCampaigns(Array.isArray(upcoming) ? upcoming : (upcoming.data || []));
     } catch (err) {
       console.error(err);
@@ -70,7 +137,22 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
       setLoading(false);
     }
   };
+  // FETCH COUNT
+  // -------------------------
 
+  const fetchActiveCount = async () => {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
+    try {
+
+      const res = await fetch(`${API_BASE_URL}/campaigns/active/count`);
+      const data = await res.json();
+
+      setActiveCount(data.total || 0);
+
+    } catch (e) {
+      console.error(e);
+    }
+  };
   // -----------------------
   // Fetch pickup points (super_pickuppoint)
   // -----------------------
@@ -96,10 +178,88 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
       console.error('Erreur fetching pickup points:', e);
     }
   };
+  const fetchActiveByCity = async (city: string | null) => {
 
+    if (!city) return;
+
+    try {
+
+      const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
+
+      const res = await fetch(
+        `${API_BASE_URL}/campaigns/active/city/${city}`
+      );
+
+      const data = await res.json();
+
+      console.log("Campagne active pour la ville sélectionnée:", data?.[0] || null);
+
+      if (Array.isArray(data) && data.length > 0) {
+
+        setActiveCampaign(data[0]);
+        //setActiveCampaignsCity(data);
+      } else {
+
+        setActiveCampaign(null);
+        setShowGeoModalNoData(true);
+        //setActiveCampaignsCity([]);
+        //alert("Aucune campagne active trouvée pour cette ville.");
+
+      }
+
+    } catch (e) {
+      console.error(e);
+    }
+
+  };
+  const filteredCities = beninCities.filter(city =>
+    city.toLowerCase().includes(citySearch.toLowerCase())
+  );
   useEffect(() => {
+    const detectCity = async () => {
+
+      try {
+
+        if (!navigator.geolocation) return;
+
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true
+          });
+        });
+
+        const { latitude, longitude } = position.coords;
+
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&countrycodes=bj&accept-language=fr`,
+          {
+            headers: {
+              "User-Agent": "EdotoFamilyApp"
+            }
+          }
+        );
+
+        const data = await res.json();
+
+        const city =
+          data.address?.city ||
+          data.address?.town ||
+          data.address?.village ||
+          null;
+
+        if (city) {
+          setDetectedCity(city);
+          setShowGeoModal(true);
+        }
+
+      } catch (e) {
+        console.error(e);
+      }
+
+    }; detectCity()
     fetchCampaigns();
     fetchPickupPoints();
+    fetchActiveCount()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -260,7 +420,79 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
       {showForm && (
         <ModalSubscribe onClose={() => setShowForm(false)} onSubmit={handleSubscribe} />
       )}
+      {/* MODAL CAMPAGNES */}
 
+      <AnimatePresence>
+
+        {showCampaignModal && (
+
+          <motion.div
+            className="fixed inset-0 bg-black/60 backdrop-blur-lg flex items-center justify-center z-[200]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+
+            <motion.div
+              className="bg-slate-900 text-white w-full max-w-2xl rounded-3xl p-8"
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+            >
+
+              <div className="flex justify-between items-center mb-6">
+
+                <h2 className="text-2xl font-bold">
+                  Campagnes actives
+                </h2>
+
+                <button onClick={() => setShowCampaignModal(false)}>
+                  <X size={24} />
+                </button>
+
+              </div>
+
+              <div className="space-y-4">
+
+                {activeCampaignsCity.map((c) => (
+
+                  <div
+                    key={c.id}
+                    onClick={() => {
+                      setActiveCampaign(c);
+                      setShowCampaignModal(false);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="p-4 bg-slate-800 rounded-xl cursor-pointer hover:bg-slate-700 transition"
+                  >
+
+                    <div className="flex justify-between">
+
+                      <h3 className="font-bold">
+                        {c.title}
+                      </h3>
+
+                      <MapPin size={18} />
+
+                    </div>
+
+                    <p className="text-sm text-slate-400">
+                      {c.location}
+                    </p>
+
+                  </div>
+
+                ))}
+
+              </div>
+
+            </motion.div>
+
+          </motion.div>
+
+        )}
+
+      </AnimatePresence>
       {/* MODAL: Pickup (choose point OR custom) */}
       <ModalPickup
         visible={showPickupModal}
@@ -337,8 +569,146 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
           </div>
         </div>
       )}
+      {showGeoModal && (
+        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/70 backdrop-blur-xl">
+
+          <div className="bg-[#0f172a] text-white rounded-3xl p-8 w-full max-w-md shadow-2xl border border-white/10">
+
+            <div className="text-center">
+
+              <h2 className="text-2xl font-bold mb-4">
+                📍 Ville détectée
+              </h2>
+
+              <p className="text-3xl font-bold text-pink-400 mb-8">
+                {detectedCity}
+              </p>
+
+              <div className="flex gap-4 justify-center">
+
+                <button
+                  onClick={() => {
+                    setSelectedCity(detectedCity);
+                    setShowGeoModal(false);
+                    fetchActiveByCity(detectedCity);
+                  }}
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 font-semibold"
+                >
+                  ✅ Confirmer
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowGeoModal(false);
+                    setShowCityDrawer(true);
+                  }}
+                  className="px-6 py-3 rounded-xl bg-white/10"
+                >
+                  ✏ Modifier
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+      {showGeoModalNoData && (
+        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/70 backdrop-blur-xl">
+
+          <div className="bg-[#0f172a] text-white rounded-3xl p-8 w-full max-w-md shadow-2xl border border-white/10">
+
+            <div className="text-center">
+
+              <h2 className="text-2xl font-bold mb-4">
+                📍 Aucune campagne n'est en cours pour la ville choisie. Merci !
+              </h2>
 
 
+
+              <div className="flex gap-4 justify-center">
+
+
+                <button
+                  onClick={() => {
+                    setShowGeoModalNoData(false);
+
+                  }}
+                  className="px-6 py-3 rounded-xl bg-white/10"
+                >
+                  OK
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+      {showCityDrawer && (
+        <div className="fixed inset-0 z-[600] bg-black/80 backdrop-blur-xl flex justify-end">
+
+          <div className="w-full max-w-sm bg-[#020617] text-white p-6">
+
+            <h2 className="text-xl font-bold mb-6">
+              🌍 Choisir une ville
+            </h2>
+            <button
+              onClick={() => setShowCityDrawer(false)}
+              className="absolute top-4 right-4 text-white/70 hover:text-white text-2xl"
+            >
+              ✕
+            </button>
+            <input
+              placeholder="Rechercher ville..."
+              className="w-full p-3 rounded-xl bg-white/5 mb-6"
+              value={citySearch}
+              onChange={(e) => setCitySearch(e.target.value)}
+            />
+
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+
+              {filteredCities.map(city => (
+                <div
+                  key={city}
+                  onClick={() => {
+                    setSelectedCity(city);
+                    setShowCityDrawer(false);
+                    fetchActiveByCity(city);
+                    setShowGeoModal(false);
+                  }}
+                  className="p-4 rounded-xl bg-white/5 hover:bg-pink-600 cursor-pointer transition"
+                >
+                  {city}
+                </div>
+              ))}
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* BOUTON PREMIUM */}
+      {activeCount > 0 && (
+
+        <button
+          onClick={() => setShowCampaignModal(true)}
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-2xl bg-slate-900 text-white shadow-2xl hover:scale-105 transition"
+        >
+          <Layers size={20} />
+
+          <span className="font-semibold">
+            {activeCount} active(s)
+          </span>
+        </button>
+
+      )}
     </div>
   );
 };

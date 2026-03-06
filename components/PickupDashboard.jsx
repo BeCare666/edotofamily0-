@@ -13,7 +13,7 @@ import {
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-export default function PickupDashboard({ mode = "orders", campaignId }) {
+export default function PickupDashboardarchive({ mode = "orders", campaignId }) {
     const router = useRouter();
     const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT || "";
     const token =

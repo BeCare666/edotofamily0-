@@ -14,22 +14,22 @@ const CampaignStatusCard: React.FC<CampaignStatusProps> = ({
   date_end,
   status,
 }) => {
-const formatDate = (isoDate: string) => {
-  if (!isoDate) return "Non définie";
+  const formatDate = (isoDate: string) => {
+    if (!isoDate) return "Non définie";
 
-  const date = new Date(isoDate);
+    const date = new Date(isoDate);
 
-  const options: Intl.DateTimeFormatOptions = {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+    const options: Intl.DateTimeFormatOptions = {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+
+    return date.toLocaleDateString("fr-FR", options)
+      .replace(",", ""); // petit nettoyage
   };
-
-  return date.toLocaleDateString("fr-FR", options)
-    .replace(",", ""); // petit nettoyage
-};
 
   const [countdown, setCountdown] = useState({
     days: "--",
@@ -67,23 +67,28 @@ const formatDate = (isoDate: string) => {
   }, [date_end]);
 
   // --- STYLES DU BADGE SELON STATUT ---
- const statusMap = {
-  a_venir: {
-    label: "À venir",
-    color: "bg-yellow-100 text-yellow-800",
-    icon: <Clock size={16} className="text-yellow-700" />,
-  },
-  planifie: {
-    label: "Planifiée",
-    color: "bg-blue-100 text-blue-800",
-    icon: <CalendarCheck size={16} className="text-blue-700" />,
-  },
-  en_cours: {
-    label: "En cours",
-    color: "bg-green-100 text-green-800",
-    icon: <Activity size={16} className="text-green-700 animate-pulse" />,
-  },
-};
+  const safeStatus = (status || "").toLowerCase().replace("-", "_");
+
+  const statusMap: any = {
+    a_venir: {
+      label: "À venir",
+      color: "bg-yellow-100 text-yellow-800",
+      icon: <Clock size={16} className="text-yellow-700" />,
+    },
+    planifie: {
+      label: "Planifiée",
+      color: "bg-blue-100 text-blue-800",
+      icon: <CalendarCheck size={16} className="text-blue-700" />,
+    },
+    en_cours: {
+      label: "En cours",
+      color: "bg-green-100 text-green-800",
+      icon: <Activity size={16} className="text-green-700 animate-pulse" />,
+    },
+  };
+
+  const config =
+    statusMap[safeStatus] || statusMap["a_venir"];
 
   return (
     <div className="w-full bg-white/60 backdrop-blur-xl border border-white/30 rounded-[5px] mb-6">
@@ -92,12 +97,12 @@ const formatDate = (isoDate: string) => {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-slate-900">{title}</h2>
 
-<span
-  className={`flex items-center gap-2 px-4 py-1 rounded-full text-sm font-semibold ${statusMap[status].color}`}
->
-  {statusMap[status].icon}
-  {statusMap[status].label}
-</span>
+        <span
+          className={`flex items-center gap-2 px-4 py-1 rounded-full text-sm font-semibold ${config.color}`}
+        >
+          {config.icon}
+          {config.label}
+        </span>
       </div>
 
       {/* Dates */}
@@ -114,7 +119,7 @@ const formatDate = (isoDate: string) => {
       {/* Countdown */}
       {status === "en_cours" && (
         <div className="mt-6 bg-[#FFF0F7] rounded-2xl p-5 border border-pink-100 text-center">
-          
+
           {!countdown.ended ? (
             <>
               <div className="flex justify-center items-center gap-2 mb-2">

@@ -33,7 +33,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
   const router = useRouter()
   // const [user, setUser] = useState(false)
   const { user, logout } = useAuthContext();
-  console.log("User in DrawerMenu:", user);
+  //console.log("User in DrawerMenu:", user);
   // Charger le user depuis localStorage
   // useEffect(() => {
   //   const storedUser = localStorage.getItem("token")

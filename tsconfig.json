@@ -24,7 +24,9 @@
     "pages/login.jsx",
     "pages/login.js",
     "pages/succesregister.js",
-    "pages/pickup-dashboard.js"
+    "pages/pickup-dashboard.js",
+    "pages/pickup-dashboard-for-orders.js",
+    "components/Campagns.jsx"
   ],
   "exclude": [
     "node_modules"

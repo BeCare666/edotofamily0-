@@ -74,17 +74,17 @@ const SSRAccessDrawer = () => {
                 setOpen(false);
                 router.push("/category/categories_id=3");
               }}
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-slate-200 bg-green-600 hover:border-pink-300 hover:shadow-lg transition-all"
+              className="group flex items-center gap-4 p-5 rounded-2xl border border-slate-200  hover:border-pink-300 hover:shadow-lg transition-all"
             >
               <div className="p-3 rounded-xl bg-pink-100 text-pink-600">
                 <ShoppingBag />
               </div>
 
               <div className="text-left">
-                <p className="font-semibold text-slate-800 text-white">
+                <p className="font-semibold text-slate-800  ">
                   Visiter nos produits
                 </p>
-                <p className="text-sm text-slate-500 text-white">
+                <p className="text-sm text-slate-500 ">
                   Commandez en toute discrétion
                 </p>
               </div>

@@ -293,7 +293,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                                             {user?.role === "super_pickuppoint" ? (
                                                 <button
                                                     onClick={() => {
-                                                        router.push("/pickup-dashboard");
+                                                        router.push("/pickup-dashboard-for-orders");
                                                         setShowUserMenuDesktop(false);
                                                     }}
                                                     className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-pink-50 transition text-gray-700"
