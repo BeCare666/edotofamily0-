@@ -44,7 +44,8 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
   const [activeCampaign, setActiveCampaign] = useState<Campaign | null>(null);
   const [upcomingCampaigns, setUpcomingCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [loadingcity, setLoadingcity] = useState(true);
+  const [loadingcityc, setLoadingcityc] = useState(false);
   const [pickupPoints, setPickupPoints] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -120,6 +121,7 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
   // Fetch campaigns
   // -----------------------
   const fetchCampaigns = async () => {
+    setLoadingcity(false);
     const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
     try {
       const [activeRes, upcomingRes] = await Promise.all([
@@ -137,6 +139,7 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
       toast.error('Impossible de charger les campagnes.');
     } finally {
       setLoading(false);
+      setLoadingcity(true);
     }
   };
   // FETCH COUNT
@@ -181,7 +184,7 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
     }
   };
   const fetchActiveByCity = async (city: string | null) => {
-
+    setLoadingcityc(true)
     if (!city) return;
 
     try {
@@ -211,6 +214,8 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
 
     } catch (e) {
       console.error(e);
+    } finally {
+      setLoadingcityc(false);
     }
 
   };
@@ -256,6 +261,8 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
 
       } catch (e) {
         console.error(e);
+      } finally {
+        setLoadingcity(false);
       }
 
     }; detectCity()
@@ -377,7 +384,12 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center text-slate-600 text-xl">Chargement des campagnes...</div>
   );
-
+  if (loadingcity) return (
+    <div className="min-h-screen flex items-center justify-center text-slate-600 text-xl">Détection de votre ville...</div>
+  );
+  if (loadingcityc) return (
+    <div className="min-h-screen flex items-center justify-center text-slate-600 text-xl">En cours...</div>
+  );
   return (
     <div className="min-h-screen bg-slate-50">
       {/* HERO */}
