@@ -84,7 +84,7 @@ export default function PickupMap({ pickupLat, pickupLng, name }) {
         <div className="w-full h-[90vh]">
             <MapContainer
                 center={center}
-                zoom={10}
+                zoom={14}
                 className="w-full h-full"
             >
 

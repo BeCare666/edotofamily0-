@@ -23,7 +23,7 @@ import dynamic from "next/dynamic";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 //import PickupMapModal from "../pickupmap/PickupMapModal";
 const PickupMapModal = dynamic(
-  () => import("../pickupmap/PickupMapModal"),
+  () => import("../../components/pickupmap/PickupMapModal"),
   { ssr: false }
 );
 // 🟣 CONFIG
