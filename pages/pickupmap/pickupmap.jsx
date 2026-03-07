@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+
 
 function Routing({ userLocation, pickupLat, pickupLng }) {
-
+    ///ok je pour eviter l'erreur windows
     const map = useMap();
     const routingRef = useRef(null);
 
@@ -84,7 +84,7 @@ export default function PickupMap({ pickupLat, pickupLng, name }) {
         <div className="w-full h-[90vh]">
             <MapContainer
                 center={center}
-                zoom={14}
+                zoom={10}
                 className="w-full h-full"
             >
 

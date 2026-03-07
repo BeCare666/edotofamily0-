@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 import { Toaster } from "react-hot-toast"
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation"
+import "leaflet/dist/leaflet.css";
 import Router from "next/router";
 const Header = dynamic(() => import("../components/header"), {
   ssr: false,
@@ -21,38 +22,7 @@ export default function MyApp({ Component, pageProps }) {
     pathname === "/register" ||
     pathname === "/forgot-password" ||
     pathname === "/succesregister"
-  useEffect(() => {
-    const logStart = (url) => {
-      console.log("➡️ routeChangeStart:", url);
-      console.trace("Navigation stack");
-    };
 
-    const logComplete = (url) => {
-      console.log("✅ routeChangeComplete:", url);
-    };
-
-    const logError = (err, url) => {
-      console.error("❌ routeChangeError vers:", url, err);
-    };
-
-    Router.events.on("routeChangeStart", logStart);
-    Router.events.on("routeChangeComplete", logComplete);
-    Router.events.on("routeChangeError", logError);
-    const originalPush = Router.push;
-
-    Router.push = (...args) => {
-      console.log("🚨 router.push vers:", args[0]);
-      console.trace("Stack navigation");
-      return originalPush.apply(Router, args);
-    };
-
-    return () => {
-      Router.events.off("routeChangeStart", logStart);
-      Router.events.off("routeChangeComplete", logComplete);
-      Router.events.off("routeChangeError", logError);
-      Router.push = originalPush;
-    };
-  }, []);
 
   return (
     <AuthProvider>
