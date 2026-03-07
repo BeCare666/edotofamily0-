@@ -21,6 +21,11 @@ import toast from "react-hot-toast";
 import OrderProgressBar from "../../components/OrderProgressBar";
 import dynamic from "next/dynamic";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
+import PickupMapModal from "../pickupmap/PickupMapModal";
+const PickupMap = dynamic(
+  () => import("../pickupmap/pickupmap"),
+  { ssr: false }
+);
 // 🟣 CONFIG
 const PAGE_SIZE = 6;
 
@@ -45,7 +50,8 @@ export default function OrderDetailsPage() {
   const [isShowEndOrders, setIsShowEndOrders] = useState(false);
   const [isSetData, setIsSetData] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [openMap, setOpenMap] = useState(false);
+  const [mapCoords, setMapCoords] = useState(null);
   useEffect(() => {
     if (id) fetchOrderDetails(id);
   }, [id]);
@@ -427,6 +433,19 @@ export default function OrderDetailsPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
       </motion.button>
+      {order?.pickup_point?.pickup_lat && (
+        <motion.button
+          onClick={() => setOpenMap(true)}
+          className="fixed bottom-5 right-4 z-[9999] w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
+             flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
+          whileHover={{ rotate: -5 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF6EA9" className="w-7 h-7">
+            <path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
+          </svg>
+        </motion.button>
+      )}
 
       {/* --------------------------------------------------------------------- */}
       {/* MODAL PICKUP */}
@@ -689,6 +708,13 @@ export default function OrderDetailsPage() {
         </div>
       )}
 
+      <PickupMapModal
+        open={openMap}
+        onClose={() => setOpenMap(false)}
+        pickupLat={order?.pickup_point?.pickup_lat}
+        pickupLng={order?.pickup_point?.pickup_lng}
+        name={order?.pickup_point?.name}
+      />
     </main>
   );
 }
