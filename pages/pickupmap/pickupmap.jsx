@@ -2,19 +2,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-if (typeof window !== "undefined") {
-    require("leaflet");
-    require("leaflet-routing-machine");
-}
-// Fix icon Leaflet NextJS
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-    iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
+
+let L; // Lazy load Leaflet
 
 function Routing({ userLocation, pickupLat, pickupLng }) {
 
@@ -23,13 +13,18 @@ function Routing({ userLocation, pickupLat, pickupLng }) {
 
     useEffect(() => {
 
-        if (!userLocation || !pickupLat || !pickupLng) return;
+        if (typeof window === "undefined") return;
+        if (!userLocation) return;
 
-        import("leaflet-routing-machine").then(() => {
+        const loadRouting = async () => {
+
+            if (!L) {
+                L = await import("leaflet");
+                await import("leaflet-routing-machine");
+            }
 
             if (!L.Routing) return;
 
-            // supprimer ancien route
             if (routingRef.current) {
                 map.removeControl(routingRef.current);
             }
@@ -39,25 +34,23 @@ function Routing({ userLocation, pickupLat, pickupLng }) {
                     L.latLng(userLocation.lat, userLocation.lng),
                     L.latLng(pickupLat, pickupLng),
                 ],
-
                 addWaypoints: false,
                 draggableWaypoints: false,
                 routeWhileDragging: false,
-
-                show: false, // 👈 cache texte instructions
-
+                show: false,
                 createMarker: () => null,
 
                 lineOptions: {
                     styles: [
-                        { color: "#062d83", weight: 10 },
-                        { color: "#ffffff", weight: 2 }
+                        { color: "#062d83", weight: 8 },
+                        { color: "#ffffff", weight: 3 }
                     ]
                 }
 
             }).addTo(map);
+        };
 
-        });
+        loadRouting();
 
         return () => {
             if (routingRef.current) {
@@ -99,19 +92,22 @@ export default function PickupMap({ pickupLat, pickupLng, name }) {
 
     return (
         <div className="w-full h-[90vh]">
-            <MapContainer center={center} zoom={9} className="w-full h-full">
+            <MapContainer
+                center={center}
+                zoom={9}
+                className="w-full h-full"
+                scrollWheelZoom
+            >
 
                 <TileLayer
                     attribution="&copy; OpenStreetMap"
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
-                {/* Pickup */}
                 <Marker position={[pickupLat, pickupLng]}>
                     <Popup>{name}</Popup>
                 </Marker>
 
-                {/* User */}
                 {userLocation && (
                     <Marker position={[userLocation.lat, userLocation.lng]}>
                         <Popup>Votre position</Popup>
