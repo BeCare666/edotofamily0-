@@ -47,7 +47,7 @@ export const authService = {
         const res = await apiRequest("/me", {
             method: "GET",
         })
-        console.log("👉 Réponse /me :", res)
+        //console.log("👉 Réponse /me :", res)
         return res
     },
 

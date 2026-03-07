@@ -7,7 +7,6 @@ import Footer from '../components/Footer';
 import { Toaster } from "react-hot-toast"
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation"
-import "leaflet/dist/leaflet.css";
 import Router from "next/router";
 const Header = dynamic(() => import("../components/header"), {
   ssr: false,

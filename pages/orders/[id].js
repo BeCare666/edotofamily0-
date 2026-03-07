@@ -89,7 +89,7 @@ export default function OrderDetailsPage() {
       );
 
       const data = await res.json();
-      console.log("viens vois", data)
+      //console.log("viens vois", data)
 
       setOrder({
         ...data,
@@ -154,7 +154,7 @@ export default function OrderDetailsPage() {
       );
 
       const data = await res.json();
-      console.log('data', data)
+      //console.log('data', data)
 
       setPickupPoints(Array.isArray(data.data) ? data.data : []);;
     } catch (e) {
