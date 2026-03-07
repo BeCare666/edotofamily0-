@@ -4,8 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-let L; // Lazy load Leaflet
-
 function Routing({ userLocation, pickupLat, pickupLng }) {
 
     const map = useMap();
@@ -13,15 +11,14 @@ function Routing({ userLocation, pickupLat, pickupLng }) {
 
     useEffect(() => {
 
-        if (typeof window === "undefined") return;
         if (!userLocation) return;
 
-        const loadRouting = async () => {
+        let L;
 
-            if (!L) {
-                L = await import("leaflet");
-                await import("leaflet-routing-machine");
-            }
+        const load = async () => {
+
+            L = await import("leaflet");
+            await import("leaflet-routing-machine");
 
             if (!L.Routing) return;
 
@@ -32,25 +29,18 @@ function Routing({ userLocation, pickupLat, pickupLng }) {
             routingRef.current = L.Routing.control({
                 waypoints: [
                     L.latLng(userLocation.lat, userLocation.lng),
-                    L.latLng(pickupLat, pickupLng),
+                    L.latLng(pickupLat, pickupLng)
                 ],
                 addWaypoints: false,
                 draggableWaypoints: false,
                 routeWhileDragging: false,
                 show: false,
-                createMarker: () => null,
-
-                lineOptions: {
-                    styles: [
-                        { color: "#062d83", weight: 8 },
-                        { color: "#ffffff", weight: 3 }
-                    ]
-                }
-
+                createMarker: () => null
             }).addTo(map);
+
         };
 
-        loadRouting();
+        load();
 
         return () => {
             if (routingRef.current) {
@@ -58,7 +48,7 @@ function Routing({ userLocation, pickupLat, pickupLng }) {
             }
         };
 
-    }, [userLocation, pickupLat, pickupLng]);
+    }, [userLocation]);
 
     return null;
 }
@@ -94,13 +84,11 @@ export default function PickupMap({ pickupLat, pickupLng, name }) {
         <div className="w-full h-[90vh]">
             <MapContainer
                 center={center}
-                zoom={9}
+                zoom={14}
                 className="w-full h-full"
-                scrollWheelZoom
             >
 
                 <TileLayer
-                    attribution="&copy; OpenStreetMap"
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
@@ -109,17 +97,17 @@ export default function PickupMap({ pickupLat, pickupLng, name }) {
                 </Marker>
 
                 {userLocation && (
-                    <Marker position={[userLocation.lat, userLocation.lng]}>
-                        <Popup>Votre position</Popup>
-                    </Marker>
-                )}
+                    <>
+                        <Marker position={[userLocation.lat, userLocation.lng]}>
+                            <Popup>Votre position</Popup>
+                        </Marker>
 
-                {userLocation && (
-                    <Routing
-                        userLocation={userLocation}
-                        pickupLat={pickupLat}
-                        pickupLng={pickupLng}
-                    />
+                        <Routing
+                            userLocation={userLocation}
+                            pickupLat={pickupLat}
+                            pickupLng={pickupLng}
+                        />
+                    </>
                 )}
 
             </MapContainer>
