@@ -4,7 +4,10 @@ import { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
+if (typeof window !== "undefined") {
+    require("leaflet");
+    require("leaflet-routing-machine");
+}
 // Fix icon Leaflet NextJS
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
