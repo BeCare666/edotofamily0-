@@ -8,6 +8,7 @@ import { Toaster } from "react-hot-toast"
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation"
 import Router from "next/router";
+import CookieConsent from '../components/CookieConsent';
 const Header = dynamic(() => import("../components/header"), {
   ssr: false,
 });
@@ -31,6 +32,7 @@ export default function MyApp({ Component, pageProps }) {
       <Layout>
         {!isHomePage && <Header />}
         <Component {...pageProps} />
+        <CookieConsent />
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       </Layout>
       {!isHomePage && <Footer />}

@@ -38,7 +38,7 @@ export default function ProfilePage() {
             </main>
         )
     }
-
+    //console.log("users", user);
     // --- Déconnexion
     const handleLogout = async () => {
         await logout()
@@ -161,14 +161,14 @@ export default function ProfilePage() {
                     </motion.div>
 
                     <motion.div whileHover={{ scale: 1.02 }} className="flex items-center gap-3 p-4 rounded-2xl bg-white/70 border border-gray-100 shadow-sm">
-                        {user.is_verified ? (
+                        {user.is_active ? (
                             <CheckCircle2 size={20} className="text-green-500" />
                         ) : (
                             <XCircle size={20} className="text-red-400" />
                         )}
                         <div>
-                            <p className="text-xs text-gray-500">Email vérifié</p>
-                            <p className="font-medium">{user.is_verified ? "Oui" : "Non"}</p>
+                            <p className="text-xs text-gray-500">Compte vérifié</p>
+                            <p className="font-medium">{user.is_active ? "Oui" : "Non"}</p>
                         </div>
                     </motion.div>
                 </div>

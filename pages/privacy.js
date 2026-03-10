@@ -3,16 +3,78 @@
 import { motion } from "framer-motion"
 import { ShieldCheck, Lock, Eye, Heart } from "lucide-react"
 import { useRouter } from "next/navigation"
+
 export default function PrivacyPage() {
   const router = useRouter()
+
+  const legalSections = [
+    {
+      title: "Responsable du traitement",
+      text: `Le responsable du traitement des données collectées sur la plateforme edotofamily.com est :
+SODINYESSI Sènou Gérard – Startup BeCare
+Email : becare.fr.ge@fmail.com
+Téléphone : +229 01 67698191
+Ville : Cotonou, République du Bénin.`,
+    },
+    {
+      title: "Données collectées",
+      text: `Lors de l’utilisation du site, les données suivantes peuvent être collectées :
+Nom et prénoms, adresse email, numéro de téléphone, identifiant utilisateur,
+adresse IP, données de connexion, images téléchargées par les utilisateurs
+et données liées aux commandes ou à l’utilisation du service.`,
+    },
+    {
+      title: "Finalités du traitement",
+      text: `Les données collectées servent à :
+- créer et gérer les comptes utilisateurs
+- permettre l’accès aux services de la plateforme
+- gérer les commandes et interactions
+- envoyer des emails liés au fonctionnement du service
+- améliorer l’expérience utilisateur
+- assurer la sécurité de la plateforme`,
+    },
+    {
+      title: "Base légale du traitement",
+      text: `Le traitement des données repose sur :
+- le consentement de l’utilisateur
+- l’exécution d’un contrat entre l’utilisateur et la plateforme
+- l’intérêt légitime lié au fonctionnement et à la sécurité du service.`,
+    },
+    {
+      title: "Conservation des données",
+      text: `Les données personnelles sont conservées pendant la durée nécessaire
+à la fourniture des services et au maximum cinq (05) ans après la dernière
+activité du compte utilisateur, sauf obligation légale contraire.`,
+    },
+    {
+      title: "Destinataires des données",
+      text: `Certaines données peuvent être traitées par des prestataires
+techniques nécessaires au fonctionnement du service :
+
+LWS – hébergement du site web
+TiDB Cloud (PingCAP) – gestion de la base de données
+Cloudinary – stockage et gestion des images
+Brevo – envoi d’emails transactionnels
+
+Ces prestataires agissent en qualité de sous-traitants.`,
+    },
+    {
+      title: "Transfert des données",
+      text: `Certains services utilisés peuvent impliquer un transfert de données
+vers des serveurs situés hors du Bénin, notamment en France,
+dans l’Union Européenne ou aux États-Unis.`,
+    },
+  ]
+
   return (
     <main className="relative min-h-screen bg-gradient-to-b from-[#fff9fb] via-white to-[#fff3f8] text-[#0F172A] overflow-hidden px-6 py-20">
-      {/* Orbes lumineuses décoratives */}
+
       <motion.div
         className="absolute top-10 left-10 w-64 h-64 bg-[#FF6EA9]/20 rounded-full blur-3xl"
         animate={{ y: [0, 25, 0], opacity: [0.4, 0.7, 0.4] }}
         transition={{ repeat: Infinity, duration: 7 }}
       />
+
       <motion.div
         className="absolute bottom-10 right-10 w-96 h-96 bg-[#FF6EA9]/30 rounded-full blur-3xl"
         animate={{ y: [0, -30, 0], opacity: [0.5, 0.8, 0.5] }}
@@ -36,11 +98,13 @@ export default function PrivacyPage() {
           transition={{ delay: 0.3, duration: 1 }}
           className="text-gray-600 text-lg leading-relaxed"
         >
-          Chez <span className="font-semibold text-[#FF6EA9]">E·Doto Family</span>, la protection de vos données personnelles n’est pas qu’une obligation — c’est un engagement d’amour, de respect et de transparence.
+          Chez <span className="font-semibold text-[#FF6EA9]">E·Doto Family</span>,
+          la protection de vos données personnelles n’est pas qu’une obligation —
+          c’est un engagement d’amour, de respect et de transparence.
         </motion.p>
       </section>
 
-      {/* SECTIONS DE POLITIQUE */}
+      {/* SECTIONS PRINCIPALES */}
       <section className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12">
         {[
           {
@@ -51,7 +115,7 @@ export default function PrivacyPage() {
           {
             icon: <Lock size={36} className="text-[#FF6EA9]" />,
             title: "Collecte responsable",
-            text: "Les données collectées servent uniquement à améliorer votre expérience : commandes, accompagnement personnalisé, et services de bien-être.",
+            text: "Les données collectées servent uniquement à améliorer votre expérience : commandes, accompagnement personnalisé et services de bien-être.",
           },
           {
             icon: <Eye size={36} className="text-[#FF6EA9]" />,
@@ -61,7 +125,7 @@ export default function PrivacyPage() {
           {
             icon: <Heart size={36} className="text-[#FF6EA9]" />,
             title: "Respect de votre vie privée",
-            text: "Vos données ne seront jamais revendues ni partagées sans votre consentement. Vous restez la seule personne maître de votre identité numérique.",
+            text: "Vos données ne seront jamais revendues ni partagées sans votre consentement.",
           },
         ].map((section, i) => (
           <motion.div
@@ -80,7 +144,27 @@ export default function PrivacyPage() {
         ))}
       </section>
 
-      {/* SECTION — DROITS UTILISATEURS */}
+      {/* SECTIONS JURIDIQUES */}
+      <section className="max-w-5xl mx-auto mt-24 grid md:grid-cols-2 gap-12">
+        {legalSections.map((section, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: i * 0.15 }}
+            className="bg-white/70 backdrop-blur-lg border border-[#ffd6e8]/60 rounded-3xl p-8 shadow-md"
+          >
+            <h3 className="text-xl font-semibold mb-4 text-[#0F172A]">
+              {section.title}
+            </h3>
+            <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+              {section.text}
+            </p>
+          </motion.div>
+        ))}
+      </section>
+
+      {/* DROITS UTILISATEURS */}
       <section className="max-w-4xl mx-auto text-center mt-28">
         <motion.h3
           initial={{ opacity: 0, y: 20 }}
@@ -90,9 +174,18 @@ export default function PrivacyPage() {
         >
           Vos droits, notre responsabilité.
         </motion.h3>
+
         <p className="text-gray-600 mb-6 leading-relaxed">
-          Vous pouvez à tout moment demander la modification, la suppression ou la consultation de vos données.
-          Écrivez-nous simplement à <span className="text-[#FF6EA9] font-medium">privacy@edotofamily.com</span> — nous répondrons avec bienveillance.
+          Conformément à la législation en vigueur, vous disposez des droits
+          d’accès, de rectification, d’opposition, de suppression et de
+          portabilité de vos données personnelles.
+        </p>
+
+        <p className="text-gray-600 mb-6">
+          Contact :{" "}
+          <span className="text-[#FF6EA9] font-medium">
+            privacy@edotofamily.com
+          </span>
         </p>
 
         <motion.button
@@ -103,7 +196,7 @@ export default function PrivacyPage() {
         </motion.button>
       </section>
 
-      {/* CITATION DE CLÔTURE */}
+      {/* CITATION */}
       <section className="relative text-center py-24">
         <motion.blockquote
           initial={{ opacity: 0, y: 30 }}
@@ -112,18 +205,27 @@ export default function PrivacyPage() {
           className="max-w-3xl mx-auto text-2xl italic text-gray-700 leading-relaxed"
         >
           “La confiance est le premier soin que nous offrons à nos utilisateurs.”
-          <footer className="mt-4 text-sm text-gray-500">— L’équipe E·Doto Family</footer>
+          <footer className="mt-4 text-sm text-gray-500">
+            — L’équipe E·Doto Family
+          </footer>
         </motion.blockquote>
       </section>
-      {/* Bouton retour flottant */}
+
+      {/* BOUTON RETOUR */}
       <motion.button
         onClick={() => router.back()}
-        className="fixed bottom-8 left-8 z-50 w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
-             flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
+        className="fixed bottom-8 left-8 z-50 w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
         whileHover={{ rotate: -5 }}
         whileTap={{ scale: 0.9 }}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#FF6EA9" className="w-7 h-7">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="#FF6EA9"
+          className="w-7 h-7"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
       </motion.button>
