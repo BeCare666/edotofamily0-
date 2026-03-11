@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation"
 import Router from "next/router";
 import CookieConsent from '../components/CookieConsent';
+import SSRAdvisorButton from "../components/SSRAdvisorButton";
 const Header = dynamic(() => import("../components/header"), {
   ssr: false,
 });
@@ -23,6 +24,13 @@ export default function MyApp({ Component, pageProps }) {
     pathname === "/forgot-password" ||
     pathname === "/succesregister"
 
+  const isHomePagex =
+    pathname === "/" ||
+    pathname === "/orders" ||
+    pathname.startsWith("/category") ||
+    pathname.startsWith("/product") ||
+    pathname.startsWith("/orders") ||
+    pathname === "/Campaigns"
 
   return (
     <AuthProvider>
@@ -33,6 +41,7 @@ export default function MyApp({ Component, pageProps }) {
         {!isHomePage && <Header />}
         <Component {...pageProps} />
         <CookieConsent />
+        {isHomePagex && <SSRAdvisorButton />}
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       </Layout>
       {!isHomePage && <Footer />}

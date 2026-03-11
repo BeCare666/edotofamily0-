@@ -1,23 +1,23 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { ShoppingBag, Gift, Sparkles, X } from "lucide-react";
+import { ShoppingBag, Gift, Sparkles, X, CalendarCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
-
+import CalendlyFullScreen from "./CalendlyDrawer";
 const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes en ms
 
 const SSRAccessDrawer = () => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
+  const [openCalendly, setOpenCalendly] = useState(false);
   useEffect(() => {
     // Fonction qui ouvre le drawer
     const showDrawer = () => {
       setOpen(true);
     };
 
-    // Affiche au premier chargement
+    // Affiche au premier chargement.
     showDrawer();
 
     // Lance un intervalle toutes les 5 minutes
@@ -68,7 +68,7 @@ const SSRAccessDrawer = () => {
             Accès simple, confidentiel et immédiat aux produits SSR
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <button
               onClick={() => {
                 setOpen(false);
@@ -110,9 +110,33 @@ const SSRAccessDrawer = () => {
                 </p>
               </div>
             </button>
+            <button
+              onClick={() => {
+                setOpen(false);
+                setOpenCalendly(true);
+              }}
+              className="group flex items-center gap-4 p-5 rounded-2xl border border-slate-200 hover:border-purple-300 hover:shadow-lg transition-all"
+            >
+              <div className="p-3 rounded-xl bg-purple-100 text-purple-600">
+                <CalendarCheck size={22} />
+              </div>
+
+              <div className="text-left">
+                <p className="font-semibold text-slate-800">
+                  Parler à un conseiller SSR
+                </p>
+                <p className="text-sm text-slate-500">
+                  Prenez un rendez-vous privé
+                </p>
+              </div>
+            </button>
           </div>
         </div>
       </div>
+      <CalendlyFullScreen
+        isOpen={openCalendly}
+        onClose={() => setOpenCalendly(false)}
+      />
     </>
   );
 };
