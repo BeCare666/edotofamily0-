@@ -12,7 +12,7 @@ export default function CalendlyFullScreen({ isOpen, onClose }) {
     // Redirection si non connecté
     if (typeof window !== "undefined") {
         const token = localStorage.getItem("token");
-        if (!token) router.push("/login");
+        if (!token && isOpen) router.push("/login");
     }
 
     // Construire l'URL Calendly avec préremplissage https://calendly.com/edotofamily/30min
