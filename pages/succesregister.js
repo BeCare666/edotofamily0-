@@ -19,8 +19,8 @@ export default function RegistrationSuccessPage() {
         const storedVerified = sessionStorage.getItem("register_verified");
 
         if (!storedEmail && !storedVerified) {
-            router.replace("/");
-            return;
+             router.replace("/");
+             return;
         }
 
         setEmail(storedEmail);

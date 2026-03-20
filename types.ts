@@ -65,3 +65,7 @@ export interface Campaign {
     objective_kits: number;
     distributed_kits: number;
 }
+
+export interface IntrinsicAttributes {
+    href: string;
+}

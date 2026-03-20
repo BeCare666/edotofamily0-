@@ -10,6 +10,7 @@ import {
   CheckCircle,
   ArrowRight,
   X,
+  Eye,
   Search,
   XCircle,
   Layers
@@ -424,7 +425,7 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
 
         <div className="grid md:grid-cols-3 gap-8 mb-20">
           {upcomingCampaigns.map((c) => (
-            <EventCard key={c.id} date={new Date(c.date_start).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} location={c.location} title={c.title} status={c.status === 'planifie' ? 'Planifié' : 'À venir'} />
+            <EventCard key={c.id} date={new Date(c.date_start).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} location={c.location} title={c.title} status={c.status === 'planifie' ? 'Planifié' : 'À venir'} description={c.description} />
           ))}
         </div>
       </div>
@@ -786,22 +787,107 @@ const ActiveCampaignCard = ({ campaign, onOpen }: any) => (
   </div>
 );
 
-const EventCard = ({ date, location, title, status }: any) => (
-  <div className="bg-white p-6 rounded-3xl border border-slate-100 hover:shadow-xl transition-all cursor-pointer group flex flex-col h-full">
-    <div className="flex justify-between items-start mb-4">
-      <div className="bg-slate-50 px-3 py-1 rounded-lg text-slate-900 font-bold text-sm border border-slate-200">{date}</div>
-      <span className={`text-xs font-bold px-3 py-1 rounded-full ${status === 'À venir' ? 'bg-pink-100 text-pink-600' : 'bg-blue-100 text-blue-600'}`}>{status}</span>
-    </div>
+const EventCard = ({ date, location, title, status, description }: any) => {
+  const [openModal, setOpenModal] = useState(false);
 
-    <h4 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-pink-600 transition-colors">{title}</h4>
+  return (
+    <>
+      <div className="bg-white p-6 rounded-3xl border border-slate-100 hover:shadow-xl transition-all cursor-pointer group flex flex-col h-full">
+        <div className="flex justify-between items-start mb-4">
+          <div className="bg-slate-50 px-3 py-1 rounded-lg text-slate-900 font-bold text-sm border border-slate-200">{date}</div>
+          <span className={`text-xs font-bold px-3 py-1 rounded-full ${status === 'À venir' ? 'bg-pink-100 text-pink-600' : 'bg-blue-100 text-blue-600'}`}>{status}</span>
+        </div>
 
-    <div className="flex items-center gap-2 text-slate-500 text-sm mb-6"><MapPin size={16} /><span>{location}</span></div>
+        <h4 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-pink-600 transition-colors">{title}</h4>
 
-    <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
-      <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400"><ArrowRight size={20} /></div>
-    </div>
-  </div>
-);
+        <div className="flex items-center gap-2 text-slate-500 text-sm mb-3">
+          <MapPin size={16} /><span>{location}</span>
+        </div>
+
+        {/* DESCRIPTION AJOUTÉE */}
+      <p
+      style={{
+        display: "-webkit-box",
+        WebkitLineClamp: 2,   // nombre de lignes à afficher
+        WebkitBoxOrient: "vertical",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        marginBottom: "1rem",
+        color: "#6b7280", // équivalent text-slate-500
+        fontSize: "0.875rem", // text-sm
+        lineHeight: "1.25rem", // leading-relaxed
+      }}
+    >
+      {description}
+    </p>
+        <div
+          className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-center cursor-pointer hover:bg-slate-50 rounded-xl transition"
+          onClick={() => setOpenModal(true)}
+        >
+          <div className="flex items-center gap-1 text-slate-700 font-semibold py-2 px-4">
+            <Eye size={18} />
+            <span>En savoir plus</span>
+          </div>
+        </div>
+      </div>
+
+      {/* MODAL DARK PREMIUM */}
+      {openModal && (
+        <div
+          className="fixed inset-0 z-[500] flex items-center justify-center bg-black/70 backdrop-blur-xl px-4 transition-opacity duration-300 opacity-100"
+          style={{ animation: "fadeIn 0.3s ease forwards" }}
+        >
+          <div
+            className="bg-[#0f172a] text-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl relative transform scale-100 transition-transform duration-300"
+            style={{ animation: "scaleIn 0.3s ease forwards" }}
+          >
+            <button
+              onClick={() => setOpenModal(false)}
+              className="absolute top-4 right-4 text-white/70 hover:text-white text-2xl"
+            >
+              ✕
+            </button>
+
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <MapPin size={20} className="text-purple-400" />
+                <span className="font-semibold text-lg">{location}</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Eye size={20} className="text-green-400" />
+                <span className="font-semibold text-lg">{title}</span>
+              </div>
+
+              <p className="text-slate-300 text-sm leading-relaxed">{description}</p>
+            </div>
+
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => setOpenModal(false)}
+                className="px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold shadow-lg hover:scale-105 transition-all"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <style>
+        {`
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scaleIn {
+      from { transform: scale(0.9); }
+      to { transform: scale(1); }
+    }
+  `}
+      </style>
+    </>
+  );
+};
 
 // ==================================================
 // ModalSubscribe — simple, prompts to open pickup

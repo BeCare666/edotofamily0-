@@ -86,7 +86,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                             className="flex-shrink-0 flex items-center cursor-pointer gap-2"
                             onClick={() => setView(ViewState.HOME)}
                         >
-                            <div className="relative w-12 p-3 h-12 rounded-full overflow-hidden shadow-md ring-1 ring-[#ffb3d9]/40">
+                            <div className="relative w-12 p-3 h-12  overflow-hidden  ring-1 ring-white">
                                 <Image src={logo} alt="E·Doto" fill className="object-cover" />
                             </div>
 

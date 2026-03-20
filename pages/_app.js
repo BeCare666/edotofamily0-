@@ -27,10 +27,8 @@ export default function MyApp({ Component, pageProps }) {
 
   const isHomePagex =
     pathname === "/" ||
-    pathname === "/orders" ||
     pathname.startsWith("/category") ||
     pathname.startsWith("/product") ||
-    pathname.startsWith("/orders") ||
     pathname === "/Campaigns"
 
   return (

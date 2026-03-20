@@ -12,6 +12,7 @@ import {
   Home, Info, Phone, Target, Flag, FileText, Shield,
   User, LogOut, ShoppingBag, Star, Briefcase, Gift
 } from "lucide-react"
+import { SiX } from "react-icons/si"; // icône officielle X
 import { FaFacebookF, FaLinkedinIn, FaTwitter, FaTiktok, FaInstagram } from "react-icons/fa"
 import { useRouter } from "next/navigation"
 
@@ -64,7 +65,13 @@ export default function DrawerMenu({ isOpen, onClose }) {
       toast.error("Une erreur est survenue lors de la déconnexion")
     }
   }
-
+  const socialLinks = [
+    { icon: <FaInstagram />, color: "#E4405F", url: "https://www.instagram.com/toncompte" },
+    { icon: <FaFacebookF />, color: "#1877F2", url: "https://www.facebook.com/toncompte" },
+    { icon: <FaLinkedinIn />, color: "#0077B5", url: "https://www.linkedin.com/in/toncompte" },
+    { icon: <SiX />, color: "#000000", url: "https://x.com/toncompte" }, // Remplacement Twitter -> X
+    { icon: <FaTiktok />, color: "#000000", url: "https://www.tiktok.com/@toncompte" },
+  ];
   const handleFinalize = () => {
 
     const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScY-R5SkFwByPEDyzW7AxVmEoEc2NSTI4RYYtvlp0w0jhEIjg/viewform?usp=publish-editor";
@@ -90,14 +97,16 @@ export default function DrawerMenu({ isOpen, onClose }) {
       >
         {/* HEADER */}
         <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center gap-3">
-            <div className="relative w-12 p-3 h-12 rounded-full overflow-hidden shadow-md ring-1 ring-[#ffb3d9]/40">
+          <div
+            className="flex-shrink-0 flex items-center cursor-pointer gap-2"
+          >
+            <div className="relative w-12 p-3 h-12  overflow-hidden  ring-1 ring-white">
               <Image src={logo} alt="E·Doto" fill className="object-cover" />
             </div>
-            <div>
-              <h2 className="font-semibold text-lg text-[#1a1a1a]">E·Doto Family</h2>
-              <p className="text-sm text-gray-500">Soins & bien-être</p>
-            </div>
+
+            <h1 className="text-2xl font-bold text-[#0F172A] mt-2 text-center">
+              <span className="text-[#FF6EA9]">E·Doto</span> Family
+            </h1>
           </div>
 
           {/* AVATAR UTILISATEUR */}
@@ -174,7 +183,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
                   }`}
               >
                 <div className="flex items-center gap-3">
-                  <ShoppingBag size={18} />
+                  <ShoppingBag size={18} color="#FF6EA9" />
                   Boutique
                 </div>
                 <span className="text-xs">{openShop ? "▲" : "▼"}</span>
@@ -211,7 +220,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
                   }`}
               >
                 <div className="flex items-center gap-3">
-                  <Gift size={18} />
+                  <Gift size={18} color="#FF6EA9" />
                   Campagnes
                 </div>
               </button>
@@ -247,16 +256,12 @@ export default function DrawerMenu({ isOpen, onClose }) {
             Suivez-nous
           </p>
           <div className="flex justify-center gap-4 text-gray-600">
-            {[
-              { icon: <FaInstagram />, color: "#E4405F" },
-              { icon: <FaFacebookF />, color: "#1877F2" },
-              { icon: <FaLinkedinIn />, color: "#0077B5" },
-              { icon: <FaTwitter />, color: "#1DA1F2" },
-              { icon: <FaTiktok />, color: "#000000" },
-            ].map((social, i) => (
+            {socialLinks.map((social, i) => (
               <motion.a
                 key={i}
-                href="#"
+                href={social.url} // lien réel
+                target="_blank"
+                rel="noopener noreferrer"
                 whileHover={{ scale: 1.2 }}
                 transition={{ type: "spring", stiffness: 300 }}
                 className="p-2 rounded-full bg-white/70 shadow-md hover:shadow-lg transition"
@@ -267,7 +272,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
             ))}
           </div>
           <p className="text-[11px] mt-6 text-gray-400">
-            © {new Date().getFullYear()} E·Doto — Bien-être féminin.
+            © {new Date().getFullYear()} E·Doto Family — Le bien-être de la jeunesse.
           </p>
         </div>
       </motion.aside >
