@@ -10,14 +10,21 @@ export const authService = {
 
         return res
     },
-    async registerPickUpPoint(name, email, password) {
+    async registerPickUpPoint({ name, email, password, pickup_lat, pickup_lng, pickup_address }) {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/register-pick-up-point`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ name, email, password }),
+                body: JSON.stringify({
+                    name,
+                    email,
+                    password,
+                    pickup_lat,
+                    pickup_lng,
+                    pickup_address,
+                }),
             });
 
             const data = await response.json();
@@ -34,7 +41,7 @@ export const authService = {
             body: JSON.stringify({ email, password }),
         })
 
-        // Sauvegarde du token
+        // Sauvegarde du token... dans le localStorage (ou cookie selon ton choix)
         if (typeof window !== "undefined" && res.token) {
             localStorage.setItem("token", res.token)
         }

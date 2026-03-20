@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import logo from "../public/logo/logo.png"
+import logo from "../public/logo/favicon.png"
 import { useAuthContext } from "../context/AuthContext";
 import GoogleFormDrawer from "./GoogleFormDrawer";
 import toast from "react-hot-toast"
@@ -91,7 +91,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
         {/* HEADER */}
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-3">
-            <div className="relative w-12 h-12 rounded-full overflow-hidden shadow-md ring-1 ring-[#ffb3d9]/40">
+            <div className="relative w-12 p-3 h-12 rounded-full overflow-hidden shadow-md ring-1 ring-[#ffb3d9]/40">
               <Image src={logo} alt="E·Doto" fill className="object-cover" />
             </div>
             <div>

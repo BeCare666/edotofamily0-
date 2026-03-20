@@ -121,7 +121,7 @@ export default function AProposPage() {
             Des soins, des émotions, des cycles. Découvrez une nouvelle approche du bien-être féminin.
           </p>
           <Link
-            href="/categories"
+            href="/category/categories_id=3"
             className="px-8 py-3 bg-[#FF6EA9] text-white font-semibold rounded-full shadow-md hover:bg-[#ff589d] transition-all"
           >
             Découvrir nos produits

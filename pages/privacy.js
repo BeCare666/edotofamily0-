@@ -11,7 +11,7 @@ export default function PrivacyPage() {
     {
       title: "Responsable du traitement",
       text: `Le responsable du traitement des données collectées sur la plateforme edotofamily.com est :
-SODINYESSI Sènou Gérard – Startup BeCare
+SODINYESSI Sènou Gérard PDG de BeCare, la startup E-doto Family
 Email : becare.fr.ge@fmail.com
 Téléphone : +229 01 67698191
 Ville : Cotonou, République du Bénin.`,
@@ -52,7 +52,7 @@ activité du compte utilisateur, sauf obligation légale contraire.`,
 techniques nécessaires au fonctionnement du service :
 
 LWS – hébergement du site web
-TiDB Cloud (PingCAP) – gestion de la base de données
+TiDB Cloud – gestion de la base de données
 Cloudinary – stockage et gestion des images
 Brevo – envoi d’emails transactionnels
 
@@ -184,13 +184,13 @@ dans l’Union Européenne ou aux États-Unis.`,
         <p className="text-gray-600 mb-6">
           Contact :{" "}
           <span className="text-[#FF6EA9] font-medium">
-            privacy@edotofamily.com
+            contact@edotofamily.com
           </span>
         </p>
 
         <motion.button
           whileHover={{ scale: 1.05 }}
-          className="px-8 py-3 rounded-full bg-[#FF6EA9] text-white font-semibold shadow-md hover:bg-[#ff589d] transition-all"
+          className="hidden px-8 py-3 rounded-full bg-[#FF6EA9] text-white font-semibold shadow-md hover:bg-[#ff589d] transition-all"
         >
           Contacter notre équipe
         </motion.button>

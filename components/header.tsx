@@ -4,7 +4,7 @@ import { ShoppingBag, Menu, X, Home, MapPin, Info, CheckCircle, User, Gift, Phon
 import { ViewState } from '../types';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from "../context/AuthContext";
-import logo from "../public/logo/logo.png";
+import logo from "../public/logo/favicon.png";
 import toast from "react-hot-toast"
 import GoogleFormDrawer from "./GoogleFormDrawer";
 import CalendlyDrawer from "./CalendlyDrawer";
@@ -86,12 +86,13 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                             className="flex-shrink-0 flex items-center cursor-pointer gap-2"
                             onClick={() => setView(ViewState.HOME)}
                         >
-                            <div className="w-13 h-13 bg-gradient-to-tr from-pink-400 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-pink-200">
-                                <Image src={logo} alt="E-Doto logo" width={40} height={40} className="rounded-full object-cover" />
+                            <div className="relative w-12 p-3 h-12 rounded-full overflow-hidden shadow-md ring-1 ring-[#ffb3d9]/40">
+                                <Image src={logo} alt="E·Doto" fill className="object-cover" />
                             </div>
-                            <span className="font-bold text-2xl tracking-tight text-slate-800">
-                                <span className="text-pink-500">E-Doto</span> Family
-                            </span>
+
+                            <h1 className="text-2xl font-bold text-[#0F172A] mt-2 text-center">
+                                <span className="text-[#FF6EA9]">E·Doto</span> Family
+                            </h1>
                         </div>
 
                         {/* Desktop Nav */}
@@ -303,7 +304,8 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                                             ) : (
                                                 <button
                                                     onClick={() => {
-                                                        handleFinalize();
+                                                        //handleFinalize();
+                                                        setOpenForm(true)
                                                         setShowUserMenuDesktop(false);
                                                     }}
                                                     className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-pink-50 transition text-gray-700"

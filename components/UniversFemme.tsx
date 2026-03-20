@@ -78,11 +78,11 @@ export default function UniversFemme() {
                             <Heart className="w-5 h-5 text-pink-600" />
                         </div>
                         <h3 className="text-sm font-semibold text-slate-900">
-                            Conseiller virtuel IA – 24/7
+                            Conseiller SSR
                         </h3>
                         <p className="text-xs text-slate-500">
                             Posez toutes vos questions sur la sexualité, la fertilité, l’hygiène, la grossesse, etc.
-                            Réponses anonymes, instantanées, fiables.
+                            Réponses anonymes, fiables.
                         </p>
                     </article>
 

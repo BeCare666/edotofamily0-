@@ -7,7 +7,7 @@ import { Mail, Lock, User, Eye, EyeOff, CheckCircle2, XCircle } from "lucide-rea
 import Image from "next/image"
 import Link from "next/link"
 import { useApi } from "../lib/api"
-import logo from "../public/logo/logo.png"
+import logo from "../public/logo/favicon.png"
 import { authService } from "../services/authService"
 import { useAuthContext } from "../context/AuthContext" // ✅ import du contexte
 export default function RegisterPage() {
@@ -78,19 +78,19 @@ export default function RegisterPage() {
                     initial={{ opacity: 0, y: -6, scale: 0.9 }}
                     animate={{ opacity: 1, y: [0, -8, 0], scale: 1 }}
                     transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 1.6, ease: "easeInOut" }}
-                    className="absolute -top-14 left-1/2 -translate-x-1/2 bg-white p-3 rounded-full shadow-lg border border-white/40"
+                    className="absolute -top-14 left-1/2 -translate-x-1/2 bg-white pt-2.5 pr-2 pb-2.5 pl-2 rounded-full shadow-lg border border-white/40"
                 >
                     <Image src={logo} alt="E-Doto logo" width={70} height={70} className="rounded-full object-cover" />
                 </motion.div>
 
                 <h1 className="text-2xl font-bold text-[#0F172A] mt-2 text-center">
-                    Rejoignez <span className="text-[#FF6EA9]">E·Doto</span>
+                    <span className="text-[#FF6EA9]">E·Doto</span> Family
                 </h1>
-                <p className="text-gray-500 mt-2 mb-8 text-sm text-center">
-                    Créez votre compte et explorez le bien-être autrement
-                </p>
+                <strong className="text-black mt-2 mb-4 text-sm text-center item-center flex gap-2 justify-center">
+                    Créez votre compte
+                </strong>
 
-                {/* 🔔 Alertes professionnelles */}
+                {/* 🔔 Alertes professionnelles.    */}
                 {alert.message && (
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
@@ -194,6 +194,6 @@ export default function RegisterPage() {
                     </Link>
                 </p>
             </motion.div>
-        </main>
+        </main >
     )
 }

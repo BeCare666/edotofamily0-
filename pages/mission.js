@@ -36,7 +36,7 @@ export default function MissionPage() {
           transition={{ delay: 0.4, duration: 1 }}
           className="mt-6 text-gray-600 max-w-2xl mx-auto text-lg"
         >
-          Chez <span className="text-[#FF6EA9] font-medium">E-Doto Family</span>, nous croyons que chaque femme mérite une santé intime, une maternité et un bien-être entourés de respect, de science et de beauté.
+          Chez <span className="text-[#FF6EA9] font-medium">E-Doto Family</span>, nous croyons que chaque jeune mérite une santé intime, une maternité et un bien-être entourés de respect, de science et de beauté.
         </motion.p>
       </section>
 
@@ -51,7 +51,7 @@ export default function MissionPage() {
             <Target className="text-[#FF6EA9]" /> Notre mission
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            Apporter à chaque femme et chaque famille un accompagnement de qualité à travers des produits et services
+            Apporter à chaque jeune et chaque famille un accompagnement de qualité à travers des produits et services
             centrés sur la santé sexuelle et reproductive, la maternité et le bien-être corporel.
             <br /><br />
             Nous voulons réconcilier science, nature et élégance, pour une expérience de soin douce, sincère et innovante.

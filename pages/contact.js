@@ -146,7 +146,7 @@ export default function ContactPage() {
               <div className="p-3 rounded-full bg-[#FF6EA9]/10 text-[#FF6EA9]">
                 <MapPin size={22} />
               </div>
-              <p className="text-gray-800 font-medium">Bénin, Cotonou — Akpakpa Kpondéhou</p>
+              <p className="text-gray-800 font-medium">Bénin, Cotonou</p>
             </div>
           </div>
         </motion.div>

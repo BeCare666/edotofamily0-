@@ -12,9 +12,9 @@ interface Stat {
 
 export default function SocialProof() {
     const stats: Stat[] = [
-        { value: 12000, label: "jeunes accompagnés", icon: <Users className="w-10 h-10 text-pink-600" />, suffix: "+" },
-        { value: 140, label: "points de retrait partenaires", icon: <MapPin className="w-10 h-10 text-pink-600" />, suffix: "+" },
-        { value: 25, label: "entreprises engagées en RSE", icon: <Briefcase className="w-10 h-10 text-pink-600" />, suffix: "+" },
+        { value: 12000, label: "jeunes accompagnés d’ici 2027", icon: <Users className="w-10 h-10 text-pink-600" />, suffix: "+" },
+        { value: 140, label: "points de retrait partenaires d’ici 2027", icon: <MapPin className="w-10 h-10 text-pink-600" />, suffix: "+" },
+        { value: 25, label: "entreprises engagées en RSE d’ici 2027", icon: <Briefcase className="w-10 h-10 text-pink-600" />, suffix: "+" },
     ];
 
     const [counts, setCounts] = useState<number[]>(stats.map(() => 0));
@@ -40,7 +40,7 @@ export default function SocialProof() {
             {/* Title */}
             <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900">
-                    Notre impact
+                    Notre objectif
                 </h2>
                 <p className="text-slate-500 max-w-2xl mx-auto mt-3">
                     Aligné avec les standards du Ministère de la Santé et de ses partenaires

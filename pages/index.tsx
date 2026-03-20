@@ -8,7 +8,7 @@ import Impact from '../components/Zimpact';
 import Temoignages from '../components/Temoignages';
 import Cta from '../components/Cta';
 import Image from 'next/image';
-import Visions from '../public/images/woman-soft-bg.jpg';
+import Visions from '../public/icons/edotocenter.gif';
 import SSRAccessDrawer from "../components/SSRAccessDrawer";
 interface HomeProps {
   changeView: (view: ViewState) => void;
@@ -98,7 +98,7 @@ export const Home: React.FC<HomeProps> = ({ changeView }) => {
 
               <button
                 onClick={() => changeView(ViewState.SHOP)}
-                className="mt-4 px-8 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-pink-600 transition-colors"
+                className="hidden mt-4 px-8 py-3 bg-slate-900 text-white rounded-full font-semibold hover:bg-pink-600 transition-colors"
               >
                 Rejoindre la mission
               </button>

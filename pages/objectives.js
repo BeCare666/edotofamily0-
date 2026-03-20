@@ -37,7 +37,7 @@ export default function ObjectifsPage() {
           transition={{ delay: 0.4, duration: 1 }}
           className="mt-6 text-gray-600 max-w-2xl mx-auto text-lg"
         >
-          E·Doto Family s’engage à transformer durablement la perception de la santé féminine,
+          E·Doto Family s’engage à transformer durablement la perception de la santé Sexuelle et reproductive,
           à inspirer confiance et à offrir des solutions douces et puissantes à la fois.
         </motion.p>
       </section>
@@ -48,7 +48,7 @@ export default function ObjectifsPage() {
           {
             icon: <HeartHandshake className="text-[#FF6EA9]" size={30} />,
             title: "Accompagner avec bienveillance",
-            text: "Offrir à chaque femme une écoute et un accompagnement personnalisé, à travers des solutions naturelles et respectueuses."
+            text: "Offrir à chaque jeune une écoute et un accompagnement personnalisé, à travers des solutions naturelles et respectueuses."
           },
           {
             icon: <Lightbulb className="text-[#FF6EA9]" size={30} />,

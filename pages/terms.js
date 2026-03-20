@@ -75,7 +75,7 @@ export default function TermsPage() {
       id: "liability",
       title: "9. Limitation de responsabilité",
       icon: AlertTriangle,
-      content: `Dans la mesure permise par la loi, E·Doto ne pourra être tenu responsable des dommages indirects, perte de profit ou préjudice découlant de l'utilisation du site.`,
+      content: `Dans la mesure permise par la loi, E·Doto Family ne pourra être tenu responsable des dommages indirects, perte de profit ou préjudice découlant de l'utilisation du site.`,
     },
     {
       id: "law",
@@ -198,7 +198,7 @@ export default function TermsPage() {
               Ces conditions peuvent être modifiées. La version publiée sur ce site fait foi. En cas de modification substantielle, nous vous en informerons par email.
             </p>
             <p>
-              Pour toute question juridique : <strong className="text-[#FF6EA9]">legal@edotofamily.com</strong>
+              Pour toute question juridique : <strong className="text-[#FF6EA9]">contact@edotofamily.com</strong>
             </p>
           </div>
         </article>

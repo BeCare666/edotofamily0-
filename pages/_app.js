@@ -21,6 +21,7 @@ export default function MyApp({ Component, pageProps }) {
   const isHomePage =
     pathname === "/login" ||
     pathname === "/register" ||
+    pathname.startsWith("/admin") ||
     pathname === "/forgot-password" ||
     pathname === "/succesregister"
 

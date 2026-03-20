@@ -356,7 +356,6 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
   };
 
   // -----------------------
-  // Helper: called when a pickup is selected from ModalPickup
   // We will set local state (optional) and immediately trigger registration using the passed value.
   // Important: we call registerToCampaign(...) with the actual value to avoid race conditions.
   // -----------------------
