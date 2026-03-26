@@ -63,7 +63,7 @@ export const authService = {
         await apiRequest("/logout", { method: "POST" });
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        router.push("/");
+        //router.push("/");
     },
     forgetPassword: (email) =>
         apiRequest("/forget-password", {

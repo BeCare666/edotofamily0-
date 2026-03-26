@@ -105,7 +105,7 @@ export default function OrderDetailsPage() {
       const hasNote = Boolean(data.note && data.note.trim() !== "");
       const isProcessing = data.order_status === "order-processing";
       const isPendingPayment = data.order_status === "order-pending";
-
+      console.log("voici data", data.order_status)
       // 👉 1. Choix du point de retrait
       if (!hasPickupPoint && isProcessing && !hasNote) {
         setShopModalButton(true);

@@ -36,8 +36,10 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
         try {
             await logout()
             toast.success("Déconnexion réussie 👋")
+            router.push("/");
         } catch (error) {
             toast.error("Une erreur est survenue lors de la déconnexion")
+            console.log(error)
         }
     }
     const handleLogin = () => {
@@ -81,10 +83,10 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
             <header className="sticky top-0 z-40 w-full glass-card border-b border-pink-100 shadow-sm ">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-20">
-                        {/* Logo */}
+                        {/* Logo onClick={() => setView(ViewState.HOME)}*/}
                         <div
                             className="flex-shrink-0 flex items-center cursor-pointer gap-2"
-                            onClick={() => setView(ViewState.HOME)}
+
                         >
                             <div className="relative w-12 p-3 h-12  overflow-hidden  ring-1 ring-white">
                                 <Image src={logo} alt="E·Doto" fill className="object-cover" />

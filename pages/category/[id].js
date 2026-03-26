@@ -88,12 +88,17 @@ export default function CategoryPage() {
     return null;
   }
 
+  const categoriesId = useMemo(() => {
+    if (!router.isReady) return null;
+    return extractCategoriesId(router);
+  }, [router.isReady, router.query, router.asPath]);
+
   /* === USE THIS useEffect (robuste) === */
   useEffect(() => {
-    if (!router.isReady) return;
+    if (!router.isReady || !categoriesId) return;
 
     // --- On extrait categories_id une seule fois ---
-    const categories_id = extractCategoriesId(router);
+    const categories_id = categoriesId;
     if (!categories_id) {
       console.warn("[products] pas de categories_id trouvé — abort fetch");
       return;
@@ -172,7 +177,7 @@ export default function CategoryPage() {
     load();
 
     return () => controller.abort();
-  }, [router.isReady, router.asPath, query, sortBy]);
+  }, [router.isReady, categoriesId, query, sortBy]);
 
 
   // helper to parse an image field that might be JSON string or CSV
@@ -217,12 +222,13 @@ export default function CategoryPage() {
 
     return list;
   }, [products, query, priceFilter, typeFilter, onlyNew, onlyPopular, sortBy]);
-  console.log("Filtered products:", filtered);
-  filtered.slice(0, visibleCount).map((p, i) => console.log(" Product", i, p.image.url));
+
+  const visibleProducts = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
+
   // navigate to product page (or open drawer)
   const openProduct = (p) => {
     // if you have a product page route, push to it, e.g. /product/[id]
-    console.log("Navigating to product:", p);
+    //console.log("Navigating to product:", p);
     router.push(`/product/${p.raw.slug}`);
   };
   const handlePayment = async (p) => {
@@ -232,7 +238,7 @@ export default function CategoryPage() {
     try {
       const res = await fetch(`${API_BASE_URL}/products/${id}`);
       const data = await res.json();
-      console.log("Initiating payment for product:", data);
+      //console.log("Initiating payment for product:", data);
       setProduct(data);
       if (!data) {
         alert("Produit introuvable.");
@@ -252,7 +258,7 @@ export default function CategoryPage() {
   }
   const handleOrder = async (product, quantity) => {
     setPassOrder(true);
-    console.log("Creating order for product:", product);
+    //console.log("Creating order for product:", product);
     if (!product) return;
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
@@ -391,7 +397,7 @@ export default function CategoryPage() {
               <div className="col-span-full text-center py-20 text-gray-400 text-lg">
                 Chargement des produits…
               </div>
-            ) : filtered.slice(0, visibleCount).map((p, i) => (
+            ) : visibleProducts.map((p, i) => (
 
               <article
                 key={p.id || i}
