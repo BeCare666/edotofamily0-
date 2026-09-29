@@ -21,6 +21,18 @@ export default function RegisterPage() {
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [alert, setAlert] = useState({ type: "", message: "" })
+    const [resendState, setResendState] = useState({ loading: false, message: "" })
+
+    // Compte créé mais e-mail non parti : l'utilisateur redemande le lien de confirmation
+    const handleResendVerification = async () => {
+        setResendState({ loading: true, message: "" })
+        try {
+            const res = await authService.resendVerificationEmail(email.trim())
+            setResendState({ loading: false, message: res?.message || "E-mail envoyé." })
+        } catch (err) {
+            setResendState({ loading: false, message: err.message || "Envoi impossible pour le moment." })
+        }
+    }
 
     const handleRegister = async (e) => {
         e.preventDefault()
@@ -103,6 +115,20 @@ export default function RegisterPage() {
                         {alert.type === "success" ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
                         {alert.message}
                     </motion.div>
+                )}
+
+                {alert.type === "error" && alert.message.includes("Votre compte est créé") && (
+                    <div className="-mt-3 mb-5 text-sm text-gray-600">
+                        <button
+                            type="button"
+                            onClick={handleResendVerification}
+                            disabled={resendState.loading}
+                            className="text-[#FF6EA9] font-medium hover:underline disabled:opacity-50"
+                        >
+                            {resendState.loading ? "Envoi…" : "Renvoyer l'e-mail de confirmation"}
+                        </button>
+                        {resendState.message && <p role="status" className="text-xs mt-1 text-gray-500">{resendState.message}</p>}
+                    </div>
                 )}
 
                 {/* Formulaire */}
@@ -191,6 +217,12 @@ export default function RegisterPage() {
                     Déjà membre ?{" "}
                     <Link href="/login" className="text-[#FF6EA9] font-medium hover:underline">
                         Connectez-vous
+                    </Link>
+                </p>
+                <p className="text-gray-500 text-sm mt-2 text-center">
+                    Vous êtes un établissement ?{" "}
+                    <Link href="/devenir-point-de-retrait" className="text-[#FF6EA9] font-medium hover:underline">
+                        Devenir point de retrait
                     </Link>
                 </p>
             </motion.div>

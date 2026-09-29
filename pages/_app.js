@@ -10,6 +10,8 @@ import { usePathname } from "next/navigation"
 import Router from "next/router";
 import CookieConsent from '../components/CookieConsent';
 import SSRAdvisorButton from "../components/SSRAdvisorButton";
+import { ChatAIProvider } from "../context/ChatAIContext";
+const ChatAIDrawer = dynamic(() => import("../components/ai-chat/ChatAIDrawer"), { ssr: false });
 const Header = dynamic(() => import("../components/header"), {
   ssr: false,
 });
@@ -21,6 +23,10 @@ export default function MyApp({ Component, pageProps }) {
   const isHomePage =
     pathname === "/login" ||
     pathname === "/register" ||
+    pathname === "/devenir-point-de-retrait" ||
+    pathname === "/pickup-dashboard" || // le dashboard a sa propre barre latérale, son en-tête et son pied de page
+    pathname.startsWith("/sponsor") || // espace sponsor : même principe
+
     pathname.startsWith("/admin") ||
     pathname === "/forgot-password" ||
     pathname === "/succesregister"
@@ -33,6 +39,7 @@ export default function MyApp({ Component, pageProps }) {
 
   return (
     <AuthProvider>
+      <ChatAIProvider>
       <Head>
         <title>e-doto family</title>
       </Head>
@@ -41,9 +48,11 @@ export default function MyApp({ Component, pageProps }) {
         <Component {...pageProps} />
         <CookieConsent />
         {isHomePagex && <SSRAdvisorButton />}
+        <ChatAIDrawer />
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       </Layout>
       {!isHomePage && <Footer />}
+      </ChatAIProvider>
     </AuthProvider>
   )
 }

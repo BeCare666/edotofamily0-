@@ -1,48 +1,38 @@
 "use client";
 
-import { MapPin, X } from "lucide-react";
+import { useEffect } from "react";
 import dynamic from "next/dynamic";
+import { Loader2 } from "lucide-react";
 
-const PickupMap = dynamic(
-    () => import("./pickupmap"),
-    { ssr: false }
-);
-export default function PickupMapModal({
-    open,
-    onClose,
-    pickupLat,
-    pickupLng,
-    name
-}) {
+// Navigation temps réel (MapLibre GL + OpenStreetMap), chargée uniquement côté navigateur
+const NavigationMap = dynamic(() => import("../map/NavigationMap"), {
+    ssr: false,
+    loading: () => (
+        <div className="w-full h-full flex items-center justify-center bg-white">
+            <Loader2 className="animate-spin text-[#FF6EA9]" size={30} />
+        </div>
+    ),
+});
+
+export default function PickupMapModal({ open, onClose, pickupLat, pickupLng, name }) {
+    // Pas de défilement de la page derrière la carte ; fermeture avec Échap
+    useEffect(() => {
+        if (!open) return;
+        const previous = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        const onKey = (e) => e.key === "Escape" && onClose?.();
+        window.addEventListener("keydown", onKey);
+        return () => {
+            document.body.style.overflow = previous;
+            window.removeEventListener("keydown", onKey);
+        };
+    }, [open, onClose]);
 
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-[9999] bg-white">
-
-            {/* header */}
-            <div className="flex justify-between items-center p-4 border-b ">
-                <h2 className="font-semibold">
-                    Navigation vers {name}
-                </h2>
-
-                <button
-                    onClick={onClose}
-                    className="p-2 rounded-full hover:bg-gray-100"
-                >
-                    <X size={22} />
-                </button>
-            </div>
-
-            {/* map */}
-            <div className="w-full h-[calc(100vh-60px)]">
-                <PickupMap
-                    pickupLat={pickupLat}
-                    pickupLng={pickupLng}
-                    name={name}
-                />
-            </div>
-
+        <div className="fixed inset-0 z-[10000] bg-white" role="dialog" aria-modal="true" aria-label={`Navigation vers ${name || "le point de retrait"}`}>
+            <NavigationMap destLat={pickupLat} destLng={pickupLng} destName={name} onClose={onClose} />
         </div>
     );
 }

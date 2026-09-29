@@ -54,7 +54,10 @@ export default function FeexPayModal({ payment, onClose }) {
                     try {
                         const res = await fetch(`${API_BASE_URL}/payments/feexpay/complete`, {
                             method: "POST",
-                            headers: { "Content-Type": "application/json" },
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                            },
                             body: JSON.stringify({
                                 transaction_id: response.transaction_id,
                                 custom_id: payment.reference,

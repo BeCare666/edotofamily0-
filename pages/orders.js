@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import toast from "react-hot-toast"
 import { authService } from "../services/authService";
 import { useRouter } from "next/navigation";
+import CampaignKitsSection from "../components/CampaignKitsSection";
 
 export default function OrdersPage() {
     const [orders, setOrders] = useState([]);
@@ -242,6 +243,8 @@ export default function OrdersPage() {
                     </div>
                 </>
             )}
+
+            <CampaignKitsSection />
 
             <motion.button
                 onClick={() => router.back()}

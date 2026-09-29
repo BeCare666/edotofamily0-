@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Star, Truck, CheckCircle, Shield, ArrowLeft } from "lucide-react";
 import dynamic from "next/dynamic";
 import OrderProgressBar from "../../components/OrderProgressBar";
+import DeliveryChoiceStep from "../../components/DeliveryChoiceStep";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 // pour feexpay
 //import("@feexpay/react-sdk").then(console.log);
@@ -24,6 +25,7 @@ export default function ProductDetails() {
     const [passOrder, setPassOrder] = useState(false);
     const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
     const [quantity, setQuantity] = useState(1);
+    const [orderStep, setOrderStep] = useState("quantity"); // quantity | delivery
     const handleMouseMove = (e) => {
         if (!zoom) return;
         const rect = e.currentTarget.getBoundingClientRect();
@@ -72,12 +74,14 @@ export default function ProductDetails() {
     const openOrderModal = () => {
         if (!product) return;
         setQuantity(1);
+        setOrderStep("quantity");
         setIsOrderModalOpen(true);
     };
-    const handleOrder = async (quantity) => {
+    // Le lieu (point de retrait ou livraison à domicile) est choisi avant le paiement :
+    // le serveur ajoute les frais de livraison au total, un seul paiement.
+    const handleOrder = async (quantity, delivery) => {
+        if (!product || quantity < 1 || !delivery) return;
         setPassOrder(true);
-
-        if (!product || quantity < 1) return;
 
         try {
             const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
@@ -110,13 +114,14 @@ export default function ProductDetails() {
                     ],
                     total: totalAmount,
                     payment_gateway: "FEEXPAY",
+                    delivery,
                 }),
             });
 
-            const order = await res.json();
+            const order = await res.json().catch(() => ({}));
 
-            if (!order?.tracking_number)
-                throw new Error("Erreur création commande");
+            if (!res.ok || !order?.tracking_number)
+                throw new Error(order?.message || "Erreur création commande");
 
             setPaymentData({
                 orderId: order.id,
@@ -126,10 +131,11 @@ export default function ProductDetails() {
                 currency: "XOF",
             });
 
+            setIsOrderModalOpen(false);
             setIsPaymentOpen(true);
         } catch (err) {
             console.error("Erreur commande/paiement:", err);
-            alert("Une erreur est survenue lors de la commande.");
+            alert(err?.message || "Une erreur est survenue lors de la commande.");
         } finally {
             setPassOrder(false);
         }
@@ -315,7 +321,7 @@ export default function ProductDetails() {
             )}
             {isOrderModalOpen && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[999] p-4">
-                    <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+                    <div className={`bg-white w-full ${orderStep === "delivery" ? "max-w-2xl" : "max-w-md"} max-h-[92vh] overflow-y-auto rounded-2xl shadow-2xl p-6 relative`}>
 
                         <button
                             onClick={() => setIsOrderModalOpen(false)}
@@ -324,49 +330,64 @@ export default function ProductDetails() {
                             ✕
                         </button>
 
-                        <h3 className="text-lg font-semibold mb-4">
-                            Choisir la quantité
-                        </h3>
+                        {orderStep === "delivery" ? (
+                            <DeliveryChoiceStep
+                                productsTotal={product.sale_price * quantity}
+                                onBack={() => setOrderStep("quantity")}
+                                submitting={passOrder}
+                                onConfirm={(delivery) => handleOrder(quantity, delivery)}
+                            />
+                        ) : (
+                            <>
+                                <h3 className="text-lg font-semibold mb-4">
+                                    Choisir la quantité
+                                </h3>
 
-                        {/* Quantity Selector */}
-                        <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4 mb-6">
-                            <button
-                                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                                className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
-                            >
-                                -
-                            </button>
+                                {/* Quantity Selector */}
+                                <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4 mb-6">
+                                    <button
+                                        onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                                        className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
+                                    >
+                                        -
+                                    </button>
 
-                            <span className="text-xl font-semibold">
-                                {quantity}
-                            </span>
+                                    <span className="text-xl font-semibold">
+                                        {quantity}
+                                    </span>
 
-                            <button
-                                onClick={() => setQuantity((prev) => prev + 1)}
-                                className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
-                            >
-                                +
-                            </button>
-                        </div>
+                                    <button
+                                        onClick={() => setQuantity((prev) => prev + 1)}
+                                        className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
+                                    >
+                                        +
+                                    </button>
+                                </div>
 
-                        {/* Total */}
-                        <div className="flex justify-between mb-6">
-                            <span>Total :</span>
-                            <span className="font-bold text-pink-600">
-                                {product.sale_price * quantity} XOF
-                            </span>
-                        </div>
+                                {/* Total */}
+                                <div className="flex justify-between mb-6">
+                                    <span>Total produits :</span>
+                                    <span className="font-bold text-pink-600">
+                                        {product.sale_price * quantity} XOF
+                                    </span>
+                                </div>
 
-                        {/* Confirm */}
-                        <button
-                            onClick={() => {
-                                setIsOrderModalOpen(false);
-                                handleOrder(quantity);
-                            }}
-                            className="w-full bg-pink-600 text-white py-3 rounded-xl font-medium hover:bg-pink-700 transition"
-                        >
-                            Confirmer la commande
-                        </button>
+                                {/* Étape suivante : choix du lieu */}
+                                <button
+                                    onClick={() => {
+                                        if (!localStorage.getItem("token")) {
+                                            localStorage.setItem("redirect_after_login", window.location.pathname);
+                                            router.push("/login");
+                                            return;
+                                        }
+                                        setOrderStep("delivery");
+                                    }}
+                                    className="w-full bg-pink-600 text-white py-3 rounded-xl font-medium hover:bg-pink-700 transition"
+                                >
+                                    Continuer
+                                </button>
+                            </>
+                        )}
 
                     </div>
                 </div>

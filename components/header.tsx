@@ -10,6 +10,7 @@ import GoogleFormDrawer from "./GoogleFormDrawer";
 import CalendlyDrawer from "./CalendlyDrawer";
 import DrawerMenu from "./DrawerMenu";
 import Image from "next/image"
+import UserAvatarMenu from "./UserAvatarMenu";
 interface HeaderProps {
     currentView: ViewState;
     setView: (view: ViewState) => void;
@@ -243,94 +244,9 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                         {/* CTA  */}
                         <div className="flex items-center gap-4">
 
-                            {/* 🔥 USER DROPDOWN (DESKTOP) */}
+                            {/* 🔥 AVATAR DU COMPTE (même présentation que les dashboards) */}
                             {user ? (
-                                <div className="relative">
-                                    <button
-                                        onClick={() => setShowUserMenuDesktop((prev) => !prev)}
-                                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-700 text-sm font-medium transition-all hover:border-pink-300 hover:text-pink-600"
-                                    >
-                                        {/* Avatar */}
-                                        <div className="w-7 h-7 rounded-full bg-pink-100 flex items-center justify-center text-pink-600">
-                                            <User size={16} />
-                                        </div>
-
-                                        <span className="hidden sm:inline">{user?.name || "Mon Espace"}</span>
-                                        <span className="text-xs">{showUserMenuDesktop ? "▲" : "▼"}</span>
-                                    </button>
-
-                                    {/* MENU */}
-                                    {showUserMenuDesktop && (
-                                        <div className="absolute right-0 mt-2 w-60 bg-white shadow-xl border border-pink-100 rounded-xl overflow-hidden z-50 animate-fade-in">
-
-                                            {/* Header */}
-                                            <div className="px-4 py-3 bg-pink-50 border-b border-pink-100">
-                                                <p className="text-sm font-semibold text-gray-900">
-                                                    {user?.name}
-                                                </p>
-                                                <p className="text-xs text-gray-500 truncate">
-                                                    {user?.email}
-                                                </p>
-                                            </div>
-
-                                            {/* Liens */}
-                                            <button
-                                                onClick={() => {
-                                                    router.push("/profile");
-                                                    setShowUserMenuDesktop(false);
-                                                }}
-                                                className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-pink-50 transition text-gray-700"
-                                            >
-                                                <User size={16} /> Profil
-                                            </button>
-
-                                            <button
-                                                onClick={() => {
-                                                    router.push("/orders");
-                                                    setShowUserMenuDesktop(false);
-                                                }}
-                                                className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-pink-50 transition text-gray-700"
-                                            >
-                                                <ShoppingBag size={16} /> Commandes
-                                            </button>
-                                            {user?.role === "super_pickuppoint" ? (
-                                                <button
-                                                    onClick={() => {
-                                                        router.push("/pickup-dashboard-for-orders");
-                                                        setShowUserMenuDesktop(false);
-                                                    }}
-                                                    className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-pink-50 transition text-gray-700"
-                                                >
-                                                    <Star size={16} /> Dashboard
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => {
-                                                        //handleFinalize();
-                                                        setOpenForm(true)
-                                                        setShowUserMenuDesktop(false);
-                                                    }}
-                                                    className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-pink-50 transition text-gray-700"
-                                                >
-                                                    <Star size={16} /> Devenir Point de Retrait
-                                                </button>
-                                            )}
-
-
-
-                                            {/* Logout */}
-                                            <button
-                                                onClick={() => {
-                                                    handleLogout();
-                                                    setShowUserMenuDesktop(false);
-                                                }}
-                                                className="w-full text-left px-4 py-3 flex items-center gap-2 text-pink-600 hover:bg-pink-50 transition font-medium"
-                                            >
-                                                <LogOut size={16} /> Déconnexion
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
+                                <UserAvatarMenu user={user} onNavigate={(path) => router.push(path)} onLogout={handleLogout} />
                             ) : (
                                 <button
                                     onClick={handleLogin}

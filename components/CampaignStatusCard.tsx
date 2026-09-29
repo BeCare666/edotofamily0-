@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Calendar, Clock, Hourglass, CheckCircle, Timer, CalendarCheck, Activity } from "lucide-react";
+import { Calendar, Clock, CheckCircle, Timer, Activity } from "lucide-react";
 
 interface CampaignStatusProps {
   title: string;
   date_start: string;
   date_end: string;
-  status: "a_venir" | "planifie" | "en_cours";
+  status: "a_venir" | "en_cours" | "terminee";
 }
 
 const CampaignStatusCard: React.FC<CampaignStatusProps> = ({
@@ -75,15 +75,15 @@ const CampaignStatusCard: React.FC<CampaignStatusProps> = ({
       color: "bg-yellow-100 text-yellow-800",
       icon: <Clock size={16} className="text-yellow-700" />,
     },
-    planifie: {
-      label: "Planifiée",
-      color: "bg-blue-100 text-blue-800",
-      icon: <CalendarCheck size={16} className="text-blue-700" />,
-    },
     en_cours: {
       label: "En cours",
       color: "bg-green-100 text-green-800",
       icon: <Activity size={16} className="text-green-700 animate-pulse" />,
+    },
+    terminee: {
+      label: "Terminée",
+      color: "bg-gray-100 text-gray-700",
+      icon: <CheckCircle size={16} className="text-gray-600" />,
     },
   };
 
@@ -157,13 +157,6 @@ const CampaignStatusCard: React.FC<CampaignStatusProps> = ({
         </div>
       )}
 
-      {/* Si campagne planifiée */}
-      {status === "planifie" && (
-        <div className="mt-6 flex items-center justify-center gap-2 text-blue-700 bg-blue-50 border border-blue-100 p-4 rounded-2xl">
-          <Hourglass size={18} />
-          <p>Cette campagne démarre bientôt…</p>
-        </div>
-      )}
 
       {/* Si campagne à venir */}
       {status === "a_venir" && (

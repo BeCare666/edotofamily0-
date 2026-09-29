@@ -250,17 +250,22 @@ export default function DashboardPickupCampaigns({ setView }) {
         try {
             setValidating(true);
 
-            await fetch(`${API}/campaigns/verify-otp`, {
+            // Les réponses de l'API sont vérifiées : code faux, expiré ou point bloqué → message affiché
+            const verifyRes = await fetch(`${API}/campaigns/verify-otp`, {
                 method: "POST",
                 headers: authHeaders(),
                 body: JSON.stringify({ registration_id: id, otp }),
             });
+            const verifyData = await verifyRes.json().catch(() => ({}));
+            if (!verifyRes.ok) throw new Error(verifyData?.message || "OTP invalide");
 
-            await fetch(`${API}/campaigns/mark-pickup`, {
+            const pickupRes = await fetch(`${API}/campaigns/mark-pickup`, {
                 method: "POST",
                 headers: authHeaders(),
                 body: JSON.stringify({ registration_id: id }),
             });
+            const pickupData = await pickupRes.json().catch(() => ({}));
+            if (!pickupRes.ok) throw new Error(pickupData?.message || "Retrait non enregistré");
 
             toast.success("Validation réussie");
             setOtp("");
@@ -268,8 +273,8 @@ export default function DashboardPickupCampaigns({ setView }) {
 
             loadOrders();
             loadStats();
-        } catch {
-            toast.error("OTP invalide");
+        } catch (err) {
+            toast.error(err?.message || "OTP invalide");
         } finally {
             setValidating(false);
         }

@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import CampaignStatusCard from './CampaignStatusCard';
+import PickupPointPicker from './PickupPointPicker';
 
 // ========= IMPORTANT =========
 // This file is a single self-contained React component (TSX) for Next.js
@@ -37,6 +38,8 @@ const ITEMS_PER_PAGE = 5;
 
 export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotification }) => {
   const [showForm, setShowForm] = useState(false);
+  // Ville du participant, enregistrée à l'inscription (une des villes de la campagne)
+  const [registrationCity, setRegistrationCity] = useState<string>("");
   const [showPickupModal, setShowPickupModal] = useState(false);
 
   const [selectedPickup, setSelectedPickup] = useState<number | null>(null);
@@ -313,9 +316,15 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
       return;
     }
 
+    if (!registrationCity) {
+      toast.error('Indiquez votre ville.');
+      return;
+    }
+
     const payload = {
       campaign_id: activeCampaign.id,
-      pickup_center: pickupCenterValue
+      pickup_center: pickupCenterValue,
+      city: registrationCity
     };
 
     try {
@@ -414,7 +423,13 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 z-20 relative">
         {/* ACTIVE */}
         {activeCampaign && (
-          <ActiveCampaignCard campaign={activeCampaign} onOpen={() => setShowForm(true)} />
+          <ActiveCampaignCard campaign={activeCampaign} onOpen={() => {
+            const cities: string[] = activeCampaign?.cities || [];
+            const known = [selectedCity, detectedCity].filter(Boolean).map((c) => String(c).toLowerCase());
+            const match = cities.find((c) => known.includes(c.toLowerCase()));
+            setRegistrationCity(match || (cities.length === 1 ? cities[0] : ""));
+            setShowForm(true);
+          }} />
         )}
 
         {/* UPCOMING */}
@@ -425,14 +440,15 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
 
         <div className="grid md:grid-cols-3 gap-8 mb-20">
           {upcomingCampaigns.map((c) => (
-            <EventCard key={c.id} date={new Date(c.date_start).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} location={c.location} title={c.title} status={c.status === 'planifie' ? 'Planifié' : 'À venir'} description={c.description} />
+            <EventCard key={c.id} date={new Date(c.date_start).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} location={c.location} title={c.title} status="À venir" description={c.description} />
           ))}
         </div>
       </div>
 
       {/* MODAL: Subscribe (simple: just continue to pickup) */}
       {showForm && (
-        <ModalSubscribe onClose={() => setShowForm(false)} onSubmit={handleSubscribe} />
+        <ModalSubscribe onClose={() => setShowForm(false)} onSubmit={handleSubscribe}
+          cities={activeCampaign?.cities || []} city={registrationCity} setCity={setRegistrationCity} />
       )}
       {/* MODAL CAMPAGNES */}
 
@@ -768,15 +784,15 @@ const ActiveCampaignCard = ({ campaign, onOpen }: any) => (
         <div className="space-y-4 mb-8 bg-slate-50 p-6 rounded-2xl border border-slate-100">
           <div className="flex justify-between text-sm font-medium">
             <span className="text-slate-500">Progression</span>
-            <span className="text-pink-600 font-bold">{Math.round((campaign.distributed_kits / campaign.objective_kits) * 100)}%</span>
+            <span className="text-pink-600 font-bold">{campaign.objective_kits ? Math.round(((campaign.picked_up_count || 0) / campaign.objective_kits) * 100) : 0}%</span>
           </div>
 
           <div className="w-full bg-white rounded-full h-3 overflow-hidden shadow-inner">
-            <div className="bg-gradient-to-r from-pink-500 to-purple-500 h-full rounded-full" style={{ width: `${(campaign.distributed_kits / campaign.objective_kits) * 100}%` }} />
+            <div className="bg-gradient-to-r from-pink-500 to-purple-500 h-full rounded-full" style={{ width: `${campaign.objective_kits ? Math.min(100, ((campaign.picked_up_count || 0) / campaign.objective_kits) * 100) : 0}%` }} />
           </div>
 
           <div className="flex justify-between text-xs text-slate-500 font-medium">
-            <span>{campaign.distributed_kits} kits distribués</span>
+            <span>{campaign.registrations_count || 0} inscrits · {campaign.picked_up_count || 0} kits retirés</span>
             <span>Objectif : {campaign.objective_kits}</span>
           </div>
         </div>
@@ -892,7 +908,7 @@ const EventCard = ({ date, location, title, status, description }: any) => {
 // ==================================================
 // ModalSubscribe — simple, prompts to open pickup
 // ==================================================
-const ModalSubscribe = ({ onClose, onSubmit }: any) => {
+const ModalSubscribe = ({ onClose, onSubmit, cities = [], city, setCity }: any) => {
   return (
     <div className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-md flex items-center justify-center p-4">
       <div className="relative w-full max-w-md bg-white/60 backdrop-blur-xl rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.2)] border border-white/40 p-8">
@@ -905,14 +921,30 @@ const ModalSubscribe = ({ onClose, onSubmit }: any) => {
           <p className="text-slate-600 text-sm mt-1">Sélectionnez votre point de retrait pour finaliser votre demande.</p>
         </div>
 
-        <button onClick={onSubmit} className="w-full px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-pink-600 transition-all shadow-lg">Sélectionner un point de retrait</button>
+        {cities.length > 1 && (
+          <div className="mb-4 text-left">
+            <label htmlFor="campaign-city" className="block text-sm font-medium text-slate-700 mb-1">Votre ville</label>
+            <select
+              id="campaign-city"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white"
+            >
+              <option value="" disabled>Choisissez votre ville</option>
+              {cities.map((c: string) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+        )}
+        {cities.length === 1 && <p className="mb-4 text-sm text-slate-600">Ville : <strong>{cities[0]}</strong></p>}
+        <button onClick={onSubmit} disabled={!city} className="w-full px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-pink-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">Sélectionner un point de retrait</button>
       </div>
     </div>
   );
 };
 
 // ==================================================
-// ModalPickup — choose from list or custom note
+// ModalPickup — choix d'un point de retrait uniquement
+// (kits gratuits : centre de traitement → point de retrait ; pas de lieu personnalisé)
 // Props: visible, close, search, setSearch, page, setPage, totalPages, pageData, onChoose
 // ==================================================
 const ModalPickup = ({
@@ -927,23 +959,17 @@ const ModalPickup = ({
   onChoose,
 }: any) => {
 
-  const [customMode, setCustomMode] = useState(false);
-  const [customNote, setCustomNote] = useState('');
   const [selected, setSelected] = useState<any>(null);
 
   if (!visible) return null;
 
   const choosePickup = () => {
-    if (!selected && !customNote.trim()) {
+    if (!selected) {
       toast.error("Veuillez choisir un point de retrait");
       return;
     }
 
-    if (customMode) {
-      onChoose(null, customNote);
-    } else {
-      onChoose(selected, undefined);
-    }
+    onChoose(selected, undefined);
     // closing handled by parent or here:
     // close(); parent will close after registering (we close in parent), but closing here gives immediate UI feedback:
     close();
@@ -952,69 +978,17 @@ const ModalPickup = ({
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[300]">
 
-      <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-lg">
+      <div className="bg-white rounded-3xl shadow-2xl p-5 sm:p-6 w-full max-w-2xl max-h-[92vh] overflow-y-auto mx-3">
 
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Choisir un point de retrait</h2>
-          <button onClick={close}><XCircle size={26} /></button>
+          <button onClick={close} aria-label="Fermer"><XCircle size={26} /></button>
         </div>
 
-        {!customMode && (
-          <>
-            <input
-              type="text"
-              placeholder="Rechercher..."
-              className="w-full mb-4 p-2 border rounded-xl"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-            />
-
-            <div className="max-h-80 overflow-y-auto pr-2">
-              {pageData.map((p: any) => (
-                <div
-                  key={p.id}
-                  onClick={() => setSelected(p.id)}
-                  className={`p-4 border rounded-xl mb-3 cursor-pointer ${selected === p.id
-                    ? 'bg-pink-50 border-pink-500'
-                    : 'hover:border-pink-400'
-                    }`}
-                >
-                  <p className="font-semibold">{p.name}</p>
-                  <p className="text-sm text-gray-500">{p.address}</p>
-                </div>
-              ))}
-            </div>
-
-            <p
-              className="text-center text-[#FF6EA9] mt-5 cursor-pointer"
-              onClick={() => setCustomMode(true)}
-            >
-              Décrire un point personnalisé
-            </p>
-          </>
-        )}
-
-        {customMode && (
-          <>
-            <textarea
-              rows={3}
-              className="w-full border rounded-xl p-3"
-              value={customNote}
-              placeholder="Décrire l’endroit..."
-              onChange={(e) => setCustomNote(e.target.value)}
-            />
-
-            <p
-              className="text-center text-[#FF6EA9] mt-5 cursor-pointer"
-              onClick={() => setCustomMode(false)}
-            >
-              Retour
-            </p>
-          </>
-        )}
+        <PickupPointPicker
+          selectedId={selected}
+          onSelect={(p: any) => setSelected(p.id)}
+        />
 
         {/* Bouton valider */}
         <button

@@ -17,6 +17,18 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false)
     const [alert, setAlert] = useState({ type: "", message: "" })
     const { setUser } = useAuthContext() // ✅ accès au setter global
+    const [resendState, setResendState] = useState({ loading: false, message: "" })
+
+    // Point de retrait en attente : son e-mail n'est peut-être pas confirmé (lien valable 5 min)
+    const handleResendVerification = async () => {
+        setResendState({ loading: true, message: "" })
+        try {
+            const res = await authService.resendVerificationEmail(email.trim())
+            setResendState({ loading: false, message: res?.message || "E-mail envoyé." })
+        } catch (err) {
+            setResendState({ loading: false, message: err.message || "Envoi impossible pour le moment." })
+        }
+    }
     const handleLogin = async (e) => {
         e.preventDefault()
         setAlert({ type: "", message: "" })
@@ -39,14 +51,16 @@ export default function LoginPage() {
                 // 🔁 récupérer la page d'origine
                 const redirect = localStorage.getItem("redirect_after_login");
 
-                setTimeout(() => {
-                    if (redirect) {
-                        localStorage.removeItem("redirect_after_login");
-                        router.push(redirect);
-                    } else {
-                        router.push("/");
-                    }
-                }, 500);
+                // Redirection immédiate (l'ancien délai fixe de 500 ms ralentissait chaque connexion)
+                // Un sponsor arrive sur son espace
+                if (me?.role === "sponsor" && !redirect) {
+                    router.push("/sponsor");
+                } else if (redirect) {
+                    localStorage.removeItem("redirect_after_login");
+                    router.push(redirect);
+                } else {
+                    router.push("/");
+                }
             } else {
                 throw new Error("Identifiants invalides.")
             }
@@ -116,6 +130,20 @@ export default function LoginPage() {
                         {alert.type === "success" ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
                         {alert.message}
                     </motion.div>
+                )}
+                {alert.type === "error" && alert.message.includes("en attente de validation") && (
+                    <div className="-mt-3 mb-5 text-sm text-gray-600">
+                        Adresse e-mail pas encore confirmée ?{" "}
+                        <button
+                            type="button"
+                            onClick={handleResendVerification}
+                            disabled={resendState.loading}
+                            className="text-[#FF6EA9] font-medium hover:underline disabled:opacity-50"
+                        >
+                            {resendState.loading ? "Envoi…" : "Renvoyer l'e-mail de confirmation"}
+                        </button>
+                        {resendState.message && <p role="status" className="text-xs mt-1 text-gray-500">{resendState.message}</p>}
+                    </div>
                 )}
 
                 {/* Formulaire */}

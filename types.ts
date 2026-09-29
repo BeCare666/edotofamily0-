@@ -61,9 +61,13 @@ export interface Campaign {
     location: string;
     date_start: string;
     date_end: string | null;
-    status: "a_venir" | "planifie" | "en_cours";
+    // Statut calculé par l'API à partir des dates
+    status: "a_venir" | "en_cours" | "terminee";
     objective_kits: number;
-    distributed_kits: number;
+    distributed_kits: number; // ancien compteur, plus utilisé
+    cities: string[];
+    registrations_count: number;
+    picked_up_count: number;
 }
 
 export interface IntrinsicAttributes {

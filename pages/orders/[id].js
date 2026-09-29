@@ -19,6 +19,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import OrderProgressBar from "../../components/OrderProgressBar";
+import PickupPointPicker from "../../components/PickupPointPicker";
+import OrderStepsBar from "../../components/OrderStepsBar";
 import dynamic from "next/dynamic";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 //import PickupMapModal from "../pickupmap/PickupMapModal";
@@ -26,8 +28,6 @@ const PickupMapModal = dynamic(
   () => import("../../components/pickupmap/PickupMapModal"),
   { ssr: false }
 );
-// 🟣 CONFIG
-const PAGE_SIZE = 6;
 
 export default function OrderDetailsPage() {
   const router = useRouter();
@@ -35,16 +35,10 @@ export default function OrderDetailsPage() {
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [cashselectpickuppoint, setCashselectpickuppoint] = useState(true);
   const [shopModalButton, setShopModalButton] = useState(false);
   // 🔥 Modal
   const [modalOpen, setModalOpen] = useState(false);
   const [modalOpenConfirm, setmodalOpenConfirm] = useState(false);
-  // 🟣 Pickup points
-  const [pickupPoints, setPickupPoints] = useState([]);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [customNote, setCustomNote] = useState("");
   const [paymentData, setPaymentData] = useState(null);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isShowEndOrders, setIsShowEndOrders] = useState(false);
@@ -52,6 +46,7 @@ export default function OrderDetailsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openMap, setOpenMap] = useState(false);
   const [mapCoords, setMapCoords] = useState(null);
+  const [regeneratingOtp, setRegeneratingOtp] = useState(false);
   useEffect(() => {
     if (id) fetchOrderDetails(id);
   }, [id]);
@@ -107,9 +102,9 @@ export default function OrderDetailsPage() {
       const isPendingPayment = data.order_status === "order-pending";
       console.log("voici data", data.order_status)
       // 👉 1. Choix du point de retrait
-      if (!hasPickupPoint && isProcessing && !hasNote) {
+      // (une livraison à domicile a déjà son lieu, choisi et payé avant le paiement)
+      if (!hasPickupPoint && isProcessing && !hasNote && data.delivery_type !== "CUSTOM") {
         setShopModalButton(true);
-        fetchPickupPoints();
         setModalOpen(true);
         return;
       }
@@ -117,7 +112,6 @@ export default function OrderDetailsPage() {
       // 👉 2. Paiement
       if (isPendingPayment) {
         setShopModalButton(true);
-        fetchPickupPoints();
         setIsShowEndOrders(true);
       }
 
@@ -133,6 +127,30 @@ export default function OrderDetailsPage() {
     }
   };
 
+  // Nouveau code de retrait : l'API revérifie que le code a expiré et que le retrait n'a pas eu lieu
+  const regenerateOtp = async () => {
+    if (regeneratingOtp) return;
+    setRegeneratingOtp(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/orders/${id}/regenerate-otp`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data?.message || "Impossible de générer un nouveau code.");
+        return;
+      }
+      toast.success(data.message || "Un nouveau code vous a été envoyé par e-mail.");
+      fetchOrderDetails(id);
+    } catch (e) {
+      toast.error("Erreur réseau. Veuillez réessayer.");
+    } finally {
+      setRegeneratingOtp(false);
+    }
+  };
+
   const handleFinalize = () => {
     if (isSubmitting) return;
 
@@ -140,36 +158,6 @@ export default function OrderDetailsPage() {
     setIsSetData(true);
   };
 
-  const fetchPickupPoints = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/users?role=super_pickuppoint&limit=100`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-      //console.log('data', data)
-
-      setPickupPoints(Array.isArray(data.data) ? data.data : []);;
-    } catch (e) {
-      console.error("Erreur:", e);
-    }
-  };
-
-  // function to showOrNo the list pickuppoin
-
-  const setCashselectpickuppointF = async () => {
-    setCashselectpickuppoint(false)
-  }
-  const setCashselectpickuppointFF = async () => {
-    setCashselectpickuppoint(true)
-  }
   // 🟣 UPDATE pickup point
   const selectPickupPoint = async (pickupPointId) => {
     const token = localStorage.getItem("token");
@@ -185,7 +173,7 @@ export default function OrderDetailsPage() {
           },
           body: JSON.stringify({
             pickup_point_id: pickupPointId,
-            note: customNote || null,
+            note: null,
           }),
         }
       );
@@ -212,13 +200,6 @@ export default function OrderDetailsPage() {
       toast.error("Erreur réseau. Veuillez réessayer.");
     }
   };
-
-  const filteredPoints = pickupPoints.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredPoints.length / PAGE_SIZE);
-  const pageData = filteredPoints.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -251,7 +232,7 @@ export default function OrderDetailsPage() {
     );
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-white via-[#fff5f8] to-[#ffe4ef] px-4 py-10">
+    <main className="min-h-screen bg-gradient-to-br from-white via-[#fff5f8] to-[#ffe4ef] px-4 pt-10 pb-48 sm:pb-36">
       <div className="max-w-4xl mx-auto bg-white/70 backdrop-blur-2xl border border-white/40  p-6">
         <div className="flex items-center justify-between mb-8">
           <button
@@ -349,6 +330,31 @@ export default function OrderDetailsPage() {
         {/* ------------------------------------------------------------------- */}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          {order.delivery_type === "CUSTOM" ? (
+            <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
+              <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <Truck className="text-[#FF6EA9]" /> Livraison à domicile
+              </h2>
+              {order.custom_delivery ? (
+                <>
+                  <p className="text-sm text-gray-700 whitespace-pre-line">{order.custom_delivery.description}</p>
+                  <p className="text-sm text-gray-500 mt-1">Téléphone : {order.custom_delivery.phone}</p>
+                  <p className="text-sm text-gray-500">
+                    Distance : {String(order.custom_delivery.distance_km).replace(".", ",")} km
+                  </p>
+                  {order.payment_status === "payment-success" && !order.custom_delivery.delivered_at && (
+                    <p className="text-sm mt-2 font-medium text-[#0F172A]">
+                      {order.custom_delivery.courier_assigned
+                        ? "Un livreur a été désigné : il vous demandera votre code de retrait à la remise."
+                        : "Nous cherchons un livreur pour votre colis."}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-gray-500">Lieu de livraison enregistré.</p>
+              )}
+            </div>
+          ) : (
           <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <MapPin className="text-[#FF6EA9]" /> Adresse de retrait
@@ -361,6 +367,7 @@ export default function OrderDetailsPage() {
                   : "Non spécifiée"}
             </p>
           </div>
+          )}
           <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <User className="text-[#FF6EA9]" /> Client
@@ -406,25 +413,56 @@ export default function OrderDetailsPage() {
             </div>
           </div>
         </div>
+
+        {/* ------------------------------------------------------------------- */}
+        {/* CODE DE RETRAIT */}
+        {/* ------------------------------------------------------------------- */}
+
+        {order.payment_status === "payment-success" && (() => {
+          const withdrawn = Number(order.otp_used) === 1 || order.order_status === "order-completed" || !!order.delivered_at;
+          const expiresAt = order.otp_expires_at ? new Date(order.otp_expires_at) : null;
+          const expired = !!expiresAt && expiresAt.getTime() < Date.now();
+          const formatDate = (d) => d.toLocaleString("fr-FR", { day: "2-digit", month: "long", hour: "2-digit", minute: "2-digit" });
+
+          return (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-6">
+              <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <Clock className="text-[#FF6EA9]" /> Code de retrait
+              </h2>
+              {withdrawn ? (
+                <p className="text-sm text-green-700 flex items-center gap-2">
+                  <CheckCircle size={18} /> Commande retirée
+                  {order.delivered_at ? ` le ${formatDate(new Date(order.delivered_at))}` : ""}.
+                </p>
+              ) : expired ? (
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <p className="text-sm text-gray-700">
+                    Votre code de retrait a expiré le {formatDate(expiresAt)}. Générez-en un nouveau : il vous sera envoyé par e-mail.
+                  </p>
+                  <button
+                    onClick={regenerateOtp}
+                    disabled={regeneratingOtp}
+                    className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#FF6EA9] text-white text-sm font-semibold hover:bg-[#ff579d] disabled:opacity-60 transition"
+                  >
+                    {regeneratingOtp && <Loader2 size={16} className="animate-spin" />}
+                    {regeneratingOtp ? "Envoi…" : "Générer un nouveau code"}
+                  </button>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-700">
+                  Votre code vous a été envoyé par e-mail
+                  {expiresAt ? `. Il est valable jusqu'au ${formatDate(expiresAt)}` : ""}.
+                  Présentez-le à votre point de retrait.
+                </p>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
-      {/* --------------------------------------------------------------------- */}
-      {/* BOUTON FLOTTANT POUR RÉOUVRIR MODAL */}
-      {/* --------------------------------------------------------------------- */}
-      {shopModalButton && (
-        <motion.button
-          onClick={() => setModalOpen(true)}
-          className="fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
-                          flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
-          whileHover={{ rotate: -5 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <LocateFixed className="text-[#FF6EA9]" size={26} />
-        </motion.button>
-      )}
       <motion.button
         onClick={() => router.back()}
-        className="fixed bottom-5 left-4 z-[9999] w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
+        className="fixed bottom-[150px] sm:bottom-[110px] left-4 z-40 w-12 h-12 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
              flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
         whileHover={{ rotate: -5 }}
         whileTap={{ scale: 0.9 }}
@@ -433,20 +471,6 @@ export default function OrderDetailsPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
       </motion.button>
-      {order?.pickup_point?.pickup_lat && (
-        <motion.button
-          onClick={() => setOpenMap(true)}
-          className="fixed bottom-5 right-4 z-[9999] w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
-             flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
-          whileHover={{ rotate: -5 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF6EA9" className="w-7 h-7">
-            <path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" />
-          </svg>
-        </motion.button>
-      )}
-
       {/* --------------------------------------------------------------------- */}
       {/* MODAL PICKUP */}
       {/* --------------------------------------------------------------------- */}
@@ -463,7 +487,7 @@ export default function OrderDetailsPage() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-white  shadow-2xl p-6 w-full max-w-lg"
+              className="bg-white shadow-2xl rounded-3xl p-5 sm:p-6 w-full max-w-2xl max-h-[92vh] overflow-y-auto mx-3"
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Choisir un point de retrait</h2>
@@ -471,89 +495,12 @@ export default function OrderDetailsPage() {
                   <XCircle size={26} />
                 </button>
               </div>
-              {cashselectpickuppoint && (
-                <>
-                  {/* SEARCH */}
-                  <div className="relative mb-4">
-                    <Search className="absolute left-3 top-3 text-gray-400" size={18} />
-                    <input
-                      type="text"
-                      placeholder="Rechercher un point..."
-                      className="w-full pl-10 pr-3 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-300"
-                      value={search}
-                      onChange={(e) => {
-                        setSearch(e.target.value);
-                        setPage(1);
-                      }}
-                    />
-                  </div>
-
-                  {/* LISTE */}
-                  <div className="max-h-80 overflow-y-auto pr-2">
-                    {pageData.map((p) => (
-                      <div
-                        key={p.id}
-                        className="p-4 border rounded-xl mb-3 hover:border-pink-400 cursor-pointer transition"
-                        onClick={() => selectPickupPoint(p.id)}
-                      >
-                        <p className="font-semibold">{p.name}</p>
-                        <p className="text-sm text-gray-500">{p.address}</p>
-                      </div>
-                    ))}
-
-                    {pageData.length === 0 && (
-                      <p className="text-center text-gray-500 py-6">Aucun résultat</p>
-                    )}
-                  </div>
-
-                  {/* PAGINATION */}
-                  <div className="flex justify-between mt-4">
-                    <button
-                      disabled={page === 1}
-                      onClick={() => setPage((p) => p - 1)}
-                      className="px-3 py-1 text-sm border rounded-lg disabled:opacity-30"
-                    >
-                      Précédent
-                    </button>
-
-                    <button
-                      disabled={page === totalPages}
-                      onClick={() => setPage((p) => p + 1)}
-                      className="px-3 py-1 text-sm border rounded-lg disabled:opacity-30"
-                    >
-                      Suivant
-                    </button>
-                  </div>
-                  <p className="font-medium mb-2 text-center items-center mt-5 cursor-pointer text-[#FF6EA9]"
-                    onClick={setCashselectpickuppointF}
-                  >Décrire un point personnalisé</p>
-                </>
-              )}
-              {!cashselectpickuppoint && (
-                <>
-                  {/* NOTE PERSO */}
-                  <div className="mt-6">
-                    <p className="font-medium mb-2 ">Décrire un point personnalisé</p>
-                    <textarea
-                      rows={3}
-                      className="w-full border rounded-xl p-3 focus:ring-pink-300 focus:ring-2"
-                      placeholder="Décrire l’endroit ici…"
-                      value={customNote}
-                      onChange={(e) => setCustomNote(e.target.value)}
-                    ></textarea>
-
-                    <button
-                      onClick={() => selectPickupPoint(null)}
-                      className="mt-3 w-full bg-[#FF6EA9] text-white py-2 rounded-xl hover:bg-[#ff5599]"
-                    >
-                      Utiliser ce lieu
-                    </button>
-                  </div>
-                  <p className="font-medium mb-2 text-center items-center text-[#FF6EA9] mt-5 cursor-pointer"
-                    onClick={setCashselectpickuppointFF}
-                  >Ou sélectionner un point de retrait</p>
-                </>
-              )}
+              {/* Commande déjà payée : seul un point de retrait peut être choisi ici
+                  (la livraison à domicile se choisit et se paie avant le paiement) */}
+              <PickupPointPicker
+                selectedId={order?.pickup_point_id}
+                onSelect={(p) => selectPickupPoint(p.id)}
+              />
 
             </motion.div>
           </motion.div>
@@ -635,78 +582,14 @@ export default function OrderDetailsPage() {
         <FeexPayModal payment={paymentData} onClose={() => setIsPaymentOpen(false)} />
       )}
       {/*  <OrderProgressBar />*/}
-      {isShowEndOrders && (
-        <div className="fixed bottom-6 inset-x-0 z-50 flex justify-center">
-          <motion.button
-            onClick={handleFinalize}
-            disabled={isSubmitting}
-            className={`
-        inline-flex items-center justify-center gap-3
-        px-7 py-4
-        rounded-full
-        bg-gradient-to-r from-pink-500 to-pink-600
-        text-white font-semibold whitespace-nowrap
-        shadow-[0_12px_30px_rgba(236,72,153,0.35)]
-        transition-all
-        ${isSubmitting
-                ? "opacity-80 cursor-not-allowed"
-                : "hover:shadow-[0_18px_40px_rgba(236,72,153,0.45)]"}
-      `}
-            whileHover={!isSubmitting ? { scale: 1.05 } : undefined}
-            whileTap={!isSubmitting ? { scale: 0.95 } : undefined}
-          >
-            {isSubmitting ? (
-              <>
-                {/* Spinner */}
-                <svg
-                  className="w-5 h-5 animate-spin"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="white"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="white"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  />
-                </svg>
-
-                <span className="text-base leading-none">
-                  Traitement en cours…
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="text-base leading-none">
-                  Finaliser votre commande
-                </span>
-
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5 shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13.5 4.5L21 12l-7.5 7.5M3 12h18"
-                  />
-                </svg>
-              </>
-            )}
-          </motion.button>
-        </div>
-      )}
+      <OrderStepsBar
+        order={order}
+        canPay={isShowEndOrders}
+        onPay={handleFinalize}
+        paying={isSubmitting}
+        onChoosePoint={() => setModalOpen(true)}
+        onVisit={() => setOpenMap(true)}
+      />
 
       <PickupMapModal
         open={openMap}

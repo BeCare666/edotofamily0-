@@ -65,6 +65,12 @@ export const authService = {
         localStorage.removeItem("user");
         //router.push("/");
     },
+    resendVerificationEmail: (email) =>
+        apiRequest("/resend-verification-email", {
+            method: "POST",
+            body: JSON.stringify({ email }),
+        }),
+
     forgetPassword: (email) =>
         apiRequest("/forget-password", {
             method: "POST",

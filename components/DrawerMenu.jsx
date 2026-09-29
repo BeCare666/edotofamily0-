@@ -73,9 +73,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
     { icon: <FaTiktok />, color: "#000000", url: "https://www.tiktok.com/@toncompte" },
   ];
   const handleFinalize = () => {
-
-    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScY-R5SkFwByPEDyzW7AxVmEoEc2NSTI4RYYtvlp0w0jhEIjg/viewform?usp=publish-editor";
-    window.open(formUrl, "_blank", "noopener,noreferrer")
+    router.push("/devenir-point-de-retrait");
   };
   return (
     <>
