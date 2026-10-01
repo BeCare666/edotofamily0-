@@ -126,10 +126,10 @@ const SSRAccessDrawer = () => {
 
               <div className="text-left">
                 <p className="font-semibold text-slate-800">
-                  Parler à un conseiller SSR
+                  Poser une question à l'Assistant SSR
                 </p>
                 <p className="text-sm text-slate-500">
-                  Posez vos questions à l'IA, en toute confidentialité
+                  Réponses automatiques, anonymes et confidentielles
                 </p>
               </div>
             </button>

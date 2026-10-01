@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
-// Ouverture du chat « IA Edotofamily » depuis n'importe quel déclencheur
+// Ouverture du chat « Assistant SSR » depuis n'importe quel déclencheur
 // (bouton flottant, option « Parler à un conseiller SSR » du drawer d'accueil).
 const ChatAIContext = createContext({ isOpen: false, openChat: () => {}, closeChat: () => {} });
 

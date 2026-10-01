@@ -1,6 +1,6 @@
 // Textes de l'interface. Le fon utilise l'interface française (pas encore de traduction validée).
 const FR = {
-    title: "IA Edotofamily",
+    title: "Assistant SSR",
     subtitle: "Santé sexuelle & reproductive · confidentiel",
     close: "Fermer",
     newChat: "Nouvelle conversation",

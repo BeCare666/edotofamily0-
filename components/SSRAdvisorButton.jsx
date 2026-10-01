@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { useChatAI } from "../context/ChatAIContext";
 
-// Bouton flottant : ouvre le chat « IA Edotofamily » (remplace l'ancien accès direct à Calendly).
+// Bouton flottant : ouvre le chat « Assistant SSR » (remplace l'ancien accès direct à Calendly).
 export default function SSRAdvisorButton() {
     const { isOpen, openChat } = useChatAI();
 
@@ -20,7 +20,7 @@ export default function SSRAdvisorButton() {
                 >
                     <motion.button
                         onClick={openChat}
-                        aria-label="Ouvrir le chat IA Edotofamily"
+                        aria-label="Ouvrir l'Assistant SSR"
                         className="group relative h-16 w-16 rounded-full"
                         whileHover={{ scale: 1.08 }}
                         whileTap={{ scale: 0.92 }}
@@ -44,7 +44,7 @@ export default function SSRAdvisorButton() {
                     </motion.button>
 
                     <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-700 shadow-sm ring-1 ring-pink-100 backdrop-blur">
-                        IA Edotofamily
+                        Assistant SSR
                     </span>
                 </motion.div>
             )}
