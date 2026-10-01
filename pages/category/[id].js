@@ -516,7 +516,7 @@ export default function CategoryPage() {
                 )}
               </button>
             </div>
-            <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="hidden lg:block flex gap-2 overflow-x-auto -mx-4 px-4 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {[{ id: null, name: "Tous" }, ...categories].map((c) => {
                 const active = c.id === null ? isAll : String(categoriesId) === c.id;
                 return (
@@ -778,65 +778,65 @@ export default function CategoryPage() {
                 onConfirm={(delivery) => handleOrder(selectedProduct, quantity, delivery)}
               />
             ) : (
-            <>
-            {/* Product Info */}
-            <div className="flex items-center gap-4 mb-6">
+              <>
+                {/* Product Info */}
+                <div className="flex items-center gap-4 mb-6">
 
-              <div>
-                <h3 className="font-semibold text-lg">
-                  {selectedProduct.name}
-                </h3>
-                <p className="text-pink-600 font-bold">
-                  {selectedProduct.sale_price} XOF
-                </p>
-              </div>
-            </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">
+                      {selectedProduct.name}
+                    </h3>
+                    <p className="text-pink-600 font-bold">
+                      {selectedProduct.sale_price} XOF
+                    </p>
+                  </div>
+                </div>
 
-            {/* Quantity Selector */}
-            <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4 mb-6">
+                {/* Quantity Selector */}
+                <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4 mb-6">
 
-              <button
-                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
-              >
-                -
-              </button>
+                  <button
+                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
+                  >
+                    -
+                  </button>
 
-              <span className="text-xl font-semibold">
-                {quantity}
-              </span>
+                  <span className="text-xl font-semibold">
+                    {quantity}
+                  </span>
 
-              <button
-                onClick={() => setQuantity((prev) => prev + 1)}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
-              >
-                +
-              </button>
-            </div>
+                  <button
+                    onClick={() => setQuantity((prev) => prev + 1)}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-pink-50 transition"
+                  >
+                    +
+                  </button>
+                </div>
 
-            {/* Total */}
-            <div className="flex justify-between mb-6">
-              <span className="text-gray-600">Total produits :</span>
-              <span className="font-bold text-lg text-pink-600">
-                {selectedProduct.sale_price * quantity} XOF
-              </span>
-            </div>
+                {/* Total */}
+                <div className="flex justify-between mb-6">
+                  <span className="text-gray-600">Total produits :</span>
+                  <span className="font-bold text-lg text-pink-600">
+                    {selectedProduct.sale_price * quantity} XOF
+                  </span>
+                </div>
 
-            {/* Étape suivante : choix du lieu */}
-            <button
-              onClick={() => {
-                if (!localStorage.getItem("token")) {
-                  localStorage.setItem("redirect_after_login", window.location.pathname);
-                  router.push("/login");
-                  return;
-                }
-                setOrderStep("delivery");
-              }}
-              className="w-full bg-pink-600 text-white py-3 rounded-xl font-medium hover:bg-pink-700 transition"
-            >
-              Continuer
-            </button>
-            </>
+                {/* Étape suivante : choix du lieu */}
+                <button
+                  onClick={() => {
+                    if (!localStorage.getItem("token")) {
+                      localStorage.setItem("redirect_after_login", window.location.pathname);
+                      router.push("/login");
+                      return;
+                    }
+                    setOrderStep("delivery");
+                  }}
+                  className="w-full bg-pink-600 text-white py-3 rounded-xl font-medium hover:bg-pink-700 transition"
+                >
+                  Continuer
+                </button>
+              </>
             )}
 
           </div>
