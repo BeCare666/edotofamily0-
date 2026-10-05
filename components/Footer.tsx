@@ -9,6 +9,7 @@ import CalendlyDrawer from "./CalendlyDrawer";
 import { motion } from "framer-motion";
 import logo from "../public/logo/favicon.png";
 import Image from "next/image"
+import BrandMark from "./BrandMark";
 
 /* ✅ FIX TS DEFINITIF */
 const MotionDiv = motion.div as React.FC<any>;
@@ -73,13 +74,7 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                             <div
                                 className="flex-shrink-0 flex items-center cursor-pointer gap-2"
                             >
-                                <div className="relative w-12 p-3 h-12  overflow-hidden  ring-1 ring-white">
-                                    <Image src={logo} alt="E·Doto" fill className="object-cover" />
-                                </div>
-
-                                <h1 className="text-2xl font-bold text-[#0F172A] mt-2 text-center">
-                                    <span className="text-[#FF6EA9]">E·Doto</span> Family
-                                </h1>
+                                <BrandMark size="lg" />
                             </div>
 
                             <p className="text-slate-500 text-sm leading-relaxed max-w-xs">

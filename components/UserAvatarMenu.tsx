@@ -11,9 +11,11 @@ interface Props {
     user: any;
     onNavigate: (path: string) => void;
     onLogout: () => void;
+    /** Avatar rond (en-tête mobile) */
+    round?: boolean;
 }
 
-export default function UserAvatarMenu({ user, onNavigate, onLogout }: Props) {
+export default function UserAvatarMenu({ user, onNavigate, onLogout, round = false }: Props) {
     const [open, setOpen] = React.useState(false);
     const ref = React.useRef<HTMLDivElement>(null);
 
@@ -45,15 +47,15 @@ export default function UserAvatarMenu({ user, onNavigate, onLogout }: Props) {
         <div ref={ref} className="relative">
             <button
                 onClick={() => setOpen((v) => !v)}
-                className="block rounded-xl transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6EA9]/50 focus-visible:ring-offset-2"
+                className={`block ${round ? "rounded-full ring-2 ring-white shadow-[0_4px_14px_-4px_rgba(194,24,91,0.45)]" : "rounded-xl"} transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6EA9]/50 focus-visible:ring-offset-2`}
                 aria-haspopup="menu"
                 aria-expanded={open}
                 aria-label="Mon compte"
             >
                 {avatar ? (
-                    <img src={avatar} alt="" className="w-10 h-10 rounded-xl object-cover" />
+                    <img src={avatar} alt="" className={`w-10 h-10 ${round ? "rounded-full" : "rounded-xl"} object-cover`} />
                 ) : (
-                    <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white text-sm font-semibold flex items-center justify-center">
+                    <span className={`w-10 h-10 ${round ? "rounded-full" : "rounded-xl"} bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white text-sm font-semibold flex items-center justify-center`}>
                         {initials(user?.name)}
                     </span>
                 )}

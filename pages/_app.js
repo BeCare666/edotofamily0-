@@ -12,6 +12,7 @@ import CookieConsent from '../components/CookieConsent';
 import SSRAdvisorButton from "../components/SSRAdvisorButton";
 import { ChatAIProvider } from "../context/ChatAIContext";
 const ChatAIDrawer = dynamic(() => import("../components/ai-chat/ChatAIDrawer"), { ssr: false });
+const MobileBottomNav = dynamic(() => import("../components/mobile/MobileBottomNav"), { ssr: false });
 const Header = dynamic(() => import("../components/header"), {
   ssr: false,
 });
@@ -30,6 +31,9 @@ export default function MyApp({ Component, pageProps }) {
     pathname.startsWith("/admin") ||
     pathname === "/forgot-password" ||
     pathname === "/succesregister"
+
+  // Page sans pied de page : « Mes commandes »
+  const hideFooter = pathname === "/orders"
 
   const isHomePagex =
     pathname === "/" ||
@@ -51,7 +55,9 @@ export default function MyApp({ Component, pageProps }) {
         <ChatAIDrawer />
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       </Layout>
-      {!isHomePage && <Footer />}
+      {!isHomePage && !hideFooter && <Footer />}
+      {/* Navigation mobile du bas (mêmes pages que l'en-tête) */}
+      {!isHomePage && <MobileBottomNav />}
       </ChatAIProvider>
     </AuthProvider>
   )

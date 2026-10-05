@@ -735,7 +735,7 @@ export const Campaigns: React.FC<CampaignsProps> = ({ changeView, showNotificati
 
         <button
           onClick={() => setShowCampaignModal(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-2xl bg-slate-900 text-white shadow-2xl hover:scale-105 transition"
+          className="fixed bottom-[calc(6.5rem+env(safe-area-inset-bottom))] right-4 md:bottom-6 md:right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-2xl bg-slate-900 text-white shadow-2xl hover:scale-105 transition"
         >
           <Layers size={20} />
 

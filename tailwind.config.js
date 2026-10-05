@@ -8,7 +8,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        poppins: ['Poppins', 'sans-serif']
+        poppins: ['Poppins', 'sans-serif'],
+        // Nom de marque (logo en-tête et pied de page)
+        brand: ['"Cormorant Garamond"', 'Georgia', 'serif']
       },
       colors: {
         edotoPink: '#FF6EA9',

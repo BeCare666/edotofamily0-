@@ -11,6 +11,9 @@ import CalendlyDrawer from "./CalendlyDrawer";
 import DrawerMenu from "./DrawerMenu";
 import Image from "next/image"
 import UserAvatarMenu from "./UserAvatarMenu";
+import BrandMark from "./BrandMark";
+import SiteNotificationBell from "./mobile/SiteNotificationBell";
+import { UserRoundIcon } from "./mobile/navIcons";
 interface HeaderProps {
     currentView: ViewState;
     setView: (view: ViewState) => void;
@@ -89,13 +92,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                             className="flex-shrink-0 flex items-center cursor-pointer gap-2"
 
                         >
-                            <div className="relative w-12 p-3 h-12  overflow-hidden  ring-1 ring-white">
-                                <Image src={logo} alt="E·Doto" fill className="object-cover" />
-                            </div>
-
-                            <h1 className="text-2xl font-bold text-[#0F172A] mt-2 text-center">
-                                <span className="text-[#FF6EA9]">E·Doto</span> Family
-                            </h1>
+                            <BrandMark />
                         </div>
 
                         {/* Desktop Nav */}
@@ -244,9 +241,27 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                         {/* CTA  */}
                         <div className="flex items-center gap-4">
 
-                            {/* 🔥 AVATAR DU COMPTE (même présentation que les dashboards) */}
+                            {/* 📱 Mobile : cloche (données réelles) + avatar rond ; le menu est dans la barre du bas */}
+                            <div className="flex items-center gap-2.5 md:hidden">
+                                <SiteNotificationBell />
+                                {user ? (
+                                    <UserAvatarMenu round user={user} onNavigate={(path) => router.push(path)} onLogout={handleLogout} />
+                                ) : (
+                                    <button
+                                        onClick={handleLogin}
+                                        aria-label="Se connecter"
+                                        className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white ring-2 ring-white shadow-[0_4px_14px_-4px_rgba(194,24,91,0.45)]"
+                                    >
+                                        <UserRoundIcon className="h-5 w-5" />
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* 🔥 AVATAR DU COMPTE (bureau, même présentation que les dashboards) */}
                             {user ? (
-                                <UserAvatarMenu user={user} onNavigate={(path) => router.push(path)} onLogout={handleLogout} />
+                                <div className="hidden md:block">
+                                    <UserAvatarMenu user={user} onNavigate={(path) => router.push(path)} onLogout={handleLogout} />
+                                </div>
                             ) : (
                                 <button
                                     onClick={handleLogin}
@@ -269,10 +284,10 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                                 )}
                             </button>
 
-                            {/* 📱 Menu Mobile */}
+                            {/* 📱 Menu Mobile : déplacé dans la barre de navigation du bas (MobileBottomNav) */}
                             <button
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className="md:hidden p-2 text-slate-600 hover:text-pink-500"
+                                className="hidden p-2 text-slate-600 hover:text-pink-500"
                             >
                                 {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
                             </button>

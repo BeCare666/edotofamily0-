@@ -12,7 +12,8 @@ export default function SSRAdvisorButton() {
         <AnimatePresence>
             {!isOpen && (
                 <motion.div
-                    className="fixed bottom-5 right-5 z-30 flex flex-col items-center gap-2"
+                    // Sur mobile, au-dessus de la barre de navigation du bas (MobileBottomNav)
+                    className="fixed bottom-[calc(6.5rem+env(safe-area-inset-bottom))] right-4 z-30 flex flex-col items-center gap-2 md:bottom-5 md:right-5"
                     initial={{ opacity: 0, y: 20, scale: 0.8 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.6 }}

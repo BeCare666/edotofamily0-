@@ -214,7 +214,7 @@ dans l’Union Européenne ou aux États-Unis.`,
       {/* BOUTON RETOUR */}
       <motion.button
         onClick={() => router.back()}
-        className="fixed bottom-8 left-8 z-50 w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
+        className="!hidden fixed bottom-8 left-8 z-50 w-14 h-14 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
         whileHover={{ rotate: -5 }}
         whileTap={{ scale: 0.9 }}
       >

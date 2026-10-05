@@ -462,7 +462,7 @@ export default function OrderDetailsPage() {
 
       <motion.button
         onClick={() => router.back()}
-        className="fixed bottom-[150px] sm:bottom-[110px] left-4 z-40 w-12 h-12 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
+        className="!hidden fixed bottom-[150px] sm:bottom-[110px] left-4 z-40 w-12 h-12 rounded-full bg-[#FF6EA9]/20 backdrop-blur-md border border-white/30 
              flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 transition-all"
         whileHover={{ rotate: -5 }}
         whileTap={{ scale: 0.9 }}

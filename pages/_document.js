@@ -10,7 +10,7 @@ export default function Document() {
                 { /*link for logo or favicon*/}
                 <link rel="icon" href="/logo/favicon.png" />
                 <link
-                    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+                    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
                     rel="stylesheet"
                 />
             </Head>
