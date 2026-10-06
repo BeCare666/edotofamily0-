@@ -144,7 +144,9 @@ export function Bars({ data, color = PALETTE.ink, height = 170, label, format, s
 }
 
 // Deux courbes cumulées (inscriptions, retraits) + ligne d'objectif
-export function CumulativeLines({ series, objective, height = 200 }) {
+// colors (facultatif) : { registrations, withdrawals, objective } ; par défaut la palette des dashboards
+export function CumulativeLines({ series, objective, height = 200, colors }) {
+    const C = { registrations: PALETTE.ink, withdrawals: PALETTE.rose, objective: PALETTE.sand, ...colors };
     const on = useAnimateIn();
     const [ref, width] = useWidth();
     const [active, setActive] = useState(null);
@@ -181,8 +183,8 @@ export function CumulativeLines({ series, objective, height = 200 }) {
                 <svg viewBox={`0 0 ${W} ${height}`} preserveAspectRatio="none" className="absolute inset-0 w-full h-full overflow-visible">
                     <defs>
                         <linearGradient id={`${clip}g`} x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0%" stopColor={PALETTE.rose} stopOpacity="0.28" />
-                            <stop offset="100%" stopColor={PALETTE.rose} stopOpacity="0" />
+                            <stop offset="0%" stopColor={C.withdrawals} stopOpacity="0.28" />
+                            <stop offset="100%" stopColor={C.withdrawals} stopOpacity="0" />
                         </linearGradient>
                         <clipPath id={clip}>
                             <rect className="dash-reveal" x="0" y="-10" width={W} height={height + 20} style={{ transform: `scaleX(${on ? 1 : 0})` }} />
@@ -192,18 +194,18 @@ export function CumulativeLines({ series, objective, height = 200 }) {
                         <line key={f} x1="0" x2={W} y1={height - (height - 12) * f} y2={height - (height - 12) * f} stroke={PALETTE.grid} strokeWidth="1" vectorEffect="non-scaling-stroke" />
                     ))}
                     {objective > 0 && (
-                        <line x1="0" x2={W} y1={y(objective)} y2={y(objective)} stroke={PALETTE.sand} strokeWidth="1.2" strokeDasharray="4 4" vectorEffect="non-scaling-stroke" />
+                        <line x1="0" x2={W} y1={y(objective)} y2={y(objective)} stroke={C.objective} strokeWidth="1.2" strokeDasharray="4 4" vectorEffect="non-scaling-stroke" />
                     )}
                     <g clipPath={`url(#${clip})`}>
                         <path d={area} fill={`url(#${clip}g)`} />
-                        <path d={path("registrations")} fill="none" stroke={PALETTE.ink} strokeWidth="2" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-                        <path d={path("withdrawals")} fill="none" stroke={PALETTE.rose} strokeWidth="2.5" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+                        <path d={path("registrations")} fill="none" stroke={C.registrations} strokeWidth="2" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+                        <path d={path("withdrawals")} fill="none" stroke={C.withdrawals} strokeWidth="2.5" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
                     </g>
                 </svg>
                 {a && (
                     <>
                         <div className="absolute top-0 bottom-0 w-px bg-[#1F1B16]/15 pointer-events-none" style={{ left: `${xp(active)}%` }} />
-                        {[["registrations", PALETTE.ink], ["withdrawals", PALETTE.rose]].map(([k, color]) => (
+                        {[["registrations", C.registrations], ["withdrawals", C.withdrawals]].map(([k, color]) => (
                             <span key={k} className="absolute w-3 h-3 -ml-1.5 -mt-1.5 rounded-full border-2 border-white shadow pointer-events-none" style={{ left: `${xp(active)}%`, top: `${(y(a[k]) / height) * 100}%`, background: color }} />
                         ))}
                         <Tip x={xp(active)}>
@@ -221,9 +223,9 @@ export function CumulativeLines({ series, objective, height = 200 }) {
                 ))}
             </div>
             <Legend items={[
-                { label: "Inscriptions (cumul)", color: PALETTE.ink, line: true },
-                { label: "Kits retirés (cumul)", color: PALETTE.rose, line: true },
-                ...(objective > 0 ? [{ label: `Objectif (${objective})`, color: PALETTE.sand, line: true, dashed: true }] : []),
+                { label: "Inscriptions (cumul)", color: C.registrations, line: true },
+                { label: "Kits retirés (cumul)", color: C.withdrawals, line: true },
+                ...(objective > 0 ? [{ label: `Objectif (${objective})`, color: C.objective, line: true, dashed: true }] : []),
             ]} />
         </div>
     );
@@ -305,7 +307,8 @@ export function HBars({ rows }) {
     );
 }
 
-export function Funnel({ steps }) {
+// colors (facultatif) : une couleur par étape ; par défaut la palette des dashboards
+export function Funnel({ steps, colors = [PALETTE.ink, PALETTE.sand, PALETTE.rose] }) {
     const on = useAnimateIn();
     const top = Math.max(1, steps[0]?.value || 0);
     return (
@@ -317,7 +320,7 @@ export function Funnel({ steps }) {
                         <span className="text-[#7A6E62] tabular-nums">{s.value}{i > 0 && steps[0].value > 0 ? ` · ${Math.round((s.value / steps[0].value) * 100)} %` : ""}</span>
                     </div>
                     <div className="h-8 rounded-xl bg-[#F1ECE4] overflow-hidden">
-                        <div className="dash-grow h-full rounded-xl" style={{ width: on ? `${(s.value / top) * 100}%` : 0, transitionDelay: `${i * 120}ms`, background: [PALETTE.ink, PALETTE.sand, PALETTE.rose][i] }} />
+                        <div className="dash-grow h-full rounded-xl" style={{ width: on ? `${(s.value / top) * 100}%` : 0, transitionDelay: `${i * 120}ms`, background: colors[i] }} />
                     </div>
                 </div>
             ))}

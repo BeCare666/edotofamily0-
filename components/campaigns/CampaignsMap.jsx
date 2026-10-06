@@ -3,18 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { MAP_STYLES } from "../map/mapConfig";
 import { circlePolygon } from "../map/geo";
 import { cityCoords, normCity } from "../../lib/beninCities";
 
 // Rayon du cercle autour d'une ville de campagne (zone indicative, centre-ville)
 const RADIUS_M = 9000;
-const ROSE = "#FF6EA9";
-const SAND = "#C9A96E";
+// Fond de carte clair et sobre (OpenFreeMap « positron », gratuit, sans clé)
+const STYLE = "https://tiles.openfreemap.org/styles/positron";
+const ROSE = "#D6457F";
+const GREY = "#6F6A64";
 const esc = (v) => String(v).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
 
 /**
- * Carte sombre : chaque ville d'une campagne est encerclée (rose = en cours, sable = à venir),
+ * Carte claire : chaque ville d'une campagne est encerclée (rose = en cours, gris = à venir),
  * la ville de l'utilisatrice est marquée. zones : [{ city, status, campaigns: [titres] }].
  * focusCity : ville à centrer (clic sur une ville dans la page).
  */
@@ -46,7 +47,7 @@ export default function CampaignsMap({ zones, userPosition, myCity, focusCity, o
     useEffect(() => {
         const map = new maplibregl.Map({
             container: box.current,
-            style: MAP_STYLES.dark,
+            style: STYLE,
             center: [2.3158, 9.3077], // Bénin entier
             zoom: 5.6,
             attributionControl: false,
@@ -57,9 +58,8 @@ export default function CampaignsMap({ zones, userPosition, myCity, focusCity, o
         map.on("load", () => {
             const empty = { type: "FeatureCollection", features: [] };
             map.addSource("zones", { type: "geojson", data: empty });
-            map.addLayer({ id: "zones-glow", type: "line", source: "zones", paint: { "line-color": ["get", "color"], "line-width": 10, "line-opacity": 0.18, "line-blur": 6 } });
-            map.addLayer({ id: "zones-fill", type: "fill", source: "zones", paint: { "fill-color": ["get", "color"], "fill-opacity": 0.16 } });
-            map.addLayer({ id: "zones-line", type: "line", source: "zones", paint: { "line-color": ["get", "color"], "line-width": 1.6, "line-dasharray": [3, 2] } });
+                        map.addLayer({ id: "zones-fill", type: "fill", source: "zones", paint: { "fill-color": ["get", "color"], "fill-opacity": 0.07 } });
+            map.addLayer({ id: "zones-line", type: "line", source: "zones", paint: { "line-color": ["get", "color"], "line-width": 1.2 } });
             setReady(true);
         });
         mapRef.current = map;
@@ -82,7 +82,7 @@ export default function CampaignsMap({ zones, userPosition, myCity, focusCity, o
             type: "FeatureCollection",
             features: placed.map((z) => {
                 const f = circlePolygon(coords[normCity(z.city)], RADIUS_M);
-                f.properties = { color: z.status === "en_cours" ? ROSE : SAND };
+                f.properties = { color: z.status === "en_cours" ? ROSE : GREY };
                 return f;
             }),
         });

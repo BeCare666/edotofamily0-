@@ -15,7 +15,6 @@ import {
   User,
   Loader2,
   Check,
-  Wallet,
   KeyRound,
   Navigation,
   PackageCheck,
@@ -55,22 +54,14 @@ const PAYMENT_STATUS = {
   "payment-wallet": { label: "Portefeuille", tone: "slate" },
   "payment-awaiting-for-approval": { label: "En attente de validation", tone: "amber" },
 };
-const TONE = {
-  amber: "bg-amber-50 text-amber-700 ring-amber-200/70",
-  sky: "bg-sky-50 text-sky-700 ring-sky-200/70",
-  violet: "bg-violet-50 text-violet-700 ring-violet-200/70",
-  green: "bg-emerald-50 text-emerald-700 ring-emerald-200/70",
-  slate: "bg-slate-100 text-slate-600 ring-slate-200/70",
-  red: "bg-rose-50 text-rose-700 ring-rose-200/70",
-};
-// Mêmes tons sur fond sombre (carte principale)
-const DARK_TONE = {
-  amber: "bg-amber-400/15 text-amber-200 ring-amber-300/25",
-  sky: "bg-sky-400/15 text-sky-200 ring-sky-300/25",
-  violet: "bg-violet-400/15 text-violet-200 ring-violet-300/25",
-  green: "bg-emerald-400/15 text-emerald-200 ring-emerald-300/25",
-  slate: "bg-white/10 text-white/75 ring-white/15",
-  red: "bg-rose-400/15 text-rose-200 ring-rose-300/25",
+// Pastille de couleur discrète par ton de statut (palette sobre)
+const DOT = {
+  amber: "bg-[#C08A2B]",
+  sky: "bg-[#4F7FA8]",
+  violet: "bg-[#6E5A9B]",
+  green: "bg-[#3F7A55]",
+  slate: "bg-[#A8A29B]",
+  red: "bg-[#B4232C]",
 };
 const fcfa = (n) => `${Math.round(Number(n) || 0).toLocaleString("fr-FR")} FCFA`;
 const fmtLong = (d) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
@@ -146,12 +137,13 @@ export default function OrderDetailsPage() {
       // ⚠️ C’est bien data.status (et pas data.order_status)
       const hasPickupPoint = Boolean(data.pickup_point_id);
       const hasNote = Boolean(data.note && data.note.trim() !== "");
-      const isProcessing = data.order_status === "order-processing";
-      const isPendingPayment = data.order_status === "order-pending";
-      console.log("voici data", data.order_status)
-      // 👉 1. Choix du point de retrait
-      // (une livraison à domicile a déjà son lieu, choisi et payé avant le paiement)
-      if (!hasPickupPoint && isProcessing && !hasNote && data.delivery_type !== "CUSTOM") {
+      const isPaid = data.payment_status === "payment-success";
+      const isStopped = ["order-cancelled", "order-refunded", "order-failed"].includes(data.order_status);
+      // Paiement en attente : selon le statut de paiement (une commande « en traitement » peut ne pas être payée)
+      const isPendingPayment = !isPaid && !isStopped && (data.order_status === "order-pending" || data.payment_status === "payment-pending");
+      // 👉 1. Choix du point de retrait : seulement une commande PAYÉE sans point
+      // (le point se choisit normalement avant le paiement ; une livraison à domicile a déjà son lieu)
+      if (isPaid && !isStopped && !hasPickupPoint && !hasNote && data.delivery_type !== "CUSTOM") {
         setShopModalButton(true);
         setModalOpen(true);
         return;
@@ -251,16 +243,16 @@ export default function OrderDetailsPage() {
 
   if (loading)
     return (
-      <main className="min-h-screen bg-[radial-gradient(1200px_500px_at_10%_-10%,#FFE4F0_0%,transparent_60%),radial-gradient(900px_400px_at_100%_0%,#E0F2FE_0%,transparent_55%)] px-4 pt-8">
+      <main className="min-h-screen bg-[#FAF8F5] px-4 pt-10">
         <div className="mx-auto max-w-5xl space-y-4">
-          <div className="h-5 w-40 animate-pulse rounded-full bg-white/80" />
-          <div className="h-56 animate-pulse rounded-[32px] bg-slate-200/70" />
-          <div className="grid gap-4 lg:grid-cols-[1.55fr_1fr]">
-            <div className="h-72 animate-pulse rounded-[28px] bg-white/80" />
-            <div className="h-72 animate-pulse rounded-[28px] bg-white/80" />
+          <div className="h-4 w-32 animate-pulse rounded bg-[#EDE8E2]" />
+          <div className="h-48 animate-pulse rounded-2xl border border-[#E7E2DC] bg-white" />
+          <div className="grid gap-5 lg:grid-cols-[1.55fr_1fr]">
+            <div className="h-72 animate-pulse rounded-2xl border border-[#E7E2DC] bg-white" />
+            <div className="h-72 animate-pulse rounded-2xl border border-[#E7E2DC] bg-white" />
           </div>
-          <p className="flex items-center justify-center gap-2 pt-2 text-sm text-slate-500">
-            <Loader2 size={16} className="animate-spin" /> Chargement de la commande…
+          <p className="flex items-center justify-center gap-2 pt-2 text-sm text-[#8A847D]">
+            <Loader2 size={15} className="animate-spin" /> Chargement de la commande…
           </p>
         </div>
       </main>
@@ -268,12 +260,9 @@ export default function OrderDetailsPage() {
 
   if (!order)
     return (
-      <main className="flex min-h-[70vh] flex-col items-center justify-center px-6 text-center">
-        <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-rose-50 text-rose-500">
-          <XCircle size={30} strokeWidth={1.6} />
-        </span>
-        <p className="mt-4 text-[15px] font-semibold text-slate-800">Commande introuvable</p>
-        <button onClick={() => router.push("/orders")} className="mt-5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white">
+      <main className="flex min-h-[70vh] flex-col items-center justify-center bg-[#FAF8F5] px-6 text-center">
+        <p className="font-brand text-[28px] font-semibold text-[#161412]">Commande introuvable</p>
+        <button onClick={() => router.push("/orders")} className="mt-5 rounded-full bg-[#161412] px-6 py-2.5 text-sm font-medium text-white">
           Mes commandes
         </button>
       </main>
@@ -281,7 +270,6 @@ export default function OrderDetailsPage() {
 
   const st = ORDER_STATUS[order.order_status] || { label: order.order_status || "—", tone: "slate", icon: Package };
   const pay = PAYMENT_STATUS[order.payment_status] || { label: order.payment_status || "—", tone: "slate" };
-  const StIcon = st.icon;
   const isCustom = order.delivery_type === "CUSTOM";
   const products = order.products || [];
   const itemsTotal = products.reduce((s, p) => s + (Number(p.subtotal) || 0), 0);
@@ -294,95 +282,72 @@ export default function OrderDetailsPage() {
     { key: "point", label: isCustom ? "Lieu de livraison" : "Point de retrait", icon: isCustom ? Truck : MapPin, done: pointChosen },
     { key: "out", label: isCustom ? "Livrée" : "Retirée", icon: PackageCheck, done: withdrawn, date: order.delivered_at || order.custom_delivery?.delivered_at },
   ];
-  const lastDone = timeline.reduce((acc, s, i) => (s.done ? i : acc), 0);
+  const current = timeline.findIndex((s) => !s.done);
   const canVisit = hasPoint && !withdrawn && order?.pickup_point?.pickup_lat != null && order?.pickup_point?.pickup_lng != null;
+  const card = "rounded-2xl border border-[#E7E2DC] bg-white";
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(1200px_500px_at_10%_-10%,#FFE4F0_0%,transparent_60%),radial-gradient(900px_400px_at_100%_0%,#E0F2FE_0%,transparent_55%)] px-4 pb-52 pt-6 sm:px-6 sm:pb-40 sm:pt-10">
-      <div className="mx-auto max-w-5xl">
-        {/* Fil */}
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-5 flex items-center justify-between">
-          <button
-            onClick={() => router.push("/orders")}
-            className="group inline-flex items-center gap-2 rounded-full bg-white/80 py-2 pl-2.5 pr-4 text-[13px] font-medium text-slate-700 ring-1 ring-slate-200/80 backdrop-blur transition hover:text-[#C2185B]"
-          >
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 transition group-hover:bg-[#FFE4F0]">
-              <ArrowLeft size={15} />
-            </span>
-            Mes commandes
-          </button>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#E0457F]">Détail de la commande</p>
-        </motion.div>
-
-        {/* Carte principale */}
-        <motion.section
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-[32px] bg-slate-950 p-6 text-white shadow-[0_40px_80px_-40px_rgba(15,23,42,0.75)] sm:p-8"
+    <main className="min-h-screen bg-[#FAF8F5] px-4 pb-52 pt-6 sm:px-6 sm:pb-40 sm:pt-10">
+      <div className="mx-auto min-w-0 max-w-5xl">
+        <button
+          onClick={() => router.push("/orders")}
+          className="inline-flex items-center gap-2 text-[13px] text-[#5E5953] underline-offset-4 transition hover:text-[#161412] hover:underline"
         >
-          <div className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-[#FF6EA9]/30 blur-[90px]" />
-          <div className="pointer-events-none absolute -bottom-32 -left-20 h-72 w-72 rounded-full bg-sky-400/15 blur-[90px]" />
-          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <ArrowLeft size={15} strokeWidth={1.8} /> Mes commandes
+        </button>
+
+        {/* En-tête de la commande */}
+        <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`${card} mt-5 p-6 sm:p-8`}>
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/50">Commande</p>
-              <h1 className="mt-1.5 break-all text-[26px] font-semibold leading-tight tracking-tight sm:text-[32px]">{order.tracking_number}</h1>
-              <p className="mt-1 text-[13px] text-white/55">
-                Passée le {fmtLong(order.created_at)} · {itemsCount} article{itemsCount > 1 ? "s" : ""}
+              <p className="text-[13px] text-[#8A847D]">Commande du {fmtLong(order.created_at)}</p>
+              <h1 className="mt-1 break-all font-brand text-[32px] font-semibold leading-tight text-[#161412] sm:text-[40px]">{order.tracking_number}</h1>
+              <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[#5E5953]">
+                <span className="inline-flex items-center gap-1.5"><span className={`h-1.5 w-1.5 rounded-full ${DOT[st.tone]}`} />{st.label}</span>
+                <span className="text-[#D5CFC8]">|</span>
+                <span className="inline-flex items-center gap-1.5"><span className={`h-1.5 w-1.5 rounded-full ${DOT[pay.tone]}`} />{pay.label}</span>
+                <span className="text-[#D5CFC8]">|</span>
+                <span>{isCustom ? "Livraison à domicile" : "Retrait en point"}</span>
               </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold ring-1 ${DARK_TONE[st.tone]}`}>
-                  <StIcon size={12} /> {st.label}
-                </span>
-                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold ring-1 ${DARK_TONE[pay.tone]}`}>
-                  <Wallet size={12} /> {pay.label}
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-white/80 ring-1 ring-white/15">
-                  {isCustom ? <Truck size={12} /> : <MapPin size={12} />} {isCustom ? "Livraison à domicile" : "Point de retrait"}
-                </span>
-              </div>
             </div>
             <div className="shrink-0 sm:text-right">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/50">Total</p>
-              <p className="mt-1 text-[34px] font-semibold leading-none tabular-nums sm:text-[40px]">{fcfa(order.total)}</p>
-              {Number(order.delivery_fee) > 0 && <p className="mt-1.5 text-[12px] text-white/50">dont livraison {fcfa(order.delivery_fee)}</p>}
+              <p className="text-[13px] text-[#8A847D]">Total</p>
+              <p className="mt-1 font-brand text-[36px] font-semibold leading-none tabular-nums text-[#161412] sm:text-[42px]">{fcfa(order.total)}</p>
+              <p className="mt-1.5 text-[12px] text-[#8A847D]">{itemsCount} article{itemsCount > 1 ? "s" : ""}</p>
             </div>
           </div>
 
           {/* Étapes réelles de la commande */}
           {stopped ? (
-            <p className="relative mt-7 flex items-center gap-2 rounded-2xl bg-rose-500/10 px-4 py-3 text-sm font-medium text-rose-200 ring-1 ring-rose-400/20">
-              <XCircle size={17} /> Commande {ORDER_STATUS[order.order_status]?.label.toLowerCase() || "arrêtée"}.
+            <p className="mt-7 flex items-center gap-2 border-t border-[#EDE8E2] pt-5 text-sm text-[#B4232C]">
+              <XCircle size={16} strokeWidth={1.8} /> Commande {ORDER_STATUS[order.order_status]?.label.toLowerCase() || "arrêtée"}.
             </p>
           ) : (
-            <ol className="relative mt-8 grid grid-cols-4">
+            <ol className="mt-8 grid grid-cols-4 border-t border-[#EDE8E2] pt-7">
               {timeline.map((s, i) => {
                 const Icon = s.icon;
-                const current = !s.done && i === lastDone + 1;
+                const isCurrent = i === current;
                 return (
                   <li key={s.key} className="relative flex flex-col items-center text-center">
                     {i > 0 && (
-                      <span className="absolute right-1/2 top-[19px] h-[3px] w-full overflow-hidden rounded-full bg-white/10">
+                      <span className="absolute right-1/2 top-[15px] h-px w-full bg-[#E2DCD5]">
                         <motion.span
-                          className="block h-full rounded-full bg-gradient-to-r from-[#FF9CC6] to-[#FF6EA9]"
+                          className="block h-full bg-[#161412]"
                           initial={{ width: 0 }}
                           animate={{ width: s.done ? "100%" : "0%" }}
-                          transition={{ duration: 0.7, delay: 0.15 * i, ease: [0.22, 1, 0.36, 1] }}
+                          transition={{ duration: 0.6, delay: 0.12 * i, ease: [0.22, 1, 0.36, 1] }}
                         />
                       </span>
                     )}
                     <span
-                      className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition ${
-                        s.done
-                          ? "border-transparent bg-gradient-to-br from-[#FF9CC6] to-[#C2185B] text-white shadow-[0_8px_20px_-6px_rgba(255,110,169,0.7)]"
-                          : current
-                            ? "border-[#FF6EA9] bg-slate-950 text-[#FF9CC6] shadow-[0_0_0_5px_rgba(255,110,169,0.15)]"
-                            : "border-white/15 bg-slate-950 text-white/35"
+                      className={`relative z-10 flex h-[30px] w-[30px] items-center justify-center rounded-full border ${
+                        s.done ? "border-[#161412] bg-[#161412] text-white" : isCurrent ? "border-[#D6457F] bg-white text-[#D6457F]" : "border-[#E2DCD5] bg-white text-[#B5AEA6]"
                       }`}
                     >
-                      {s.done ? <Check size={17} strokeWidth={3} /> : <Icon size={16} />}
+                      {s.done ? <Check size={14} strokeWidth={2.5} /> : <Icon size={14} strokeWidth={1.8} />}
                     </span>
-                    <span className={`mt-2 px-1 text-[11px] font-semibold leading-tight sm:text-[12px] ${s.done ? "text-white" : current ? "text-[#FFB8D5]" : "text-white/40"}`}>{s.label}</span>
-                    {s.done && s.date && <span className="mt-0.5 hidden text-[10px] text-white/45 sm:block">{fmtShortTime(s.date)}</span>}
+                    <span className={`mt-2 px-1 text-[11px] leading-tight sm:text-[13px] ${s.done || isCurrent ? "font-medium text-[#161412]" : "text-[#A8A29B]"}`}>{s.label}</span>
+                    {s.done && s.date && <span className="mt-0.5 hidden text-[11px] text-[#8A847D] sm:block">{fmtShortTime(s.date)}</span>}
                   </li>
                 );
               })}
@@ -390,98 +355,88 @@ export default function OrderDetailsPage() {
           )}
         </motion.section>
 
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1.55fr_1fr]">
-          {/* Colonne principale */}
-          <div className="space-y-5">
-            <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.05 } }} className="overflow-hidden rounded-[28px] bg-white/90 ring-1 ring-slate-100 shadow-[0_18px_44px_-30px_rgba(15,23,42,0.45)] backdrop-blur">
-              <div className="flex items-center justify-between px-5 pb-2 pt-5 sm:px-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Articles</p>
-                <span className="text-[12px] text-slate-400">{products.length} produit{products.length > 1 ? "s" : ""}</span>
-              </div>
-              {products.length > 0 ? (
-                <ul className="divide-y divide-slate-100/80 px-5 sm:px-6">
-                  {products.map((item, index) => {
-                    const unit = item.quantity ? Number(item.subtotal) / Number(item.quantity) : Number(item.price) || 0;
-                    return (
-                      <li key={index} className="flex items-center gap-4 py-4">
-                        {item.image?.[0] ? (
-                          <img src={item.image[0]} alt={item.name} className="h-16 w-16 shrink-0 rounded-2xl object-cover ring-1 ring-slate-100" />
-                        ) : (
-                          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FFE4F0] to-[#FFF6FA] text-[#E0457F]">
-                            <Package size={22} strokeWidth={1.6} />
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-[15px] font-semibold text-slate-900">{item.name}</p>
-                          <p className="mt-0.5 text-[12px] text-slate-500">
-                            {item.quantity} × {fcfa(unit)}
-                          </p>
+        <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+          {/* Articles et récapitulatif */}
+          <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.05 } }} className={`${card} min-w-0 self-start`}>
+            <h2 className="px-6 pt-6 font-brand text-[24px] font-semibold text-[#161412]">Articles</h2>
+            {products.length > 0 ? (
+              <ul className="mt-2 divide-y divide-[#EDE8E2] px-6">
+                {products.map((item, index) => {
+                  const unit = item.quantity ? Number(item.subtotal) / Number(item.quantity) : Number(item.price) || 0;
+                  return (
+                    <li key={index} className="flex items-center gap-4 py-4">
+                      {item.image?.[0] ? (
+                        <img src={item.image[0]} alt={item.name} className="h-16 w-16 shrink-0 rounded-lg border border-[#EDE8E2] object-cover" />
+                      ) : (
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-[#F4F1ED] text-[#A8A29B]">
+                          <Package size={20} strokeWidth={1.5} />
                         </div>
-                        <p className="shrink-0 text-[15px] font-semibold tabular-nums text-slate-900">{fcfa(item.subtotal)}</p>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p className="px-6 pb-6 text-sm text-slate-500">Aucun produit</p>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[15px] font-medium text-[#161412]">{item.name}</p>
+                        <p className="mt-0.5 text-[13px] text-[#8A847D]">{item.quantity} × {fcfa(unit)}</p>
+                      </div>
+                      <p className="shrink-0 text-[15px] tabular-nums text-[#161412]">{fcfa(item.subtotal)}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="px-6 py-4 text-sm text-[#8A847D]">Aucun produit</p>
+            )}
+            <dl className="space-y-2.5 border-t border-[#EDE8E2] px-6 py-5 text-[14px]">
+              <div className="flex justify-between text-[#5E5953]">
+                <dt>Articles</dt>
+                <dd className="tabular-nums">{fcfa(itemsTotal)}</dd>
+              </div>
+              <div className="flex justify-between text-[#5E5953]">
+                <dt>{isCustom ? "Livraison à domicile" : "Retrait en point"}</dt>
+                <dd className="tabular-nums">{Number(order.delivery_fee) > 0 ? fcfa(order.delivery_fee) : "Offert"}</dd>
+              </div>
+              {Number(order.sales_tax) > 0 && (
+                <div className="flex justify-between text-[#5E5953]">
+                  <dt>Taxe</dt>
+                  <dd className="tabular-nums">{fcfa(order.sales_tax)}</dd>
+                </div>
               )}
-              {/* Récapitulatif */}
-              <dl className="space-y-2.5 border-t border-slate-100 bg-gradient-to-b from-slate-50/70 to-white px-5 py-5 text-[14px] sm:px-6">
-                <div className="flex justify-between text-slate-600">
-                  <dt>Articles</dt>
-                  <dd className="tabular-nums">{fcfa(itemsTotal)}</dd>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <dt>{isCustom ? "Livraison à domicile" : "Retrait au point"}</dt>
-                  <dd className="tabular-nums">{Number(order.delivery_fee) > 0 ? fcfa(order.delivery_fee) : "Offert"}</dd>
-                </div>
-                {Number(order.sales_tax) > 0 && (
-                  <div className="flex justify-between text-slate-600">
-                    <dt>Taxe</dt>
-                    <dd className="tabular-nums">{fcfa(order.sales_tax)}</dd>
-                  </div>
-                )}
-                <div className="flex items-baseline justify-between border-t border-dashed border-slate-200 pt-3">
-                  <dt className="text-[15px] font-semibold text-slate-900">Total</dt>
-                  <dd className="text-[20px] font-semibold tabular-nums text-slate-900">{fcfa(order.total)}</dd>
-                </div>
-              </dl>
-            </motion.section>
-          </div>
+              <div className="flex items-baseline justify-between border-t border-[#EDE8E2] pt-3">
+                <dt className="font-medium text-[#161412]">Total</dt>
+                <dd className="font-brand text-[24px] font-semibold tabular-nums text-[#161412]">{fcfa(order.total)}</dd>
+              </div>
+            </dl>
+          </motion.section>
 
-          {/* Colonne latérale */}
-          <div className="space-y-5">
-            {/* Code de retrait */}
+          <div className="min-w-0 space-y-5">
+            {/* Code de retrait (commande payée) */}
             {order.payment_status === "payment-success" && (() => {
               const expiresAt = order.otp_expires_at ? new Date(order.otp_expires_at) : null;
               const expired = !!expiresAt && expiresAt.getTime() < Date.now();
               return (
-                <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.08 } }} className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] p-5 text-white shadow-[0_24px_50px_-28px_rgba(194,24,91,0.8)] sm:p-6">
-                  <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/15 blur-2xl" />
-                  <p className="relative flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/75">
-                    <KeyRound size={14} /> Code de retrait
-                  </p>
+                <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.08 } }} className={`${card} p-6`}>
+                  <h2 className="flex items-center gap-2 font-brand text-[22px] font-semibold text-[#161412]">
+                    <KeyRound size={17} strokeWidth={1.6} className="text-[#D6457F]" /> Code de retrait
+                  </h2>
                   {withdrawn ? (
-                    <p className="relative mt-3 flex items-center gap-2 text-[15px] font-semibold">
-                      <CheckCircle size={19} /> Commande {isCustom ? "livrée" : "retirée"}
+                    <p className="mt-3 flex items-center gap-2 text-[14px] text-[#3A3632]">
+                      <CheckCircle size={16} strokeWidth={1.8} /> Commande {isCustom ? "livrée" : "retirée"}
                       {order.delivered_at ? ` le ${formatDateTime(new Date(order.delivered_at))}` : ""}.
                     </p>
                   ) : expired ? (
-                    <div className="relative mt-3">
-                      <p className="text-[14px] leading-relaxed text-white/90">
+                    <div className="mt-3">
+                      <p className="text-[14px] leading-relaxed text-[#5E5953]">
                         Votre code a expiré le {formatDateTime(expiresAt)}. Générez-en un nouveau : il vous sera envoyé par e-mail.
                       </p>
                       <button
                         onClick={regenerateOtp}
                         disabled={regeneratingOtp}
-                        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#C2185B] transition hover:bg-white/90 disabled:opacity-60"
+                        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#161412] px-4 py-3 text-sm font-medium text-white transition hover:bg-black disabled:opacity-60"
                       >
                         {regeneratingOtp && <Loader2 size={16} className="animate-spin" />}
                         {regeneratingOtp ? "Envoi…" : "Générer un nouveau code"}
                       </button>
                     </div>
                   ) : (
-                    <p className="relative mt-3 text-[14px] leading-relaxed text-white/90">
+                    <p className="mt-3 text-[14px] leading-relaxed text-[#5E5953]">
                       Votre code vous a été envoyé par e-mail{expiresAt ? `. Il est valable jusqu'au ${formatDateTime(expiresAt)}` : ""}.{" "}
                       {isCustom ? "Donnez-le au livreur à la remise." : "Présentez-le à votre point de retrait."}
                     </p>
@@ -491,21 +446,18 @@ export default function OrderDetailsPage() {
             })()}
 
             {/* Retrait ou livraison */}
-            <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.11 } }} className="rounded-[28px] bg-white/90 p-5 ring-1 ring-slate-100 shadow-[0_18px_44px_-30px_rgba(15,23,42,0.45)] backdrop-blur sm:p-6">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{isCustom ? "Livraison à domicile" : "Retrait"}</p>
+            <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.11 } }} className={`${card} p-6`}>
+              <h2 className="font-brand text-[22px] font-semibold text-[#161412]">{isCustom ? "Livraison à domicile" : "Retrait"}</h2>
               {isCustom ? (
                 order.custom_delivery ? (
-                  <div className="mt-3 space-y-3">
-                    <div className="flex gap-3">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-violet-50 text-violet-600"><Truck size={18} /></span>
-                      <p className="whitespace-pre-line text-[14px] text-slate-700">{order.custom_delivery.description}</p>
-                    </div>
-                    <dl className="grid grid-cols-2 gap-2 text-[13px]">
-                      <div className="rounded-2xl bg-slate-50 p-3"><dt className="text-slate-400">Téléphone</dt><dd className="font-medium text-slate-800">{order.custom_delivery.phone}</dd></div>
-                      <div className="rounded-2xl bg-slate-50 p-3"><dt className="text-slate-400">Distance</dt><dd className="font-medium text-slate-800">{String(order.custom_delivery.distance_km).replace(".", ",")} km</dd></div>
+                  <div className="mt-3 space-y-3 text-[14px]">
+                    <p className="whitespace-pre-line text-[#3A3632]">{order.custom_delivery.description}</p>
+                    <dl className="grid grid-cols-2 gap-4 border-t border-[#EDE8E2] pt-3 text-[13px]">
+                      <div><dt className="text-[#8A847D]">Téléphone</dt><dd className="text-[#161412]">{order.custom_delivery.phone}</dd></div>
+                      <div><dt className="text-[#8A847D]">Distance</dt><dd className="text-[#161412]">{String(order.custom_delivery.distance_km).replace(".", ",")} km</dd></div>
                     </dl>
                     {order.payment_status === "payment-success" && !order.custom_delivery.delivered_at && (
-                      <p className="rounded-2xl bg-violet-50/70 p-3 text-[13px] font-medium text-violet-800">
+                      <p className="text-[13px] text-[#5E5953]">
                         {order.custom_delivery.courier_assigned
                           ? "Un livreur a été désigné : il vous demandera votre code de retrait à la remise."
                           : "Nous cherchons un livreur pour votre colis."}
@@ -513,27 +465,24 @@ export default function OrderDetailsPage() {
                     )}
                   </div>
                 ) : (
-                  <p className="mt-3 text-sm text-slate-500">Lieu de livraison enregistré.</p>
+                  <p className="mt-3 text-sm text-[#8A847D]">Lieu de livraison enregistré.</p>
                 )
               ) : (
                 <div className="mt-3">
-                  <div className="flex gap-3">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FFE4F0] to-[#FFF6FA] text-[#E0457F]"><MapPin size={18} /></span>
-                    <div className="min-w-0">
-                      <p className="text-[15px] font-semibold text-slate-900">
-                        {order.pickup_point ? order.pickup_point.name : order.note ? order.note : "Point de retrait à choisir"}
-                      </p>
-                      <p className="text-[12px] text-slate-500">{order.pickup_point ? "Point de retrait E·Doto" : order.note ? "Lieu personnalisé" : "Choisissez-le pour recevoir votre commande."}</p>
-                    </div>
-                  </div>
+                  <p className="text-[15px] font-medium text-[#161412]">
+                    {order.pickup_point ? order.pickup_point.name : order.note ? order.note : "Aucun point de retrait"}
+                  </p>
+                  <p className="mt-0.5 text-[13px] text-[#8A847D]">
+                    {order.pickup_point ? "Point de retrait E·Doto" : order.note ? "Lieu personnalisé" : paid ? "Choisissez-le pour recevoir votre commande." : "Disponible après le paiement de la commande."}
+                  </p>
                   {canVisit && (
-                    <button onClick={() => setOpenMap(true)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
-                      <Navigation size={16} /> Itinéraire vers le point
+                    <button onClick={() => setOpenMap(true)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#E2DCD5] px-4 py-3 text-sm font-medium text-[#161412] transition hover:border-[#161412]">
+                      <Navigation size={15} strokeWidth={1.8} /> Itinéraire vers le point
                     </button>
                   )}
-                  {paid && !pointChosen && (
-                    <button onClick={() => setModalOpen(true)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#FF6EA9] to-[#C2185B] px-4 py-3 text-sm font-semibold text-white">
-                      <MapPin size={16} /> Choisir un point de retrait
+                  {paid && !pointChosen && !stopped && (
+                    <button onClick={() => setModalOpen(true)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#161412] px-4 py-3 text-sm font-medium text-white">
+                      <MapPin size={15} strokeWidth={1.8} /> Choisir un point de retrait
                     </button>
                   )}
                 </div>
@@ -541,18 +490,13 @@ export default function OrderDetailsPage() {
             </motion.section>
 
             {/* Client et paiement */}
-            <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.14 } }} className="rounded-[28px] bg-white/90 p-5 ring-1 ring-slate-100 shadow-[0_18px_44px_-30px_rgba(15,23,42,0.45)] backdrop-blur sm:p-6">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Client et paiement</p>
-              <div className="mt-3 flex items-center gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-100 to-sky-50 text-sky-600"><User size={18} /></span>
-                <div className="min-w-0">
-                  <p className="truncate text-[15px] font-semibold text-slate-900">{order.pickupRowsCustomer?.name || "Non spécifié"}</p>
-                  {order.customer_contact && <p className="truncate text-[12px] text-slate-500">{order.customer_contact}</p>}
-                </div>
-              </div>
-              <div className="mt-4 flex items-center justify-between rounded-2xl bg-slate-50 p-3.5">
-                <span className="flex items-center gap-2 text-[13px] text-slate-600"><CreditCard size={16} className="text-slate-400" /> Paiement</span>
-                <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${TONE[pay.tone]}`}>{pay.label}</span>
+            <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.14 } }} className={`${card} p-6`}>
+              <h2 className="font-brand text-[22px] font-semibold text-[#161412]">Client</h2>
+              <p className="mt-3 truncate text-[15px] font-medium text-[#161412]">{order.pickupRowsCustomer?.name || "Non spécifié"}</p>
+              {order.customer_contact && <p className="truncate text-[13px] text-[#8A847D]">{order.customer_contact}</p>}
+              <div className="mt-4 flex items-center justify-between border-t border-[#EDE8E2] pt-4 text-[13px]">
+                <span className="text-[#8A847D]">Paiement</span>
+                <span className="inline-flex items-center gap-1.5 text-[#161412]"><span className={`h-1.5 w-1.5 rounded-full ${DOT[pay.tone]}`} />{pay.label}</span>
               </div>
             </motion.section>
           </div>
@@ -620,10 +564,10 @@ export default function OrderDetailsPage() {
             >
               {/* ICON */}
               <div className="flex justify-center mb-5">
-                <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-[#161412] flex items-center justify-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="w-12 h-12 text-emerald-600"
+                    className="w-9 h-9 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -659,14 +603,7 @@ export default function OrderDetailsPage() {
               <div className="mt-8 flex justify-center">
                 <button
                   onClick={() => window.location.reload()}
-                  className="
-            px-6 py-3 rounded-full
-            bg-gradient-to-r from-pink-500 to-pink-600
-            text-white font-semibold
-            shadow-[0_10px_25px_rgba(236,72,153,0.35)]
-            hover:shadow-[0_16px_40px_rgba(236,72,153,0.45)]
-            transition
-          "
+                  className="px-8 py-3 rounded-full bg-[#161412] text-white font-medium transition hover:bg-black"
                 >
                   Continuer
                 </button>

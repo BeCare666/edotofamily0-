@@ -5,10 +5,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
-import {
-    MapPin, Search, SlidersHorizontal, X, Gift, CalendarDays, LocateFixed, Loader2, ArrowUpRight, Check,
-    ShieldAlert, Users, PackageCheck, Building2, Radio,
-} from "lucide-react";
+import { MapPin, Search, SlidersHorizontal, X, LocateFixed, Loader2, ArrowRight, Check } from "lucide-react";
 import { CampaignRequestFlow, kitSteps } from "./CampaignKit";
 import CampaignDetail, { Ring } from "./CampaignDetail";
 import { STATUS, beninDay, daysUntil, endMoment, nf, shortDate, startMoment } from "./campaignUtils";
@@ -17,7 +14,7 @@ import { deviceMarks } from "../../lib/deviceIdentity";
 
 const CampaignsMap = dynamic(() => import("./CampaignsMap"), {
     ssr: false,
-    loading: () => <div className="flex h-full min-h-[320px] items-center justify-center text-white/40"><Loader2 className="animate-spin" /></div>,
+    loading: () => <div className="flex h-full min-h-[320px] items-center justify-center text-[#A8A29B]"><Loader2 className="animate-spin" /></div>,
 });
 
 const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
@@ -32,16 +29,17 @@ const SORTS = [
 const asList = (d) => (Array.isArray(d) ? d : Array.isArray(d?.data) ? d.data : []);
 const hasCity = (c, city) => !!city && (c.cities || []).some((x) => normCity(x) === normCity(city));
 
+// Onglet de statut : texte souligné, sobre
 function Seg({ active, onClick, children, count }) {
     return (
         <button
             type="button"
             onClick={onClick}
-            className={`relative inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-[13px] font-semibold transition ${active ? "text-white" : "text-[#5C5249] hover:text-[#1F1B16]"}`}
+            className={`relative shrink-0 pb-3 pt-1 text-[14px] transition ${active ? "font-medium text-[#161412]" : "text-[#8A847D] hover:text-[#161412]"}`}
         >
-            {active && <motion.span layoutId="seg" className="absolute inset-0 rounded-full bg-[#1F1B16] shadow-[0_10px_24px_-12px_rgba(31,27,22,0.8)]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
-            <span className="relative">{children}</span>
-            {count != null && <span className={`relative rounded-full px-1.5 text-[11px] tabular-nums ${active ? "bg-white/20" : "bg-[#F1ECE4] text-[#7A6E62]"}`}>{count}</span>}
+            {children}
+            {count != null && <span className="ml-1.5 tabular-nums text-[#A8A29B]">{count}</span>}
+            {active && <motion.span layoutId="seg" className="absolute inset-x-0 -bottom-px h-[2px] bg-[#161412]" transition={{ type: "spring", stiffness: 420, damping: 36 }} />}
         </button>
     );
 }
@@ -51,10 +49,10 @@ function Chip({ active, onClick, children, count }) {
         <button
             type="button"
             onClick={onClick}
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-medium transition ${active ? "bg-[#1F1B16] text-white" : "bg-white text-[#3B342D] ring-1 ring-[#EFE8DE] hover:ring-[#C9A96E]"}`}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] transition ${active ? "border-[#161412] bg-[#161412] text-white" : "border-[#E2DCD5] bg-white text-[#3A3632] hover:border-[#161412]"}`}
         >
             {children}
-            {count != null && <span className={`rounded-full px-1.5 text-[11px] tabular-nums ${active ? "bg-white/20" : "bg-[#F6F1EA] text-[#9A8E80]"}`}>{count}</span>}
+            {count != null && <span className={`tabular-nums ${active ? "text-white/60" : "text-[#A8A29B]"}`}>{count}</span>}
         </button>
     );
 }
@@ -70,63 +68,64 @@ function CampaignCard({ c, myCity, registration, onOpen, onRequest, index }) {
     return (
         <motion.article
             layout
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0, transition: { delay: Math.min(index, 6) * 0.05 } }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            className="group flex flex-col overflow-hidden rounded-[30px] bg-white ring-1 ring-[#EFE8DE] shadow-[0_24px_60px_-38px_rgba(31,27,22,0.55)] transition hover:-translate-y-1 hover:shadow-[0_34px_70px_-36px_rgba(194,24,91,0.45)]"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0, transition: { delay: Math.min(index, 6) * 0.04 } }}
+            exit={{ opacity: 0 }}
+            className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-[#E7E2DC] bg-white transition hover:border-[#CFC8C0] hover:shadow-[0_20px_50px_-35px_rgba(22,20,18,0.45)]"
         >
-            <button type="button" onClick={() => onOpen(c)} className="relative block h-52 overflow-hidden bg-[#1F1B16] text-left">
+            <button type="button" onClick={() => onOpen(c)} className="block text-left">
                 {c.image_url ? (
-                    <img src={c.image_url} alt="" loading="lazy" className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-105" />
+                    <div className="aspect-[16/10] overflow-hidden bg-[#F4F1ED]">
+                        <img src={c.image_url} alt="" loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]" />
+                    </div>
                 ) : (
-                    <div className="h-full w-full bg-[radial-gradient(400px_220px_at_15%_10%,rgba(255,110,169,0.5),transparent_60%),radial-gradient(360px_200px_at_95%_95%,rgba(201,169,110,0.45),transparent_60%)]" />
+                    <div className="aspect-[16/10] bg-[#F4F1ED]" />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0F0C0A]/90 via-[#0F0C0A]/20 to-transparent" />
-                <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-2">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1 text-[11px] font-semibold ring-1 backdrop-blur ${st.chip}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${st.dot} ${live ? "animate-pulse" : ""}`} />
-                        {st.label}
-                    </span>
-                    {near && <span className="rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold text-[#1F1B16]">Près de chez vous</span>}
-                </div>
-                <div className="absolute inset-x-4 bottom-4">
-                    <p className="flex items-center gap-1.5 text-[12px] text-white/75">
-                        <MapPin size={13} /> {(c.cities || []).join(" · ") || c.location || "—"}
+                <div className="px-5 pt-5">
+                    <div className="flex items-center justify-between gap-2 text-[12px]">
+                        <span className={`inline-flex items-center gap-1.5 font-medium ${st.text}`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
+                            {st.label}
+                        </span>
+                        {near && <span className="text-[#77716B]">Près de chez vous</span>}
+                    </div>
+                    <h3 className="mt-2 line-clamp-2 font-brand text-[26px] font-semibold leading-[1.1] text-[#161412]">{c.title}</h3>
+                    <p className="mt-1 flex items-center gap-1.5 text-[13px] text-[#77716B]">
+                        <MapPin size={13} strokeWidth={1.8} /> {(c.cities || []).join(" · ") || c.location || "—"}
                     </p>
-                    <h3 className="mt-1 line-clamp-2 font-brand text-[26px] font-semibold leading-[1.05] text-white">{c.title}</h3>
                 </div>
             </button>
 
-            <div className="flex flex-1 flex-col p-5">
-                <div className="flex items-center gap-4">
-                    <Ring value={Number(c.picked_up_count) || 0} max={objective} size={84} stroke={8} caption="retirés" />
-                    <dl className="grid flex-1 grid-cols-2 gap-x-3 gap-y-2.5 text-[12px]">
-                        <div><dt className="text-[#9A8E80]">Kits prévus</dt><dd className="text-[15px] font-semibold tabular-nums text-[#1F1B16]">{nf(objective)}</dd></div>
-                        <div><dt className="text-[#9A8E80]">Demandes</dt><dd className="text-[15px] font-semibold tabular-nums text-[#1F1B16]">{nf(c.registrations_count)}</dd></div>
+            <div className="flex flex-1 flex-col px-5 pb-5">
+                <div className="mt-5 flex items-center gap-5 border-t border-[#EDE8E2] pt-5">
+                    <Ring value={Number(c.picked_up_count) || 0} max={objective} size={76} stroke={4} caption="retirés" />
+                    <dl className="grid flex-1 grid-cols-2 gap-x-3 gap-y-3 text-[12px]">
+                        <div><dt className="text-[#8A847D]">Kits prévus</dt><dd className="text-[15px] font-medium tabular-nums text-[#161412]">{nf(objective)}</dd></div>
+                        <div><dt className="text-[#8A847D]">Demandes</dt><dd className="text-[15px] font-medium tabular-nums text-[#161412]">{nf(c.registrations_count)}</dd></div>
                         <div className="col-span-2">
-                            <dt className="text-[#9A8E80]">{live ? "Clôture" : "Ouverture"}</dt>
-                            <dd className="text-[13px] font-medium text-[#1F1B16]">
+                            <dt className="text-[#8A847D]">{live ? "Clôture" : "Ouverture"}</dt>
+                            <dd className="text-[13px] font-medium text-[#161412]">
                                 {live ? (c.date_end ? shortDate(c.date_end) : "Non définie") : shortDate(c.date_start)}
-                                {left != null && <span className="ml-1.5 text-[#C2185B]">· {left === 0 ? "aujourd'hui" : `${left} j`}</span>}
+                                {left != null && <span className="ml-1.5 font-normal text-[#77716B]">· {left === 0 ? "aujourd'hui" : `dans ${left} j`}</span>}
                             </dd>
                         </div>
                     </dl>
                 </div>
 
                 {track && (
-                    <div className="mt-4 flex items-center gap-2 rounded-2xl bg-emerald-50/80 px-3.5 py-2.5 text-[12px] font-medium text-emerald-800 ring-1 ring-emerald-100">
-                        <Check size={14} strokeWidth={3} />
+                    <p className="mt-4 flex items-center gap-2 text-[13px] text-[#3A3632]">
+                        <Check size={14} strokeWidth={2.2} />
                         {track.withdrawn ? "Kit retiré" : track.validated ? "Code validé au point" : track.expired ? "Code expiré : à renouveler" : "Demande envoyée · code reçu par e-mail"}
-                    </div>
+                    </p>
                 )}
 
                 <div className="mt-auto flex gap-2 pt-5">
-                    <button type="button" onClick={() => onOpen(c)} className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-2xl bg-[#F6F1EA] text-[13px] font-semibold text-[#1F1B16] transition hover:bg-[#EFE8DE]">
-                        Voir la campagne <ArrowUpRight size={15} />
+                    <button type="button" onClick={() => onOpen(c)} className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full border border-[#E2DCD5] text-[13px] font-medium text-[#161412] transition hover:border-[#161412]">
+                        Voir la campagne
                     </button>
                     {live && !registration && (
-                        <button type="button" onClick={() => onRequest(c)} className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-2xl bg-gradient-to-r from-[#FF6EA9] to-[#C2185B] text-[13px] font-semibold text-white shadow-[0_12px_26px_-14px_rgba(194,24,91,0.9)]">
-                            <Gift size={15} /> Mon kit
+                        <button type="button" onClick={() => onRequest(c)} className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-[#161412] text-[13px] font-medium text-white transition hover:bg-black">
+                            Demander mon kit
                         </button>
                     )}
                 </div>
@@ -364,190 +363,170 @@ export default function CampaignsPage() {
     const detailReg = detail ? regByCampaign.get(Number(detail.id)) : null;
 
     return (
-        <div className="min-h-screen bg-[#FBF7F2] pb-28 sm:pb-16">
-            {/* ------------------------------------------------ Héros */}
-            <section className="relative overflow-hidden bg-[#0F0C0A] text-white">
-                <div className="pointer-events-none absolute -left-40 -top-40 h-[520px] w-[520px] rounded-full bg-[#FF6EA9]/20 blur-[120px]" />
-                <div className="pointer-events-none absolute -bottom-48 right-[-120px] h-[520px] w-[520px] rounded-full bg-[#C9A96E]/15 blur-[120px]" />
-                <div className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:22px_22px]" />
-
-                <div className="relative mx-auto grid max-w-7xl gap-8 px-4 pb-10 pt-10 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:px-8 lg:pb-14 lg:pt-14">
+        <div className="min-h-screen bg-[#FAF8F5] pb-28 sm:pb-16">
+            {/* ------------------------------------------------ En-tête de page */}
+            <section className="border-b border-[#E7E2DC]">
+                <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-10 sm:px-6 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14 lg:px-8 lg:pb-16 lg:pt-16">
                     <div className="flex flex-col justify-center">
-                        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex w-fit items-center gap-2 rounded-full bg-white/[0.06] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#F6C8DB] ring-1 ring-white/10">
-                            <Radio size={13} className="text-[#FF6EA9]" /> Campagnes solidaires
-                        </motion.p>
-                        <motion.h1 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.05 } }} className="mt-5 font-brand text-[44px] font-semibold leading-[0.98] tracking-tight sm:text-[60px] lg:text-[68px]">
-                            Des kits d’hygiène offerts,{" "}
-                            <span className="bg-gradient-to-r from-[#FF9CC6] via-[#FF6EA9] to-[#E9D3A6] bg-clip-text text-transparent">près de chez vous.</span>
+                        <p className="text-[13px] text-[#8A847D]">Campagnes solidaires E·Doto</p>
+                        <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-3 font-brand text-[46px] font-semibold leading-[1.02] tracking-tight text-[#161412] sm:text-[60px] lg:text-[66px]">
+                            Des kits d’hygiène offerts, près de chez vous.
                         </motion.h1>
-                        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.12 } }} className="mt-5 max-w-xl text-[15px] leading-relaxed text-white/65">
-                            Choisissez votre campagne, votre point de retrait, et recevez votre code par e-mail. Une demande par personne, suivie étape par étape.
-                        </motion.p>
+                        <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-[#5E5953]">
+                            Choisissez votre campagne et votre point de retrait, puis recevez votre code par e-mail. Une demande par personne, suivie étape par étape.
+                        </p>
 
                         {/* Ville */}
-                        <div className="mt-7 flex flex-wrap items-center gap-2.5">
-                            <button
-                                type="button"
-                                onClick={() => setCityPicker(true)}
-                                className="inline-flex items-center gap-2.5 rounded-2xl bg-white/[0.07] py-2.5 pl-3 pr-4 text-left ring-1 ring-white/15 transition hover:bg-white/[0.12]"
-                            >
-                                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#FF6EA9]/20 text-[#FF9CC6]">
-                                    {me.status === "locating" ? <Loader2 size={16} className="animate-spin" /> : <MapPin size={16} />}
-                                </span>
-                                <span>
-                                    <span className="block text-[10px] uppercase tracking-[0.18em] text-white/45">Votre ville</span>
-                                    <span className="block text-[14px] font-semibold">
-                                        {me.city || (me.status === "locating" ? "Détection…" : "Choisir ma ville")}
-                                        {me.city && <span className="ml-2 text-[12px] font-normal text-white/45">{me.source === "detected" ? "détectée" : "choisie"} · changer</span>}
-                                    </span>
+                        <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-[#E7E2DC] pt-6">
+                            <button type="button" onClick={() => setCityPicker(true)} className="group text-left">
+                                <span className="block text-[12px] text-[#8A847D]">Votre ville</span>
+                                <span className="mt-0.5 flex items-center gap-2 text-[17px] font-medium text-[#161412]">
+                                    {me.status === "locating" ? <Loader2 size={15} className="animate-spin text-[#8A847D]" /> : <MapPin size={16} strokeWidth={1.8} />}
+                                    {me.city || (me.status === "locating" ? "Détection…" : "Choisir ma ville")}
+                                    {me.city && <span className="text-[13px] font-normal text-[#8A847D] underline-offset-4 group-hover:underline">{me.source === "detected" ? "détectée" : "choisie"} · changer</span>}
                                 </span>
                             </button>
                             {me.status !== "locating" && (
-                                <button type="button" onClick={locate} className="inline-flex items-center gap-1.5 rounded-2xl px-3 py-2.5 text-[12px] font-medium text-white/60 ring-1 ring-white/10 hover:text-white">
-                                    <LocateFixed size={14} /> Me localiser
+                                <button type="button" onClick={locate} className="inline-flex items-center gap-1.5 text-[13px] text-[#5E5953] underline-offset-4 hover:text-[#161412] hover:underline">
+                                    <LocateFixed size={14} strokeWidth={1.8} /> Me localiser
                                 </button>
                             )}
                         </div>
                         {me.city && !loading && (
-                            <p className="mt-3 text-[13px] text-white/60">
+                            <p className="mt-2 text-[14px] text-[#5E5953]">
                                 {liveHere.length > 0 ? (
-                                    <><span className="font-semibold text-[#FF9CC6]">{liveHere.length} campagne{liveHere.length > 1 ? "s" : ""} en cours</span> à {me.city}.</>
+                                    <><span className="font-medium text-[#B8336A]">{liveHere.length} campagne{liveHere.length > 1 ? "s" : ""} en cours</span> à {me.city}.</>
                                 ) : soonHere.length > 0 ? (
-                                    <>Aucune campagne en cours à {me.city} ; <span className="font-semibold text-[#E9D3A6]">{soonHere.length} à venir</span>.</>
+                                    <>Aucune campagne en cours à {me.city} ; <span className="font-medium text-[#161412]">{soonHere.length} à venir</span>.</>
                                 ) : (
                                     <>Aucune campagne à {me.city} pour le moment.</>
                                 )}
                             </p>
                         )}
-                        {me.status === "denied" && !me.city && <p className="mt-3 text-[12px] text-white/45">Localisation refusée : choisissez votre ville.</p>}
+                        {me.status === "denied" && !me.city && <p className="mt-2 text-[13px] text-[#8A847D]">Localisation refusée : choisissez votre ville.</p>}
 
                         {/* Chiffres réels des campagnes en cours */}
-                        <dl className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <dl className="mt-10 grid grid-cols-2 gap-y-6 sm:grid-cols-4 sm:divide-x sm:divide-[#E7E2DC]">
                             {[
-                                { k: "En cours", v: kpis.live, icon: Radio },
-                                { k: "Villes", v: kpis.cities, icon: Building2 },
-                                { k: "Kits prévus", v: kpis.planned, icon: Gift },
-                                { k: "Kits retirés", v: kpis.withdrawn, icon: PackageCheck },
-                            ].map(({ k, v, icon: Icon }) => (
-                                <div key={k} className="rounded-2xl bg-white/[0.05] p-3.5 ring-1 ring-white/10">
-                                    <Icon size={15} className="text-[#C9A96E]" />
-                                    <dd className="mt-2 font-brand text-[30px] font-semibold leading-none tabular-nums">{loading ? "—" : nf(v)}</dd>
-                                    <dt className="mt-1 text-[11px] text-white/50">{k}</dt>
+                                ["Campagnes en cours", kpis.live],
+                                ["Villes", kpis.cities],
+                                ["Kits prévus", kpis.planned],
+                                ["Kits retirés", kpis.withdrawn],
+                            ].map(([k, v]) => (
+                                <div key={k} className="sm:px-5 sm:first:pl-0">
+                                    <dd className="font-brand text-[36px] font-semibold leading-none tabular-nums text-[#161412]">{loading ? "—" : nf(v)}</dd>
+                                    <dt className="mt-1.5 text-[12px] text-[#8A847D]">{k}</dt>
                                 </div>
                             ))}
                         </dl>
                     </div>
 
                     {/* Carte : villes des campagnes encerclées */}
-                    <div ref={mapBox} className="relative overflow-hidden rounded-[32px] bg-[#16120F] ring-1 ring-white/10 shadow-[0_40px_90px_-40px_rgba(255,110,169,0.45)]">
-                        <div className="h-[340px] sm:h-[420px] lg:h-full lg:min-h-[480px]">
+                    <div ref={mapBox} className="relative overflow-hidden rounded-2xl border border-[#E7E2DC] bg-[#F4F1ED]">
+                        <div className="h-[340px] sm:h-[420px] lg:h-full lg:min-h-[500px]">
                             <CampaignsMap zones={zones} userPosition={me.position} myCity={me.city} focusCity={focusCity} onCityClick={(city) => { setCityFilter(city); setStatus("all"); }} height="100%" />
                         </div>
-                        <div className="pointer-events-none absolute inset-x-3 bottom-3 flex flex-wrap items-center gap-2 sm:inset-x-4 sm:bottom-4">
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-[11px] text-white/85 backdrop-blur"><span className="h-2 w-2 rounded-full bg-[#FF6EA9]" /> En cours</span>
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-[11px] text-white/85 backdrop-blur"><span className="h-2 w-2 rounded-full bg-[#C9A96E]" /> À venir</span>
-                            {me.position && <span className="inline-flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-[11px] text-white/85 backdrop-blur"><span className="h-2 w-2 rounded-full bg-[#4AB3F4]" /> Vous</span>}
+                        <div className="pointer-events-none absolute bottom-3 left-3 flex flex-wrap items-center gap-3 rounded-lg border border-[#E7E2DC] bg-white/95 px-3 py-2 text-[11px] text-[#3A3632]">
+                            <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#D6457F]" /> En cours</span>
+                            <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#6F6A64]" /> À venir</span>
+                            {me.position && <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#161412]" /> Vous</span>}
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* ------------------------------------------------ Filtres */}
-            <div className="sticky top-[80px] z-30 border-b border-[#EFE8DE] bg-[#FBF7F2]/85 backdrop-blur-xl">
-                <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
-                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-                        <div className="-mx-1 flex gap-1 overflow-x-auto rounded-full bg-white p-1 ring-1 ring-[#EFE8DE] [scrollbar-width:none] lg:mx-0">
+            <div className="sticky top-[80px] z-30 border-b border-[#E7E2DC] bg-[#FAF8F5]/95 backdrop-blur">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col gap-3 pt-3 lg:flex-row lg:items-end lg:justify-between">
+                        <div className="flex gap-7 overflow-x-auto [scrollbar-width:none]">
                             <Seg active={status === "en_cours"} onClick={() => setStatus("en_cours")} count={active.length}>En cours</Seg>
                             <Seg active={status === "a_venir"} onClick={() => setStatus("a_venir")} count={upcoming.length}>À venir</Seg>
                             <Seg active={status === "all"} onClick={() => setStatus("all")} count={all.length}>Toutes</Seg>
                         </div>
-                        <div className="flex flex-1 gap-2">
+                        <div className="flex gap-2 pb-3 lg:w-[460px]">
                             <label className="relative flex-1">
-                                <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9A8E80]" />
+                                <Search size={16} strokeWidth={1.8} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8A847D]" />
                                 <input
                                     type="search"
                                     value={searchInput}
                                     onChange={(e) => setSearchInput(e.target.value)}
-                                    placeholder="Campagne, ville…"
+                                    placeholder="Rechercher une campagne, une ville"
                                     aria-label="Rechercher une campagne"
-                                    className="h-11 w-full rounded-2xl border-0 bg-white pl-11 pr-10 text-[14px] text-[#1F1B16] ring-1 ring-[#EFE8DE] placeholder:text-[#B3A89B] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/50"
+                                    className="h-10 w-full rounded-full border border-[#E2DCD5] bg-white pl-10 pr-9 text-[14px] text-[#161412] placeholder:text-[#A8A29B] focus:border-[#161412] focus:outline-none"
                                 />
                                 {searchInput && (
-                                    <button type="button" onClick={() => setSearchInput("")} aria-label="Effacer" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#9A8E80]">
-                                        <X size={15} />
+                                    <button type="button" onClick={() => setSearchInput("")} aria-label="Effacer" className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#8A847D]">
+                                        <X size={14} />
                                     </button>
                                 )}
                             </label>
                             <button
                                 type="button"
                                 onClick={() => setPanel(true)}
-                                className={`relative flex h-11 shrink-0 items-center gap-2 rounded-2xl px-4 text-[13px] font-semibold transition ${advanced ? "bg-[#1F1B16] text-white" : "bg-white text-[#1F1B16] ring-1 ring-[#EFE8DE]"}`}
+                                className={`flex h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-[13px] font-medium transition ${advanced ? "border-[#161412] bg-[#161412] text-white" : "border-[#E2DCD5] bg-white text-[#161412] hover:border-[#161412]"}`}
                             >
-                                <SlidersHorizontal size={16} />
+                                <SlidersHorizontal size={15} strokeWidth={1.8} />
                                 <span className="hidden sm:inline">Filtres</span>
-                                {advanced > 0 && <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#FF6EA9] px-1 text-[11px] font-bold text-white">{advanced}</span>}
+                                {advanced > 0 && <span className="tabular-nums">{advanced}</span>}
                             </button>
                         </div>
                     </div>
-                    {/* Villes en un geste */}
-                    {cityCounts.length > 0 && (
-                        <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] sm:mx-0 sm:px-0">
-                            <Chip active={!cityFilter && !mineOnly} onClick={() => { setCityFilter(""); setMineOnly(false); }}>Toutes les villes</Chip>
-                            {me.city && <Chip active={mineOnly} onClick={() => { setMineOnly((v) => !v); setCityFilter(""); }}><MapPin size={13} /> Ma ville</Chip>}
-                            {cityCounts.map(([city, n]) => (
-                                <Chip key={city} active={normCity(cityFilter) === normCity(city)} onClick={() => { setCityFilter(normCity(cityFilter) === normCity(city) ? "" : city); setMineOnly(false); setFocusCity(city); }} count={n}>
-                                    {city}
-                                </Chip>
-                            ))}
-                        </div>
-                    )}
                 </div>
             </div>
 
             {/* ------------------------------------------------ Liste */}
-            <main className="mx-auto max-w-7xl px-4 pt-7 sm:px-6 lg:px-8">
-                <div className="mb-5 flex items-end justify-between gap-3">
-                    <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#C2185B]">{status === "en_cours" ? "En ce moment" : status === "a_venir" ? "Bientôt" : "Toutes les campagnes"}</p>
-                        <h2 className="mt-1 font-brand text-[32px] font-semibold leading-none text-[#1F1B16] sm:text-[38px]">
-                            {loading ? "Chargement…" : `${list.length} campagne${list.length > 1 ? "s" : ""}`}
-                        </h2>
+            <main className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+                {cityCounts.length > 0 && (
+                    <div className="-mx-4 mb-7 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
+                        <Chip active={!cityFilter && !mineOnly} onClick={() => { setCityFilter(""); setMineOnly(false); }}>Toutes les villes</Chip>
+                        {me.city && <Chip active={mineOnly} onClick={() => { setMineOnly((v) => !v); setCityFilter(""); }}>Ma ville</Chip>}
+                        {cityCounts.map(([city, n]) => (
+                            <Chip key={city} active={normCity(cityFilter) === normCity(city)} onClick={() => { setCityFilter(normCity(cityFilter) === normCity(city) ? "" : city); setMineOnly(false); setFocusCity(city); }} count={n}>
+                                {city}
+                            </Chip>
+                        ))}
                     </div>
+                )}
+
+                <div className="mb-6 flex items-end justify-between gap-3">
+                    <h2 className="font-brand text-[30px] font-semibold leading-none text-[#161412] sm:text-[34px]">
+                        {loading ? "Chargement…" : loadError ? "Campagnes" : `${list.length} campagne${list.length > 1 ? "s" : ""}`}
+                    </h2>
                     <select
                         value={sort}
                         onChange={(e) => setSort(e.target.value)}
                         aria-label="Trier"
-                        className="hidden rounded-xl border-0 bg-transparent py-1 pl-2 pr-7 text-[13px] font-medium text-[#3B342D] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/40 sm:block"
+                        className="hidden border-0 bg-transparent py-1 pl-2 pr-7 text-[13px] text-[#3A3632] focus:outline-none focus:ring-0 sm:block"
                     >
                         {SORTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                     </select>
                 </div>
 
                 {loadError ? (
-                    <div className="rounded-[28px] bg-white p-10 text-center ring-1 ring-[#EFE8DE]">
-                        <p className="text-sm text-[#7A6E62]">Impossible de charger les campagnes.</p>
-                        <button type="button" onClick={() => { setLoading(true); loadCampaigns(); }} className="mt-4 rounded-full bg-[#1F1B16] px-5 py-2.5 text-sm font-semibold text-white">Réessayer</button>
+                    <div className="rounded-2xl border border-[#E7E2DC] bg-white p-10 text-center">
+                        <p className="text-sm text-[#5E5953]">Impossible de charger les campagnes.</p>
+                        <button type="button" onClick={() => { setLoading(true); loadCampaigns(); }} className="mt-4 rounded-full bg-[#161412] px-6 py-2.5 text-sm font-medium text-white">Réessayer</button>
                     </div>
                 ) : loading ? (
-                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                        {[0, 1, 2].map((i) => <div key={i} className="h-[420px] animate-pulse rounded-[30px] bg-white ring-1 ring-[#EFE8DE]" />)}
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {[0, 1, 2].map((i) => <div key={i} className="h-[440px] animate-pulse rounded-2xl border border-[#E7E2DC] bg-white" />)}
                     </div>
                 ) : list.length === 0 ? (
-                    <div className="flex flex-col items-center rounded-[30px] bg-white px-6 py-16 text-center ring-1 ring-[#EFE8DE]">
-                        <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#F6F1EA] text-[#C9A96E]"><CalendarDays size={28} strokeWidth={1.6} /></span>
-                        <p className="mt-4 font-brand text-[24px] font-semibold text-[#1F1B16]">
+                    <div className="rounded-2xl border border-[#E7E2DC] bg-white px-6 py-16 text-center">
+                        <p className="font-brand text-[26px] font-semibold text-[#161412]">
                             {status === "en_cours" && !cityFilter && !mineOnly && !search ? "Aucune campagne en cours" : "Aucune campagne ne correspond"}
                         </p>
-                        <p className="mt-1 max-w-sm text-sm text-[#7A6E62]">
+                        <p className="mx-auto mt-2 max-w-sm text-sm text-[#77716B]">
                             {status === "en_cours" && upcoming.length > 0 ? "Découvrez les prochaines distributions." : "Modifiez les filtres pour voir plus de campagnes."}
                         </p>
-                        <div className="mt-5 flex flex-wrap justify-center gap-2">
-                            {(cityFilter || mineOnly || search || sort !== "ending") && <button type="button" onClick={resetFilters} className="rounded-full bg-[#F1ECE4] px-5 py-2.5 text-sm font-semibold text-[#3B342D]">Effacer les filtres</button>}
-                            {status === "en_cours" && upcoming.length > 0 && <button type="button" onClick={() => setStatus("a_venir")} className="rounded-full bg-[#1F1B16] px-5 py-2.5 text-sm font-semibold text-white">Voir les campagnes à venir</button>}
+                        <div className="mt-6 flex flex-wrap justify-center gap-2">
+                            {(cityFilter || mineOnly || search || sort !== "ending") && <button type="button" onClick={resetFilters} className="rounded-full border border-[#E2DCD5] px-5 py-2.5 text-sm text-[#3A3632]">Effacer les filtres</button>}
+                            {status === "en_cours" && upcoming.length > 0 && <button type="button" onClick={() => setStatus("a_venir")} className="inline-flex items-center gap-1.5 rounded-full bg-[#161412] px-5 py-2.5 text-sm font-medium text-white">Campagnes à venir <ArrowRight size={15} /></button>}
                         </div>
                     </div>
                 ) : (
-                    <motion.div layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    <motion.div layout className="grid grid-cols-[minmax(0,1fr)] gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         <AnimatePresence initial={false}>
                             {list.map((c, i) => (
                                 <CampaignCard key={c.id} c={c} index={i} myCity={me.city} registration={regByCampaign.get(Number(c.id))} onOpen={setDetail} onRequest={request} />
@@ -556,24 +535,24 @@ export default function CampaignsPage() {
                     </motion.div>
                 )}
 
-                {/* Comment ça marche : les étapes réelles d'une demande */}
-                <section className="mt-14 overflow-hidden rounded-[32px] bg-[#1F1B16] p-6 text-white sm:p-10">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#F6C8DB]">Votre kit en 4 étapes</p>
-                    <ol className="mt-6 grid gap-4 sm:grid-cols-4">
+                {/* Les étapes réelles d'une demande */}
+                <section className="mt-20 border-t border-[#E7E2DC] pt-10">
+                    <h2 className="font-brand text-[30px] font-semibold text-[#161412]">Votre kit, en quatre étapes</h2>
+                    <ol className="mt-8 grid gap-8 sm:grid-cols-4 sm:gap-6">
                         {[
                             ["Demande", "Choisissez votre ville et votre point de retrait."],
                             ["Code par e-mail", "Votre code de retrait vous est envoyé aussitôt."],
                             ["Validation", "Le point de retrait vérifie votre code."],
                             ["Kit remis", "Vous repartez avec votre kit."],
                         ].map(([t, d], i) => (
-                            <li key={t} className="relative rounded-2xl bg-white/[0.05] p-5 ring-1 ring-white/10">
-                                <span className="font-brand text-[40px] font-semibold leading-none text-[#C9A96E]">0{i + 1}</span>
-                                <p className="mt-3 font-semibold">{t}</p>
-                                <p className="mt-1 text-[13px] leading-relaxed text-white/55">{d}</p>
+                            <li key={t}>
+                                <span className="text-[13px] tabular-nums text-[#A8A29B]">0{i + 1}</span>
+                                <p className="mt-2 border-t border-[#161412] pt-3 font-medium text-[#161412]">{t}</p>
+                                <p className="mt-1 text-[14px] leading-relaxed text-[#77716B]">{d}</p>
                             </li>
                         ))}
                     </ol>
-                    <p className="mt-6 flex items-center gap-2 text-[12px] text-white/45"><Users size={14} /> Une seule demande par personne et par campagne.</p>
+                    <p className="mt-8 text-[13px] text-[#8A847D]">Une seule demande par personne et par campagne.</p>
                 </section>
             </main>
 
@@ -581,24 +560,24 @@ export default function CampaignsPage() {
             <AnimatePresence>
                 {panel && (
                     <>
-                        <motion.div className="fixed inset-0 z-[65] bg-[#0F0C0A]/35 backdrop-blur-[2px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setPanel(false)} />
+                        <motion.div className="fixed inset-0 z-[65] bg-[#161412]/30" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setPanel(false)} />
                         <motion.div
                             role="dialog"
                             aria-label="Filtres des campagnes"
-                            className="fixed inset-x-0 bottom-0 z-[66] max-h-[88vh] overflow-y-auto rounded-t-[32px] bg-[#FBF7F2] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:w-[540px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[32px]"
+                            className="fixed inset-x-0 bottom-0 z-[66] max-h-[88vh] overflow-y-auto rounded-t-2xl bg-white p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-2xl sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:w-[520px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl"
                             initial={{ y: "100%" }}
                             animate={{ y: 0 }}
                             exit={{ y: "100%" }}
-                            transition={{ type: "spring", stiffness: 380, damping: 36 }}
+                            transition={{ type: "spring", stiffness: 380, damping: 38 }}
                         >
-                            <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#E5DDD2] sm:hidden" />
-                            <div className="mb-5 flex items-center justify-between">
-                                <p className="font-brand text-[26px] font-semibold text-[#1F1B16]">Filtres</p>
-                                <button type="button" onClick={() => setPanel(false)} aria-label="Fermer" className="rounded-full bg-[#F1ECE4] p-2 text-[#3B342D]"><X size={16} /></button>
+                            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[#E2DCD5] sm:hidden" />
+                            <div className="mb-6 flex items-center justify-between">
+                                <p className="font-brand text-[28px] font-semibold text-[#161412]">Filtres</p>
+                                <button type="button" onClick={() => setPanel(false)} aria-label="Fermer" className="rounded-full p-2 text-[#77716B] hover:bg-[#F4F1ED]"><X size={18} /></button>
                             </div>
-                            <div className="space-y-6">
+                            <div className="space-y-7">
                                 <section>
-                                    <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9A8E80]">Statut</p>
+                                    <p className="mb-3 text-[13px] text-[#8A847D]">Statut</p>
                                     <div className="flex flex-wrap gap-2">
                                         <Chip active={status === "en_cours"} onClick={() => setStatus("en_cours")} count={active.length}>En cours</Chip>
                                         <Chip active={status === "a_venir"} onClick={() => setStatus("a_venir")} count={upcoming.length}>À venir</Chip>
@@ -606,25 +585,25 @@ export default function CampaignsPage() {
                                     </div>
                                 </section>
                                 <section>
-                                    <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9A8E80]">Ville</p>
+                                    <p className="mb-3 text-[13px] text-[#8A847D]">Ville</p>
                                     <div className="flex flex-wrap gap-2">
-                                        {me.city && <Chip active={mineOnly} onClick={() => { setMineOnly((v) => !v); setCityFilter(""); }}><MapPin size={13} /> Ma ville ({me.city})</Chip>}
+                                        {me.city && <Chip active={mineOnly} onClick={() => { setMineOnly((v) => !v); setCityFilter(""); }}>Ma ville ({me.city})</Chip>}
                                         {cityCounts.map(([city, n]) => (
                                             <Chip key={city} active={normCity(cityFilter) === normCity(city)} onClick={() => { setCityFilter(normCity(cityFilter) === normCity(city) ? "" : city); setMineOnly(false); }} count={n}>{city}</Chip>
                                         ))}
-                                        {cityCounts.length === 0 && <p className="text-[13px] text-[#9A8E80]">Aucune ville pour ce statut.</p>}
+                                        {cityCounts.length === 0 && <p className="text-[13px] text-[#A8A29B]">Aucune ville pour ce statut.</p>}
                                     </div>
                                 </section>
                                 <section>
-                                    <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9A8E80]">Trier par</p>
+                                    <p className="mb-3 text-[13px] text-[#8A847D]">Trier par</p>
                                     <div className="flex flex-wrap gap-2">
                                         {SORTS.map((s) => <Chip key={s.value} active={sort === s.value} onClick={() => setSort(s.value)}>{s.label}</Chip>)}
                                     </div>
                                 </section>
                             </div>
-                            <div className="mt-7 flex gap-2">
-                                <button type="button" onClick={resetFilters} className="h-12 flex-1 rounded-2xl bg-[#F1ECE4] text-sm font-semibold text-[#3B342D]">Réinitialiser</button>
-                                <button type="button" onClick={() => setPanel(false)} className="h-12 flex-[2] rounded-2xl bg-[#1F1B16] text-sm font-semibold text-white">
+                            <div className="mt-8 flex gap-2">
+                                <button type="button" onClick={resetFilters} className="h-12 flex-1 rounded-full border border-[#E2DCD5] text-sm text-[#3A3632]">Réinitialiser</button>
+                                <button type="button" onClick={() => setPanel(false)} className="h-12 flex-[2] rounded-full bg-[#161412] text-sm font-medium text-white">
                                     Voir {list.length} campagne{list.length > 1 ? "s" : ""}
                                 </button>
                             </div>
@@ -637,39 +616,43 @@ export default function CampaignsPage() {
             <AnimatePresence>
                 {cityPicker && (
                     <>
-                        <motion.div className="fixed inset-0 z-[400] bg-[#0F0C0A]/60 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setCityPicker(false)} />
+                        <motion.div className="fixed inset-0 z-[400] bg-[#161412]/30" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setCityPicker(false)} />
                         <motion.div
                             role="dialog"
                             aria-label="Choisir ma ville"
-                            className="fixed inset-y-0 right-0 z-[410] flex w-full max-w-md flex-col bg-[#0F0C0A] text-white"
+                            className="fixed inset-y-0 right-0 z-[410] flex w-full max-w-md flex-col bg-white shadow-2xl"
                             initial={{ x: "100%" }}
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
-                            transition={{ type: "spring", stiffness: 320, damping: 34 }}
+                            transition={{ type: "spring", stiffness: 320, damping: 36 }}
                         >
                             <div className="flex items-center justify-between px-6 pb-4 pt-6">
-                                <p className="font-brand text-[28px] font-semibold">Votre ville</p>
-                                <button type="button" onClick={() => setCityPicker(false)} aria-label="Fermer" className="rounded-full bg-white/10 p-2"><X size={18} /></button>
+                                <p className="font-brand text-[30px] font-semibold text-[#161412]">Votre ville</p>
+                                <button type="button" onClick={() => setCityPicker(false)} aria-label="Fermer" className="rounded-full p-2 text-[#77716B] hover:bg-[#F4F1ED]"><X size={18} /></button>
                             </div>
                             <div className="px-6">
-                                <button type="button" onClick={() => { setCityPicker(false); locate(); }} className="mb-3 flex w-full items-center gap-3 rounded-2xl bg-[#FF6EA9]/15 px-4 py-3.5 text-left text-[14px] font-semibold text-[#FFB8D5] ring-1 ring-[#FF6EA9]/30">
-                                    <LocateFixed size={18} /> Utiliser ma position
+                                <button type="button" onClick={() => { setCityPicker(false); locate(); }} className="mb-3 flex w-full items-center gap-3 rounded-xl border border-[#E2DCD5] px-4 py-3 text-left text-[14px] font-medium text-[#161412] hover:border-[#161412]">
+                                    <LocateFixed size={17} strokeWidth={1.8} /> Utiliser ma position
                                 </button>
                                 <label className="relative block">
-                                    <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
-                                    <input autoFocus value={citySearch} onChange={(e) => setCitySearch(e.target.value)} placeholder="Rechercher une ville…" className="h-12 w-full rounded-2xl border-0 bg-white/[0.06] pl-11 pr-4 text-[14px] text-white ring-1 ring-white/10 placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/50" />
+                                    <Search size={16} strokeWidth={1.8} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8A847D]" />
+                                    <input autoFocus value={citySearch} onChange={(e) => setCitySearch(e.target.value)} placeholder="Rechercher une ville" className="h-11 w-full rounded-xl border border-[#E2DCD5] bg-white pl-11 pr-4 text-[14px] text-[#161412] placeholder:text-[#A8A29B] focus:border-[#161412] focus:outline-none" />
                                 </label>
                             </div>
-                            <ul className="mt-4 flex-1 space-y-1.5 overflow-y-auto px-6 pb-8">
+                            <ul className="mt-3 flex-1 divide-y divide-[#EDE8E2] overflow-y-auto px-6 pb-8">
                                 {filteredCities.map((city) => {
                                     const live = active.some((c) => hasCity(c, city));
                                     const soon = !live && upcoming.some((c) => hasCity(c, city));
                                     const current = me.city && normCity(me.city) === normCity(city);
                                     return (
                                         <li key={city}>
-                                            <button type="button" onClick={() => chooseCity(city)} className={`flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-left transition ${current ? "bg-white text-[#1F1B16]" : "bg-white/[0.04] hover:bg-white/[0.09]"}`}>
-                                                <span className="font-medium">{city}</span>
-                                                {live ? <span className="rounded-full bg-[#FF6EA9]/20 px-2.5 py-0.5 text-[11px] font-semibold text-[#FF9CC6]">En cours</span> : soon ? <span className="rounded-full bg-[#C9A96E]/20 px-2.5 py-0.5 text-[11px] font-semibold text-[#E9D3A6]">À venir</span> : current ? <Check size={16} /> : null}
+                                            <button type="button" onClick={() => chooseCity(city)} className="flex w-full items-center justify-between py-3.5 text-left">
+                                                <span className={`text-[15px] ${current ? "font-medium text-[#161412]" : "text-[#3A3632]"}`}>{city}</span>
+                                                <span className="flex items-center gap-2 text-[12px]">
+                                                    {live && <span className="inline-flex items-center gap-1.5 text-[#B8336A]"><span className="h-1.5 w-1.5 rounded-full bg-[#D6457F]" />En cours</span>}
+                                                    {soon && <span className="text-[#77716B]">À venir</span>}
+                                                    {current && <Check size={15} className="text-[#161412]" />}
+                                                </span>
                                             </button>
                                         </li>
                                     );
@@ -713,20 +696,19 @@ export default function CampaignsPage() {
 
             <AnimatePresence>
                 {blocked && (
-                    <motion.div className="fixed inset-0 z-[300] flex items-center justify-center bg-[#0F0C0A]/60 p-4 backdrop-blur-md" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setBlocked(null)}>
-                        <motion.div onClick={(e) => e.stopPropagation()} initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.94, opacity: 0 }} className="w-full max-w-md rounded-[32px] bg-[#FBF7F2] p-8 text-center shadow-2xl">
-                            <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#1F1B16] text-[#C9A96E]"><ShieldAlert size={28} /></span>
-                            <p className="mt-5 font-brand text-[26px] font-semibold leading-tight text-[#1F1B16]">{blocked.reason === "not_active" ? "Demandes fermées" : "Demande déjà faite"}</p>
-                            <p className="mt-2 text-sm leading-relaxed text-[#6B6158]">{blocked.message}</p>
-                            <button type="button" onClick={() => setBlocked(null)} className="mt-7 h-12 w-full rounded-2xl bg-[#1F1B16] text-sm font-semibold text-white">J’ai compris</button>
+                    <motion.div className="fixed inset-0 z-[300] flex items-center justify-center bg-[#161412]/40 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setBlocked(null)}>
+                        <motion.div onClick={(e) => e.stopPropagation()} initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }} className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">
+                            <p className="font-brand text-[28px] font-semibold leading-tight text-[#161412]">{blocked.reason === "not_active" ? "Demandes fermées" : "Demande déjà faite"}</p>
+                            <p className="mt-3 text-[14px] leading-relaxed text-[#5E5953]">{blocked.message}</p>
+                            <button type="button" onClick={() => setBlocked(null)} className="mt-7 h-12 w-full rounded-full bg-[#161412] text-sm font-medium text-white">J’ai compris</button>
                         </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
             {checking && (
-                <div className="fixed inset-0 z-[290] flex items-center justify-center bg-[#0F0C0A]/30 backdrop-blur-[2px]">
-                    <div className="flex items-center gap-3 rounded-2xl bg-[#1F1B16] px-5 py-4 text-sm text-white shadow-2xl"><Loader2 size={18} className="animate-spin text-[#FF6EA9]" /> Vérification…</div>
+                <div className="fixed inset-0 z-[290] flex items-center justify-center bg-[#161412]/15">
+                    <div className="flex items-center gap-3 rounded-full bg-white px-5 py-3 text-sm text-[#161412] shadow-xl"><Loader2 size={16} className="animate-spin" /> Vérification…</div>
                 </div>
             )}
         </div>
