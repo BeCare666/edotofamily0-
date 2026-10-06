@@ -39,7 +39,7 @@ export default function ServicesPage() {
                     transition={{ delay: 0.4, duration: 1 }}
                     className="mt-6 text-gray-600 max-w-2xl mx-auto text-lg"
                 >
-                    E·Doto Family vous accompagne à chaque étape de votre bien-être : de la santé intime à la maternité,
+                    E.doto family vous accompagne à chaque étape de votre bien-être : de la santé intime à la maternité,
                     avec élégance, innovation et douceur.
                 </motion.p>
             </section>
@@ -103,7 +103,7 @@ export default function ServicesPage() {
                         Une expérience <span className="text-[#FF6EA9]">sensorielle</span> du soin.
                     </h2>
                     <p className="text-gray-600 text-lg mb-10">
-                        Chez E·Doto Family, chaque service est une immersion dans un univers doux et lumineux,
+                        Chez E.doto family, chaque service est une immersion dans un univers doux et lumineux,
                         où le corps et l’esprit se rencontrent dans un équilibre harmonieux.
                     </p>
                     <motion.button
@@ -131,7 +131,7 @@ export default function ServicesPage() {
             <section className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden">
                 <Image
                     src="/images/service-bg.jpg"
-                    alt="E·Doto Service"
+                    alt="E.doto Service"
                     fill
                     className="object-cover opacity-40"
                 />
@@ -147,7 +147,7 @@ export default function ServicesPage() {
                     <h3 className="text-3xl sm:text-4xl font-semibold text-[#0F172A] mb-4">
                         “Prendre soin de soi, c’est écrire chaque jour un poème sur son corps.”
                     </h3>
-                    <p className="text-gray-500">— L’équipe E·Doto Family</p>
+                    <p className="text-gray-500">L’équipe E.doto family</p>
                 </motion.div>
             </section>
             {/* Bouton retour flottant */}

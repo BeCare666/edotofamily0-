@@ -239,7 +239,7 @@ export default function ProfilePage() {
                                     <p className="font-semibold text-red-600">
                                         {loadingDelete ? "Suppression..." : "Supprimer mon compte"}
                                     </p>
-                                    <p className="text-sm text-gray-500">Action irréversible – soyez prudent</p>
+                                    <p className="text-sm text-gray-500">Action irréversible : soyez prudent</p>
                                 </div>
                             </div>
                             <span className="text-red-300">

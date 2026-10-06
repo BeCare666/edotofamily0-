@@ -37,7 +37,7 @@ export default function ObjectifsPage() {
           transition={{ delay: 0.4, duration: 1 }}
           className="mt-6 text-gray-600 max-w-2xl mx-auto text-lg"
         >
-          E·Doto Family s’engage à transformer durablement la perception de la santé Sexuelle et reproductive,
+          E.doto family s’engage à transformer durablement la perception de la santé Sexuelle et reproductive,
           à inspirer confiance et à offrir des solutions douces et puissantes à la fois.
         </motion.p>
       </section>
@@ -68,7 +68,7 @@ export default function ObjectifsPage() {
           {
             icon: <Globe className="text-[#FF6EA9]" size={30} />,
             title: "Rayonner à l’échelle africaine",
-            text: "Partager la vision d’E·Doto au-delà des frontières, en portant haut la santé et le bien-être féminin."
+            text: "Partager la vision d’E.doto au-delà des frontières, en portant haut la santé et le bien-être féminin."
           },
           {
             icon: <Sparkles className="text-[#FF6EA9]" size={30} />,
@@ -130,10 +130,10 @@ export default function ObjectifsPage() {
         >
           <Heart size={32} className="text-[#FF6EA9] mx-auto mb-4" />
           <h3 className="text-3xl sm:text-4xl font-semibold text-[#0F172A] leading-snug mb-4">
-            “Chaque soin, chaque produit, chaque mot d’E·Doto Family
+            “Chaque soin, chaque produit, chaque mot d’E.doto family
             est une déclaration d’amour.”
           </h3>
-          <p className="text-gray-500">— L’équipe E·Doto Family</p>
+          <p className="text-gray-500">L’équipe E.doto family</p>
         </motion.div>
 
         {/* Orbes de lumière */}

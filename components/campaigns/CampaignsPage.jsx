@@ -91,7 +91,7 @@ function CampaignCard({ c, myCity, registration, onOpen, onRequest, index }) {
                     </div>
                     <h3 className="mt-2 line-clamp-2 font-brand text-[26px] font-semibold leading-[1.1] text-[#161412]">{c.title}</h3>
                     <p className="mt-1 flex items-center gap-1.5 text-[13px] text-[#77716B]">
-                        <MapPin size={13} strokeWidth={1.8} /> {(c.cities || []).join(" · ") || c.location || "—"}
+                        <MapPin size={13} strokeWidth={1.8} /> {(c.cities || []).join(" · ") || c.location || "Ville non renseignée"}
                     </p>
                 </div>
             </button>
@@ -368,7 +368,7 @@ export default function CampaignsPage() {
             <section className="border-b border-[#E7E2DC]">
                 <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-10 sm:px-6 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14 lg:px-8 lg:pb-16 lg:pt-16">
                     <div className="flex flex-col justify-center">
-                        <p className="text-[13px] text-[#8A847D]">Campagnes solidaires E·Doto</p>
+                        <p className="text-[13px] text-[#8A847D]">Campagnes solidaires E.doto</p>
                         <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-3 font-brand text-[46px] font-semibold leading-[1.02] tracking-tight text-[#161412] sm:text-[60px] lg:text-[66px]">
                             Des kits d’hygiène offerts, près de chez vous.
                         </motion.h1>
@@ -414,7 +414,7 @@ export default function CampaignsPage() {
                                 ["Kits retirés", kpis.withdrawn],
                             ].map(([k, v]) => (
                                 <div key={k} className="sm:px-5 sm:first:pl-0">
-                                    <dd className="font-brand text-[36px] font-semibold leading-none tabular-nums text-[#161412]">{loading ? "—" : nf(v)}</dd>
+                                    <dd className="font-brand text-[36px] font-semibold leading-none tabular-nums text-[#161412]">{loading ? "…" : nf(v)}</dd>
                                     <dt className="mt-1.5 text-[12px] text-[#8A847D]">{k}</dt>
                                 </div>
                             ))}

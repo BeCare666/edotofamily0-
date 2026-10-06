@@ -45,7 +45,7 @@ export default function MyApp({ Component, pageProps }) {
     <AuthProvider>
       <ChatAIProvider>
       <Head>
-        <title>e-doto family</title>
+        <title>E.doto family</title>
       </Head>
       <Layout>
         {!isHomePage && <Header />}

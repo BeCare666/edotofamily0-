@@ -127,7 +127,7 @@ function Notifications({ data, onPick }) {
                                         <span className={`mt-1 w-2 h-2 rounded-full shrink-0 ${n.type === "kit" ? "bg-[#FF6EA9]" : "bg-[#1F1B16]"}`} />
                                         <span className="min-w-0">
                                             <span className="block text-sm text-[#1F1B16] truncate">{n.title}</span>
-                                            <span className="block text-xs text-[#9A8E80] truncate">{n.subtitle || "—"} · {dateTime(n.created_at)}</span>
+                                            <span className="block text-xs text-[#9A8E80] truncate">{n.subtitle ? `${n.subtitle} · ` : ""}{dateTime(n.created_at)}</span>
                                         </span>
                                     </button>
                                 </li>
@@ -190,7 +190,7 @@ export default function Shell({ me, view, onView, search, onSearch, notification
             onView={onView}
             viewKey={view}
             storageKey="edoto:pickup-sidebar"
-            footerText="E·Doto Family"
+            footerText="E.doto family"
             search={<SearchBox value={search} onChange={onSearch} onPick={onPick} />}
             actions={<><Notifications data={notifications} onPick={onPick} /><AvatarMenu me={me} /></>}
         >

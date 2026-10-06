@@ -16,7 +16,7 @@ export default function FinalCTA() {
                     Votre santé mérite confidentialité, respect et simplicité.
                 </h2>
                 <p className="text-lg md:text-xl">
-                    Rejoignez la communauté <span className="font-semibold">E-Doto Family</span>.
+                    Rejoignez la communauté <span className="font-semibold">E.doto family</span>.
                 </p>
 
                 {/* CTA Buttons */}

@@ -31,7 +31,7 @@ export const Legal: React.FC<LegalProps> = ({ changeView }) => {
 
                     <h2 className="text-2xl font-bold text-slate-900 mb-4">1. Présentation du site</h2>
                     <p className="text-slate-600 mb-6">
-                        En vertu de l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique, il est précisé aux utilisateurs du site internet E-Doto Family l'identité des différents intervenants dans le cadre de sa réalisation et de son suivi :
+                        En vertu de l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique, il est précisé aux utilisateurs du site internet E.doto family l'identité des différents intervenants dans le cadre de sa réalisation et de son suivi :
                         <br /><br />
                         <strong>Propriétaire :</strong> BeCare SARL - Capital social de 1.000.000 FCFA<br />
                         <strong>Siège social :</strong> St Rita, Cotonou, Bénin<br />
@@ -40,17 +40,17 @@ export const Legal: React.FC<LegalProps> = ({ changeView }) => {
 
                     <h2 className="text-2xl font-bold text-slate-900 mb-4">2. Conditions Générales d’Utilisation (CGU)</h2>
                     <p className="text-slate-600 mb-6">
-                        L’utilisation du site E-Doto Family implique l’acceptation pleine et entière des conditions générales d’utilisation ci-après décrites. Ces conditions d’utilisation sont susceptibles d’être modifiées ou complétées à tout moment, les utilisateurs du site sont donc invités à les consulter de manière régulière.
+                        L’utilisation du site E.doto family implique l’acceptation pleine et entière des conditions générales d’utilisation ci-après décrites. Ces conditions d’utilisation sont susceptibles d’être modifiées ou complétées à tout moment, les utilisateurs du site sont donc invités à les consulter de manière régulière.
                     </p>
 
                     <h2 className="text-2xl font-bold text-slate-900 mb-4">3. Description des services fournis</h2>
                     <p className="text-slate-600 mb-6">
-                        Le site internet E-Doto Family a pour objet de fournir une information concernant l’ensemble des activités de la société, ainsi qu'une plateforme de vente de produits de santé et de mise en relation avec des centres de soins.
+                        Le site internet E.doto family a pour objet de fournir une information concernant l’ensemble des activités de la société, ainsi qu'une plateforme de vente de produits de santé et de mise en relation avec des centres de soins.
                     </p>
 
                     <h2 className="text-2xl font-bold text-slate-900 mb-4">4. Limitations de responsabilité</h2>
                     <p className="text-slate-600 mb-6">
-                        E-Doto Family ne pourra être tenu responsable des dommages directs et indirects causés au matériel de l’utilisateur, lors de l’accès au site internet. De plus, l’utilisateur du site s’engage à accéder au site en utilisant un matériel récent, ne contenant pas de virus.
+                        E.doto family ne pourra être tenu responsable des dommages directs et indirects causés au matériel de l’utilisateur, lors de l’accès au site internet. De plus, l’utilisateur du site s’engage à accéder au site en utilisant un matériel récent, ne contenant pas de virus.
                     </p>
 
                     <h2 className="text-2xl font-bold text-slate-900 mb-4">5. Données personnelles</h2>

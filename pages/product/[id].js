@@ -68,7 +68,7 @@ export default function ProductDetails() {
     };
 
     const formatPrice = (p) => {
-        if (p == null) return "—";
+        if (p == null) return "Prix non disponible";
         return Math.round(p).toLocaleString("fr-FR");
     };
     const openOrderModal = () => {

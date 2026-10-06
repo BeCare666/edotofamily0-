@@ -22,7 +22,7 @@ export default function TermsPage() {
       id: "acceptance",
       title: "1. Acceptation des présentes conditions",
       icon: FileText,
-      content: `En accédant et en utilisant le site et les services E·Doto Family (ci-après "E·Doto"), vous
+      content: `En accédant et en utilisant le site et les services E.doto family (ci-après "E.doto"), vous
         acceptez d'être lié par les présentes Conditions d'utilisation. Si vous n'êtes pas d'accord, merci de ne pas utiliser nos services.`,
     },
     {
@@ -68,14 +68,14 @@ export default function TermsPage() {
       id: "ip",
       title: "8. Propriété intellectuelle",
       icon: FileText,
-      content: `Tous les contenus du site (textes, images, logos, codes) sont la propriété d'E·Doto ou de ses partenaires.
+      content: `Tous les contenus du site (textes, images, logos, codes) sont la propriété d'E.doto ou de ses partenaires.
         Toute reproduction sans autorisation est interdite.`,
     },
     {
       id: "liability",
       title: "9. Limitation de responsabilité",
       icon: AlertTriangle,
-      content: `Dans la mesure permise par la loi, E·Doto Family ne pourra être tenu responsable des dommages indirects, perte de profit ou préjudice découlant de l'utilisation du site.`,
+      content: `Dans la mesure permise par la loi, E.doto family ne pourra être tenu responsable des dommages indirects, perte de profit ou préjudice découlant de l'utilisation du site.`,
     },
     {
       id: "law",
@@ -112,7 +112,7 @@ export default function TermsPage() {
           transition={{ delay: 0.15, duration: 0.6 }}
           className="mt-4 text-gray-600 max-w-2xl mx-auto"
         >
-          Veuillez lire attentivement ces conditions. Elles régissent votre accès aux services et produits fournis par E·Doto Family.
+          Veuillez lire attentivement ces conditions. Elles régissent votre accès aux services et produits fournis par E.doto family.
         </motion.p>
 
         <div className="mt-4 inline-flex items-center gap-3 text-sm text-gray-500 bg-white/60 backdrop-blur-md px-4 py-2 rounded-full border border-[#ffd6e8]/60 shadow-sm">
@@ -126,7 +126,7 @@ export default function TermsPage() {
         <aside className="lg:col-span-1">
           <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 border border-[#ffd6e8]/60 shadow-sm sticky top-6">
             <p className="text-gray-600 mb-4">
-              Ces conditions organisent la relation entre E·Doto Family et ses utilisateurs. Elles expliquent vos droits et responsabilités.
+              Ces conditions organisent la relation entre E.doto family et ses utilisateurs. Elles expliquent vos droits et responsabilités.
             </p>
 
             <nav className="mt-4">

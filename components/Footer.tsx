@@ -173,7 +173,7 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                     {/* Bottom */}
                     <div className="border-t border-slate-100 pt-8 text-center">
                         <p className="text-slate-400 text-sm">
-                            © 2025 E-Doto Family. Tous droits réservés.
+                            © 2025 E.doto family. Tous droits réservés.
                         </p>
                     </div>
                 </div>

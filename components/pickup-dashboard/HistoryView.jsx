@@ -64,11 +64,11 @@ export default function HistoryView({ period, date, onPeriodChange, search, refr
                                                 <Badge tone={w.type === "kit" ? "rose" : "ink"}>{w.type === "kit" ? "Kit" : "Commande"}</Badge>
                                                 <span className="text-sm text-[#1F1B16] truncate">{w.reference}</span>
                                             </div>
-                                            <p className="text-xs text-[#9A8E80] mt-1 truncate">{w.customer || "—"} · {dateTime(w.withdrawn_at)}</p>
+                                            <p className="text-xs text-[#9A8E80] mt-1 truncate">{w.customer || "Client non renseigné"} · {dateTime(w.withdrawn_at)}</p>
                                         </div>
                                         <div className="text-right shrink-0">
-                                            <p className="text-sm text-[#1F1B16]">{w.amount === null ? "—" : fcfa(w.amount)}</p>
-                                            <p className="text-xs text-[#3F6B45] mt-0.5">{w.commission === null ? "—" : `+${fcfa(w.commission)}`}</p>
+                                            <p className="text-sm text-[#1F1B16]">{w.amount === null ? "Kit gratuit" : fcfa(w.amount)}</p>
+                                            <p className="text-xs text-[#3F6B45] mt-0.5">{w.commission === null ? "Non calculée" : `+${fcfa(w.commission)}`}</p>
                                         </div>
                                     </li>
                                 ))}
@@ -90,9 +90,9 @@ export default function HistoryView({ period, date, onPeriodChange, search, refr
                                             <td className="px-6 py-3.5 text-[#7A6E62] whitespace-nowrap">{dateTime(w.withdrawn_at)}</td>
                                             <td className="px-6 py-3.5"><Badge tone={w.type === "kit" ? "rose" : "ink"}>{w.type === "kit" ? "Kit" : "Commande"}</Badge></td>
                                             <td className="px-6 py-3.5 text-[#1F1B16]">{w.reference}</td>
-                                            <td className="px-6 py-3.5 text-[#1F1B16]">{w.customer || "—"}</td>
-                                            <td className="px-6 py-3.5 text-right text-[#1F1B16]">{w.amount === null ? "—" : fcfa(w.amount)}</td>
-                                            <td className="px-6 py-3.5 text-right text-[#3F6B45]">{w.commission === null ? "—" : fcfa(w.commission)}</td>
+                                            <td className="px-6 py-3.5 text-[#1F1B16]">{w.customer || "Client non renseigné"}</td>
+                                            <td className="px-6 py-3.5 text-right text-[#1F1B16]">{w.amount === null ? "Kit gratuit" : fcfa(w.amount)}</td>
+                                            <td className="px-6 py-3.5 text-right text-[#3F6B45]">{w.commission === null ? "Non calculée" : fcfa(w.commission)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -100,7 +100,7 @@ export default function HistoryView({ period, date, onPeriodChange, search, refr
                             </>
                         )}
                     </Card>
-                    <p className="text-xs text-[#9A8E80] mt-3">« — » : retrait antérieur à la mise en place des commissions.</p>
+                    <p className="text-xs text-[#9A8E80] mt-3">« Non calculée » : retrait antérieur à la mise en place des commissions.</p>
                 </>
             )}
         </div>

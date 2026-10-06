@@ -210,7 +210,7 @@ export default function DeliveryChoiceStep({ productsTotal, onBack, onConfirm, s
                 {mode === "CUSTOM" && (
                     <div className="flex justify-between text-gray-600">
                         <span>Livraison</span>
-                        <span>{quote.status === "ok" ? fcfa(fee) : "—"}</span>
+                        <span>{quote.status === "ok" ? fcfa(fee) : "Calcul en cours"}</span>
                     </div>
                 )}
                 <div className="flex justify-between text-base font-semibold">

@@ -75,13 +75,13 @@ export function formatWithdrawals(n) {
 }
 
 export function formatDistance(m) {
-    if (m == null || !Number.isFinite(m)) return "—";
+    if (m == null || !Number.isFinite(m)) return "Distance inconnue";
     if (m < 1000) return `${Math.max(0, Math.round(m / 10) * 10)} m`;
     return `${(m / 1000).toFixed(m < 10000 ? 1 : 0).replace(".", ",")} km`;
 }
 
 export function formatDuration(s) {
-    if (s == null || !Number.isFinite(s)) return "—";
+    if (s == null || !Number.isFinite(s)) return "Durée inconnue";
     const min = Math.max(1, Math.round(s / 60));
     if (min < 60) return `${min} min`;
     return `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, "0")}`;

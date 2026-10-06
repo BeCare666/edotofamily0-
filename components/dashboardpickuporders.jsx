@@ -243,7 +243,7 @@ export default function DashboardPickupCampaigns({ setView }) {
                 throw new Error(msg);
 
             }
-            toast.success("OTP validé — commande marquée comme livrée");
+            toast.success("OTP validé : commande marquée comme livrée");
             setOtp("");
             setSelectedOrder(null);
             await loadOrders();

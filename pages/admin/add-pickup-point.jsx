@@ -85,7 +85,7 @@ export default function AddPickUpPointPage() {
                 <motion.div
                     className="absolute -top-14 left-1/2 -translate-x-1/2 bg-white p-3 rounded-full shadow-lg border border-white/40"
                 >
-                    <Image src={logo} alt="E·Doto logo" width={70} height={70} className="rounded-full" />
+                    <Image src={logo} alt="E.doto logo" width={70} height={70} className="rounded-full" />
                 </motion.div>
 
                 <h1 className="text-2xl font-bold text-center text-[#0F172A]">

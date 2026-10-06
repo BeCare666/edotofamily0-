@@ -14,9 +14,9 @@ export const startMoment = (c) => (beninDay(c.date_start) ? new Date(`${beninDay
 export const endMoment = (c) => (beninDay(c.date_end) ? new Date(`${beninDay(c.date_end)}T23:59:59+01:00`) : null);
 
 export const longDate = (v) =>
-    beninDay(v) ? new Date(`${beninDay(v)}T12:00:00+01:00`).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "—";
+    beninDay(v) ? new Date(`${beninDay(v)}T12:00:00+01:00`).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "Non définie";
 export const shortDate = (v) =>
-    beninDay(v) ? new Date(`${beninDay(v)}T12:00:00+01:00`).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" }) : "—";
+    beninDay(v) ? new Date(`${beninDay(v)}T12:00:00+01:00`).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" }) : "Non définie";
 
 export const nf = (n) => Math.round(Number(n) || 0).toLocaleString("fr-FR");
 

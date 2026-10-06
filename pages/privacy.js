@@ -11,7 +11,7 @@ export default function PrivacyPage() {
     {
       title: "Responsable du traitement",
       text: `Le responsable du traitement des données collectées sur la plateforme edotofamily.com est :
-SODINYESSI Sènou Gérard PDG de BeCare, la startup E-doto Family
+SODINYESSI Sènou Gérard PDG de BeCare, la startup E.doto family
 Email : becare.fr.ge@fmail.com
 Téléphone : +229 01 67698191
 Ville : Cotonou, République du Bénin.`,
@@ -51,10 +51,10 @@ activité du compte utilisateur, sauf obligation légale contraire.`,
       text: `Certaines données peuvent être traitées par des prestataires
 techniques nécessaires au fonctionnement du service :
 
-LWS – hébergement du site web
-TiDB Cloud – gestion de la base de données
-Cloudinary – stockage et gestion des images
-Brevo – envoi d’emails transactionnels
+LWS : hébergement du site web
+TiDB Cloud : gestion de la base de données
+Cloudinary : stockage et gestion des images
+Brevo : envoi d’emails transactionnels
 
 Ces prestataires agissent en qualité de sous-traitants.`,
     },
@@ -98,8 +98,8 @@ dans l’Union Européenne ou aux États-Unis.`,
           transition={{ delay: 0.3, duration: 1 }}
           className="text-gray-600 text-lg leading-relaxed"
         >
-          Chez <span className="font-semibold text-[#FF6EA9]">E·Doto Family</span>,
-          la protection de vos données personnelles n’est pas qu’une obligation —
+          Chez <span className="font-semibold text-[#FF6EA9]">E.doto family</span>,
+          la protection de vos données personnelles n’est pas qu’une obligation :
           c’est un engagement d’amour, de respect et de transparence.
         </motion.p>
       </section>
@@ -206,7 +206,7 @@ dans l’Union Européenne ou aux États-Unis.`,
         >
           “La confiance est le premier soin que nous offrons à nos utilisateurs.”
           <footer className="mt-4 text-sm text-gray-500">
-            — L’équipe E·Doto Family
+            L’équipe E.doto family
           </footer>
         </motion.blockquote>
       </section>

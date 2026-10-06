@@ -96,7 +96,7 @@ export default function PickupDashboardPage() {
     return (
         <>
             <Head>
-                <title>Dashboard point de retrait — E·Doto</title>
+                <title>Dashboard point de retrait · E.doto</title>
             </Head>
             <Shell
                 me={me}

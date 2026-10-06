@@ -40,7 +40,7 @@ export default function CookieConsent() {
                 </h2>
                 <p className="text-sm">
                     Nous utilisons des cookies pour assurer le bon fonctionnement du site
-                    et améliorer votre expérience sur <b>E·Doto Family</b>.
+                    et améliorer votre expérience sur <b>E.doto family</b>.
                 </p>
 
                 <div className="flex items-center gap-3 mt-3">

@@ -61,7 +61,7 @@ export default function OrdersView({ search, refreshKey, onOpen }) {
                                 </div>
                                 <div className="text-right shrink-0 hidden sm:block">
                                     <p className="text-sm text-[#1F1B16]">{fcfa(o.products_amount)}</p>
-                                    {o.withdrawn && <p className="text-xs text-[#3F6B45]">{o.commission_amount === null ? "Commission —" : `Commission ${fcfa(o.commission_amount)}`}</p>}
+                                    {o.withdrawn && <p className="text-xs text-[#3F6B45]">{o.commission_amount === null ? "Commission non calculée" : `Commission ${fcfa(o.commission_amount)}`}</p>}
                                 </div>
                                 <ChevronRight size={18} className="text-[#B8AC9E] shrink-0" />
                             </button>

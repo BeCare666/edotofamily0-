@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 // Graphiques des dashboards (aucune bibliothèque) : animés à l'apparition, info-bulle au survol,
-// au toucher (mobile) et au clavier. Palette : brun profond, rose E·Doto, sauge, sable.
+// au toucher (mobile) et au clavier. Palette : brun profond, rose E.doto, sauge, sable.
 export const PALETTE = { ink: "#1F1B16", rose: "#FF6EA9", roseDeep: "#C2185B", sage: "#3F6B45", sand: "#C9A96E", grid: "#EFE8DE", muted: "#9A8E80" };
 
 // Passe à true juste après le premier affichage : déclenche les transitions CSS depuis zéro

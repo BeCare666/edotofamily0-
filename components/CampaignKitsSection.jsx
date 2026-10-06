@@ -82,7 +82,7 @@ export default function CampaignKitsSection() {
                                 <div>
                                     <p className="font-semibold text-[#0F172A]">{reg.campaign_title}</p>
                                     <p className="text-sm text-gray-500">
-                                        Point de retrait : {reg.pickup_center_name || "—"}
+                                        Point de retrait : {reg.pickup_center_name || "Non renseigné"}
                                         {reg.campaign_location ? ` · ${reg.campaign_location}` : ""}
                                     </p>
                                 </div>

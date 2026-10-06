@@ -92,11 +92,11 @@ export default function RegisterPage() {
                     transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 1.6, ease: "easeInOut" }}
                     className="absolute -top-14 left-1/2 -translate-x-1/2 bg-white pt-2.5 pr-2 pb-2.5 pl-2 rounded-full shadow-lg border border-white/40"
                 >
-                    <Image src={logo} alt="E-Doto logo" width={70} height={70} className="rounded-full object-cover" />
+                    <Image src={logo} alt="E.doto logo" width={70} height={70} className="rounded-full object-cover" />
                 </motion.div>
 
                 <h1 className="text-2xl font-bold text-[#0F172A] mt-2 text-center">
-                    <span className="text-[#FF6EA9]">E·Doto</span> Family
+                    <span className="text-[#FF6EA9]">E.doto</span> Family
                 </h1>
                 <strong className="text-black mt-2 mb-4 text-sm text-center item-center flex gap-2 justify-center">
                     Créez votre compte

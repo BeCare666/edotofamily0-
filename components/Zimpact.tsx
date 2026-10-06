@@ -1,66 +1,91 @@
 "use client";
 
-import { JSX, useEffect, useState } from "react";
-import { Users, MapPin, Briefcase } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Reveal, { PhotoFrame, photoClass } from "./home/Reveal";
+import santePhoto from "../public/images/sante1800.jpg";
 
+// Refonte du 06/10/2026 : bandeau photo, puis très grands chiffres ; le compteur démarre
+// quand les chiffres deviennent visibles. Chiffres et textes inchangés.
 interface Stat {
     value: number;
     label: string;
-    icon: JSX.Element;
     suffix?: string; // pour "+", etc.
 }
 
 export default function SocialProof() {
     const stats: Stat[] = [
-        { value: 12000, label: "jeunes accompagnés d’ici 2027", icon: <Users className="w-10 h-10 text-pink-600" />, suffix: "+" },
-        { value: 140, label: "points de retrait partenaires d’ici 2027", icon: <MapPin className="w-10 h-10 text-pink-600" />, suffix: "+" },
-        { value: 25, label: "entreprises engagées en RSE d’ici 2027", icon: <Briefcase className="w-10 h-10 text-pink-600" />, suffix: "+" },
+        { value: 12000, label: "jeunes accompagnés d’ici 2027", suffix: "+" },
+        { value: 140, label: "points de retrait partenaires d’ici 2027", suffix: "+" },
+        { value: 25, label: "entreprises engagées en RSE d’ici 2027", suffix: "+" },
     ];
 
+    const ref = useRef<HTMLDListElement | null>(null);
     const [counts, setCounts] = useState<number[]>(stats.map(() => 0));
 
     useEffect(() => {
-        const duration = 1500; // durée de l'animation en ms
-        const start = performance.now();
-
-        function animate(time: number) {
-            const progress = Math.min((time - start) / duration, 1);
-            const newCounts = stats.map((stat) => Math.floor(stat.value * progress));
-            setCounts(newCounts);
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            }
+        const el = ref.current;
+        if (!el) return;
+        let raf = 0;
+        const run = () => {
+            const duration = 2000;
+            const start = performance.now();
+            const animate = (time: number) => {
+                const p = Math.min((time - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - p, 3);
+                setCounts(stats.map((s) => Math.floor(s.value * eased)));
+                if (p < 1) raf = requestAnimationFrame(animate);
+            };
+            raf = requestAnimationFrame(animate);
+        };
+        if (typeof IntersectionObserver === "undefined") {
+            run();
+            return () => cancelAnimationFrame(raf);
         }
-
-        requestAnimationFrame(animate);
+        const io = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    run();
+                    io.disconnect();
+                }
+            },
+            { threshold: 0.3 },
+        );
+        io.observe(el);
+        return () => {
+            io.disconnect();
+            cancelAnimationFrame(raf);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
-        <section className="max-w-6xl mx-auto px-6 py-16">
-            {/* Title */}
-            <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900">
-                    Notre objectif
-                </h2>
-                <p className="text-slate-500 max-w-2xl mx-auto mt-3">
-                    Aligné avec les standards du Ministère de la Santé et de ses partenaires
-                </p>
-            </div>
+        <section className="bg-[#FCFAF8]">
+            <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:py-36">
+                <Reveal className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end">
+                    <h2 className="text-[44px] font-extralight leading-none tracking-[-0.04em] text-[#161412] sm:text-[64px]">Notre objectif</h2>
+                    <p className="max-w-md text-[16px] leading-[1.8] text-[#6B645D]">
+                        Aligné avec les standards du Ministère de la Santé et de ses partenaires
+                    </p>
+                </Reveal>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                {stats.map((stat, i) => (
-                    <div
-                        key={i}
-                        className="flex flex-col items-center justify-center gap-4 bg-white rounded-3xl p-10 shadow-lg hover:shadow-2xl transition duration-300"
-                    >
-                        <div className="mb-2">{stat.icon}</div>
-                        <p className="text-4xl md:text-5xl font-extrabold text-slate-900">
-                            {counts[i].toLocaleString()} {stat.suffix || ""}
-                        </p>
-                        <p className="text-lg md:text-xl text-slate-600">{stat.label}</p>
-                    </div>
-                ))}
+                <Reveal delay={0.1} className="mt-14">
+                    <PhotoFrame className="aspect-[16/7] sm:aspect-[16/5]">
+                        <Image src={santePhoto} alt="" fill placeholder="blur" sizes="(min-width: 1280px) 1216px, 100vw" className={photoClass} />
+                    </PhotoFrame>
+                </Reveal>
+
+                <dl ref={ref} className="mt-4 grid grid-cols-[minmax(0,1fr)] md:grid-cols-3">
+                    {stats.map((stat, i) => (
+                        <div key={stat.label} className="border-b border-[#ECE6E0] py-12 md:border-b-0 md:border-l md:px-10 md:first:border-l-0 md:first:pl-0">
+                            <dd className="text-[76px] font-extralight leading-none tracking-[-0.05em] tabular-nums text-[#161412] sm:text-[96px]">
+                                {counts[i].toLocaleString("fr-FR")}
+                                <span className="font-light text-[#D6457F]">{stat.suffix || ""}</span>
+                            </dd>
+                            <dt className="mt-5 max-w-[16rem] text-[15px] leading-[1.7] text-[#6B645D]">{stat.label}</dt>
+                        </div>
+                    ))}
+                </dl>
             </div>
         </section>
     );

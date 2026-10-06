@@ -100,7 +100,7 @@ export default function SponsorShell({ sponsor, view, viewKey, onView, search, o
             onView={onView}
             viewKey={viewKey || view}
             storageKey="edoto:sponsor-sidebar"
-            footerText="E·Doto Family — Espace sponsor"
+            footerText="E.doto family · Espace sponsor"
             search={
                 <div className="relative flex-1 min-w-0 max-w-xl">
                     <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9A8E80]" aria-hidden="true" />

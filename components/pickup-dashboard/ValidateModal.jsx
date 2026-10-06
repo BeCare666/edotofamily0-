@@ -85,7 +85,7 @@ export default function ValidateModal({ item, onClose, onDone }) {
                     </div>
                     <div>
                         <dt className="text-[#9A8E80] text-xs uppercase tracking-wider">{isKit ? "Ville" : "Montant des produits"}</dt>
-                        <dd className="text-[#1F1B16] mt-1">{isKit ? d.city || "—" : fcfa(d.products_amount)}</dd>
+                        <dd className="text-[#1F1B16] mt-1">{isKit ? d.city || "Non renseignée" : fcfa(d.products_amount)}</dd>
                     </div>
                     <div className="col-span-2">
                         <dt className="text-[#9A8E80] text-xs uppercase tracking-wider">État</dt>
@@ -93,9 +93,9 @@ export default function ValidateModal({ item, onClose, onDone }) {
                             {withdrawn ? (
                                 <Badge tone="ok">Remis le {dateTime(isKit ? d.picked_up_at : d.delivered_at)}</Badge>
                             ) : codeAlreadyValidated ? (
-                                <Badge tone="wait">Code déjà validé — retrait à enregistrer</Badge>
+                                <Badge tone="wait">Code déjà validé : retrait à enregistrer</Badge>
                             ) : expired ? (
-                                <Badge tone="off">Code expiré — le client doit en générer un nouveau</Badge>
+                                <Badge tone="off">Code expiré : le client doit en générer un nouveau</Badge>
                             ) : (
                                 <Badge tone="wait">En attente du client</Badge>
                             )}

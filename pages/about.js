@@ -28,7 +28,7 @@ export default function AProposPage() {
           transition={{ delay: 0.4, duration: 1 }}
           className="mt-6 text-gray-600 max-w-xl text-lg"
         >
-          Edoto Family propose des produits naturels et de qualité pour la fertilité, la grossesse, la maternité et la santé des femmes.
+          E.doto family propose des produits naturels et de qualité pour la fertilité, la grossesse, la maternité et la santé des femmes.
         </motion.p>
 
         {/* Floating decorative orbs — version premium visible */}
@@ -101,7 +101,7 @@ export default function AProposPage() {
           <Droplet size={28} className="text-[#FF6EA9] mb-3" />
           <h2 className="text-2xl font-semibold mb-3">Soins & bien-être</h2>
           <p className="max-w-lg text-gray-600">
-            De la peau à l’esprit, E·Doto imagine une beauté vivante, sensorielle, en harmonie avec les cycles naturels du corps.
+            De la peau à l’esprit, E.doto imagine une beauté vivante, sensorielle, en harmonie avec les cycles naturels du corps.
           </p>
         </motion.div>
       </section>
@@ -115,7 +115,7 @@ export default function AProposPage() {
           className="relative z-10"
         >
           <h3 className="text-3xl font-semibold mb-4">
-            Explorez l’univers <span className="text-[#FF6EA9]">E·Doto</span>
+            Explorez l’univers <span className="text-[#FF6EA9]">E.doto</span>
           </h3>
           <p className="text-gray-600 max-w-md mx-auto mb-8">
             Des soins, des émotions, des cycles. Découvrez une nouvelle approche du bien-être féminin.

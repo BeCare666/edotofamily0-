@@ -78,11 +78,11 @@ export default function OverviewView({ period, date, onPeriodChange, refreshKey,
                                         <li key={`${w.type}-${w.id}`} className="py-3 flex items-center justify-between gap-3">
                                             <div className="min-w-0">
                                                 <p className="text-sm text-[#1F1B16] truncate">{w.reference}</p>
-                                                <p className="text-xs text-[#9A8E80] truncate">{w.customer || "—"} · {dateTime(w.withdrawn_at)}</p>
+                                                <p className="text-xs text-[#9A8E80] truncate">{w.customer || "Client non renseigné"} · {dateTime(w.withdrawn_at)}</p>
                                             </div>
                                             <div className="text-right shrink-0">
                                                 <Badge tone={w.type === "kit" ? "rose" : "ink"}>{w.type === "kit" ? "Kit" : "Commande"}</Badge>
-                                                <p className="text-xs text-[#3F6B45] mt-1">{w.commission === null ? "—" : `+${fcfa(w.commission)}`}</p>
+                                                <p className="text-xs text-[#3F6B45] mt-1">{w.commission === null ? "Commission non calculée" : `+${fcfa(w.commission)}`}</p>
                                             </div>
                                         </li>
                                     ))}

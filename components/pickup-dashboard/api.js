@@ -42,9 +42,9 @@ export const fcfa = (n) => `${Math.round(Number(n) || 0).toLocaleString("fr-FR")
 // Dates renvoyées en UTC par l'API ; affichées à l'heure du Bénin
 const TZ = "Africa/Porto-Novo";
 export const dateTime = (iso) =>
-    iso ? new Date(iso).toLocaleString("fr-FR", { timeZone: TZ, day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
+    iso ? new Date(iso).toLocaleString("fr-FR", { timeZone: TZ, day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "Date non renseignée";
 export const dateOnly = (iso) =>
-    iso ? new Date(iso).toLocaleDateString("fr-FR", { timeZone: TZ, day: "2-digit", month: "short", year: "numeric" }) : "—";
+    iso ? new Date(iso).toLocaleDateString("fr-FR", { timeZone: TZ, day: "2-digit", month: "short", year: "numeric" }) : "Date non renseignée";
 
 export const isExpired = (iso) => !!iso && new Date(iso).getTime() < Date.now();
 

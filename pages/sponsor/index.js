@@ -28,7 +28,7 @@ export default function SponsorPage() {
             .then(setSponsor)
             .catch((e) => {
                 if (e.status === 401) router.replace("/login");
-                else setDenied(e.status === 403 ? "Cet espace est réservé aux sponsors d’E·Doto Family." : e.message);
+                else setDenied(e.status === 403 ? "Cet espace est réservé aux sponsors d’E.doto family." : e.message);
             });
     }, [router]);
 
@@ -76,7 +76,7 @@ export default function SponsorPage() {
 
     return (
         <>
-            <Head><title>Espace sponsor — E·Doto</title></Head>
+            <Head><title>Espace sponsor · E.doto</title></Head>
             <SponsorShell sponsor={sponsor} view={view} viewKey={view === "campaign" ? `campaign-${campaignId}` : view} onView={changeView} search={searchInput} onSearch={setSearchInput} notifications={notifications}>
                 {view === "home" && <HomeView onOpenCampaign={openCampaign} />}
                 {view === "campaigns" && <CampaignsView search={search} onOpenCampaign={openCampaign} />}

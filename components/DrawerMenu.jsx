@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import logo from "../public/logo/favicon.png"
+import BrandMark from "./BrandMark"
 import { useAuthContext } from "../context/AuthContext";
 import GoogleFormDrawer from "./GoogleFormDrawer";
 import toast from "react-hot-toast"
@@ -95,16 +95,9 @@ export default function DrawerMenu({ isOpen, onClose }) {
       >
         {/* HEADER */}
         <div className="flex items-center justify-between mb-10">
-          <div
-            className="flex-shrink-0 flex items-center cursor-pointer gap-2"
-          >
-            <div className="relative w-12 p-3 h-12  overflow-hidden  ring-1 ring-white">
-              <Image src={logo} alt="E·Doto" fill className="object-cover" />
-            </div>
-
-            <h1 className="text-2xl font-bold text-[#0F172A] mt-2 text-center">
-              <span className="text-[#FF6EA9]">E·Doto</span> Family
-            </h1>
+          {/* Même logo que l'en-tête et le pied de page */}
+          <div className="flex-shrink-0 flex items-center">
+            <BrandMark />
           </div>
 
           {/* AVATAR UTILISATEUR */}
@@ -270,7 +263,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
             ))}
           </div>
           <p className="text-[11px] mt-6 text-gray-400">
-            © {new Date().getFullYear()} E·Doto Family — Le bien-être de la jeunesse.
+            © {new Date().getFullYear()} E.doto family. Le bien-être de la jeunesse.
           </p>
         </div>
       </motion.aside >

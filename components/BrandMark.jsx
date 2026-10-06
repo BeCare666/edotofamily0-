@@ -1,8 +1,8 @@
 import Image from "next/image";
 import logo from "../public/logo/favicon.png";
 
-// Logo E·Doto Family commun à l'en-tête et au pied de page : emblème + nom compact
-// (« E·Doto » en serif à dégradé rose, « FAMILY » en petites capitales espacées).
+// Logo E.doto family commun à l'en-tête, au pied de page et au menu mobile : emblème + nom
+// (« E.doto » à dégradé rose, « family » en petites lettres espacées). Police unique du site.
 export default function BrandMark({ size = "md", className = "" }) {
   const lg = size === "lg";
   return (
@@ -16,10 +16,10 @@ export default function BrandMark({ size = "md", className = "" }) {
             lg ? "text-[28px]" : "text-[23px]"
           }`}
         >
-          E·Doto
+          E.doto
         </span>
-        <span className={`mt-[3px] font-poppins font-medium uppercase text-slate-500 ${lg ? "text-[9.5px] tracking-[0.5em]" : "text-[8.5px] tracking-[0.46em]"}`}>
-          Family
+        <span className={`mt-[3px] font-poppins font-medium text-slate-500 ${lg ? "text-[11px] tracking-[0.42em]" : "text-[10px] tracking-[0.38em]"}`}>
+          family
         </span>
       </span>
     </span>

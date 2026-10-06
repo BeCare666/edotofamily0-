@@ -383,7 +383,7 @@ export default function CategoryPage() {
   };
   const priceChip =
     minPrice !== "" && maxPrice !== ""
-      ? `${formatPrice(minPrice)} – ${formatPrice(maxPrice)} FCFA`
+      ? `${formatPrice(minPrice)} à ${formatPrice(maxPrice)} FCFA`
       : minPrice !== ""
         ? `Dès ${formatPrice(minPrice)} FCFA`
         : maxPrice !== ""
@@ -449,7 +449,7 @@ export default function CategoryPage() {
             value={minPriceInput} onChange={(e) => setMinPriceInput(e.target.value)}
             className="w-full min-w-0 px-3.5 py-2.5 rounded-xl border border-[#EDE6DC] bg-white text-sm text-[#1F1B16] placeholder:text-[#B8AC9E] focus:outline-none focus:border-[#D8CFC3] focus:ring-2 focus:ring-[#FF6EA9]/20"
           />
-          <span className="text-[#B8AC9E]">—</span>
+          <span className="text-[#B8AC9E]">à</span>
           <input
             type="number" min={0} inputMode="numeric" placeholder="Max" aria-label="Prix maximum"
             value={maxPriceInput} onChange={(e) => setMaxPriceInput(e.target.value)}
@@ -848,7 +848,7 @@ export default function CategoryPage() {
 
 /* small helpers */
 function formatPrice(p) {
-  if (p == null) return "—";
+  if (p == null) return "Prix non disponible";
   // show integer FCFA
   return Math.round(p).toLocaleString("fr-FR");
 }

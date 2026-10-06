@@ -17,7 +17,7 @@ export default function FeexPayModal({ payment, onClose }) {
                     reference: payment.reference,
                     amount: payment.amount,
                     currency: payment.currency || "XOF",
-                    description: payment.description || "Paiement commande e-doto",
+                    description: payment.description || "Paiement commande E.doto",
                     mode: payment.mode || "LIVE",
 
                     // Callback succès/erreur

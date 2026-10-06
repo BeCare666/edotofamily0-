@@ -91,12 +91,12 @@ export default function RegistrationSuccessPage() {
                         <>
                             Merci d’avoir confirmé votre adresse email.
                             <br /><br />
-                            Votre compte <span className="font-semibold text-slate-800">E-Doto Family</span> est maintenant actif
+                            Votre compte <span className="font-semibold text-slate-800">E.doto family</span> est maintenant actif
                             et prêt à être utilisé en toute confidentialité.
                         </>
                     ) : (
                         <>
-                            Votre compte <span className="font-semibold text-slate-800">E-Doto Family</span> a bien été créé.
+                            Votre compte <span className="font-semibold text-slate-800">E.doto family</span> a bien été créé.
                             <br /><br />
                             {email && (
                                 <>
@@ -118,7 +118,7 @@ export default function RegistrationSuccessPage() {
                     transition={{ delay: 0.45, duration: 0.6 }}
                     className="text-slate-600 text-sm md:text-base leading-relaxed"
                 >
-                    Votre inscription sur <span className="font-semibold text-slate-800">E-Doto Family</span> a bien été prise en compte 🎉
+                    Votre inscription sur <span className="font-semibold text-slate-800">E.doto family</span> a bien été prise en compte 🎉
                     <br /><br />
 
                     Afin d’activer votre compte et garantir la sécurité de vos informations,

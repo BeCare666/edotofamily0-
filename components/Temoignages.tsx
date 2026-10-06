@@ -5,7 +5,7 @@ import { Quote } from "lucide-react";
 export default function Testimonials() {
     const testimonials = [
         {
-            text: "Avec E-Doto Family, j’ai récupéré mes produits SSR en 5 minutes, sans gêne.",
+            text: "Avec E.doto family, j’ai récupéré mes produits SSR en 5 minutes, sans gêne.",
             author: "Utilisatrice, Cotonou",
         },
         {
@@ -29,7 +29,7 @@ export default function Testimonials() {
                     Témoignages
                 </h2>
                 <p className="text-slate-500 max-w-2xl mx-auto mt-3">
-                    Ce que nos utilisateurs disent de E-Doto Family
+                    Ce que nos utilisateurs disent de E.doto family
                 </p>
             </div>
 

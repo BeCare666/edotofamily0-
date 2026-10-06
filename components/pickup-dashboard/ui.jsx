@@ -1,6 +1,6 @@
 "use client";
 
-// Éléments d'interface du dashboard (palette naturelle : ivoire, sable, brun profond ; accent rose E·Doto)
+// Éléments d'interface du dashboard (palette naturelle : ivoire, sable, brun profond ; accent rose E.doto)
 export function Card({ className = "", children, ...rest }) {
     return (
         <div className={`bg-white/90 rounded-3xl border border-[#EDE6DC] shadow-[0_1px_2px_rgba(60,40,20,0.04),0_12px_32px_-18px_rgba(60,40,20,0.18)] ${className}`} {...rest}>

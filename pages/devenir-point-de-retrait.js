@@ -129,7 +129,7 @@ export default function PickupPointRegisterPage() {
                 className="relative bg-white/80 backdrop-blur-2xl border border-white/40 mt-7 px-6 sm:px-8 pt-16 pb-10 w-full max-w-lg rounded-2xl shadow-lg"
             >
                 <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white p-3 rounded-full shadow-lg border border-white/40">
-                    <Image src={logo} alt="E·Doto Family" width={64} height={64} className="rounded-full" />
+                    <Image src={logo} alt="E.doto family" width={64} height={64} className="rounded-full" />
                 </div>
 
                 {done ? (

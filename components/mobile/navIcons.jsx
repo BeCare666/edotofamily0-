@@ -1,4 +1,4 @@
-// Icônes de la navigation mobile E·Doto : un seul style (24 px, trait 1,6, bouts arrondis).
+// Icônes de la navigation mobile E.doto : un seul style (24 px, trait 1,6, bouts arrondis).
 // « filled » = version active (remplissage doux + trait).
 const base = {
   xmlns: "http://www.w3.org/2000/svg",

@@ -7,10 +7,13 @@ module.exports = {
   ],
   theme: {
     extend: {
+      // Une seule police sur tout le site (06/10/2026) : Poppins, y compris pour les classes
+      // font-serif, font-sans et font-brand déjà utilisées dans les pages et les tableaux de bord
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],
-        // Nom de marque (logo en-tête et pied de page)
-        brand: ['"Cormorant Garamond"', 'Georgia', 'serif']
+        sans: ['Poppins', 'sans-serif'],
+        serif: ['Poppins', 'sans-serif'],
+        brand: ['Poppins', 'sans-serif']
       },
       colors: {
         edotoPink: '#FF6EA9',

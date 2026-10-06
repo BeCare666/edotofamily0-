@@ -36,7 +36,7 @@ export default function MissionPage() {
           transition={{ delay: 0.4, duration: 1 }}
           className="mt-6 text-gray-600 max-w-2xl mx-auto text-lg"
         >
-          Chez <span className="text-[#FF6EA9] font-medium">E-Doto Family</span>, nous croyons que chaque jeune mérite une santé intime, une maternité et un bien-être entourés de respect, de science et de beauté.
+          Chez <span className="text-[#FF6EA9] font-medium">E.doto family</span>, nous croyons que chaque jeune mérite une santé intime, une maternité et un bien-être entourés de respect, de science et de beauté.
         </motion.p>
       </section>
 
@@ -66,7 +66,7 @@ export default function MissionPage() {
         >
           <img
             src="/images/mission-hero.avif"
-            alt="Mission E-Doto"
+            alt="Mission E.doto"
             className="rounded-2xl w-full h-64 object-cover"
           />
         </motion.div>
@@ -82,7 +82,7 @@ export default function MissionPage() {
         >
           <img
             src="/images/vision.png"
-            alt="Vision E-Doto"
+            alt="Vision E.doto"
             className="rounded-2xl w-full h-64 object-cover"
           />
         </motion.div>

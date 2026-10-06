@@ -38,7 +38,7 @@ export default function ContactPage() {
           className="mt-6 text-gray-600 max-w-xl mx-auto text-lg"
         >
           Une question, une collaboration, un besoin de conseil ?
-          L’équipe <span className="text-[#FF6EA9] font-medium">E·Doto Family</span> vous écoute avec bienveillance.
+          L’équipe <span className="text-[#FF6EA9] font-medium">E.doto family</span> vous écoute avec bienveillance.
         </motion.p>
       </section>
 
@@ -154,7 +154,7 @@ export default function ContactPage() {
       {/* MAP INTEGREE */}
       <div className="relative overflow-hidden mb-5 m-5 border border-[#ffd6e8]/70 bg-white/60 backdrop-blur-md">
         <iframe
-          title="E·Doto Family Location"
+          title="E.doto family Location"
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3971.201178289907!2d2.451!3d6.372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x102357e9d9e56f5b%3A0x80a8db33cfb9f8d!2sAkpakpa%20Kpond%C3%A9hou%2C%20Cotonou%2C%20B%C3%A9nin!5e0!3m2!1sfr!2sbj!4v1707483200000!5m2!1sfr!2sbj"
           width="100%"
           height="500"

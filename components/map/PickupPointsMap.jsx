@@ -149,7 +149,7 @@ export default function PickupPointsMap({ points, userPosition, radiusKm, select
                 .edoto-pin:focus-visible { outline: 2px solid ${COLORS.route}; outline-offset: 2px; border-radius: 6px; }
                 .edoto-me { width: 18px; height: 18px; border-radius: 50%; background: ${COLORS.user}; border: 3px solid #fff;
                     box-shadow: 0 0 0 6px rgba(26,115,232,.2), 0 1px 4px rgba(0,0,0,.3); }
-                .edoto-popup .maplibregl-popup-content { border-radius: 12px; padding: 8px 12px; font: 13px/1.4 Inter, system-ui, sans-serif;
+                .edoto-popup .maplibregl-popup-content { border-radius: 12px; padding: 8px 12px; font: 13px/1.4 Poppins, system-ui, sans-serif;
                     box-shadow: 0 6px 20px rgba(0,0,0,.18); }
             `}</style>
         </div>

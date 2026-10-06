@@ -29,7 +29,7 @@ const Hero: React.FC = () => {
                         </h1>
 
                         <p className="text-sm text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                            E-Doto Family démocratise l’accès aux produits et services de santé sexuelle et reproductive au Bénin.
+                            E.doto family démocratise l’accès aux produits et services de santé sexuelle et reproductive au Bénin.
                             Localisez les campagnes gratuites, commandez vos produits en toute discrétion et récupérez-les dans un point de proximité sans jugement, sans stress et en toute confidentialité.
                         </p>
 

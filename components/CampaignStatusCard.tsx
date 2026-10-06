@@ -32,10 +32,10 @@ const CampaignStatusCard: React.FC<CampaignStatusProps> = ({
   };
 
   const [countdown, setCountdown] = useState({
-    days: "--",
-    hours: "--",
-    minutes: "--",
-    seconds: "--",
+    days: "00",
+    hours: "00",
+    minutes: "00",
+    seconds: "00",
     ended: false,
   });
 

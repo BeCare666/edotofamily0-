@@ -78,7 +78,7 @@ export default function KitsView({ search, refreshKey, onOpen }) {
                                             </p>
                                         </div>
                                         {k.picked_up && (
-                                            <p className="text-xs text-[#3F6B45] shrink-0 hidden sm:block">{k.commission_amount === null ? "Commission —" : `Commission ${fcfa(k.commission_amount)}`}</p>
+                                            <p className="text-xs text-[#3F6B45] shrink-0 hidden sm:block">{k.commission_amount === null ? "Commission non calculée" : `Commission ${fcfa(k.commission_amount)}`}</p>
                                         )}
                                         <ChevronRight size={18} className="text-[#B8AC9E] shrink-0" />
                                     </button>

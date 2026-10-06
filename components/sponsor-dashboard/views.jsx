@@ -9,7 +9,7 @@ import { Bars, CumulativeLines, Donut, Funnel, HBars, PALETTE } from "../dashboa
 
 const STATUS_TONE = { a_venir: "wait", en_cours: "rose", terminee: "ok" };
 const MONTHS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
-const pct = (v) => (v === null || v === undefined ? "—" : `${String(v).replace(".", ",")} %`);
+const pct = (v) => (v === null || v === undefined ? "non calculé" : `${String(v).replace(".", ",")} %`);
 
 function useLoad(path, deps) {
     const [data, setData] = useState(null);
@@ -108,7 +108,7 @@ export function CampaignsView({ search, onOpenCampaign }) {
                                                     <h3 className="font-serif text-lg text-[#1F1B16]">{c.title}</h3>
                                                     <Badge tone={STATUS_TONE[c.status]}>{c.status_label}</Badge>
                                                 </div>
-                                                <p className="text-sm text-[#7A6E62] mt-1">{c.cities.join(", ") || "—"} · {dateOnly(`${c.date_start}T12:00:00Z`)} → {c.date_end ? dateOnly(`${c.date_end}T12:00:00Z`) : "—"}</p>
+                                                <p className="text-sm text-[#7A6E62] mt-1">{c.cities.join(", ") || "Ville non renseignée"} · {dateOnly(`${c.date_start}T12:00:00Z`)} → {c.date_end ? dateOnly(`${c.date_end}T12:00:00Z`) : "date de fin non définie"}</p>
                                                 <div className="mt-5 flex justify-between text-sm"><span className="text-[#7A6E62]">Kits retirés</span><span className="text-[#1F1B16] font-medium">{c.withdrawn} / {c.objective_kits}</span></div>
                                                 <div className="h-2 rounded-full bg-[#F1ECE4] mt-2 overflow-hidden"><div className="dash-grow h-full rounded-full bg-[#FF6EA9]" style={{ width: `${rate}%` }} /></div>
                                                 <div className="mt-4 flex justify-between text-xs text-[#9A8E80]"><span>{c.registrations} inscrit(s)</span><span>Votre contribution : {fcfa(c.contribution)}</span></div>
@@ -155,7 +155,7 @@ export function CampaignView({ id, onBack, onExportsChanged }) {
                         <h1 className="font-serif text-2xl sm:text-3xl text-[#1F1B16]">{c.title}</h1>
                         <Badge tone={STATUS_TONE[c.status]}>{c.status_label}</Badge>
                     </div>
-                    <p className="text-sm text-[#7A6E62] mt-2">{c.cities.join(", ") || "—"} · du {dateOnly(`${c.date_start}T12:00:00Z`)} au {c.date_end ? dateOnly(`${c.date_end}T12:00:00Z`) : "—"} · votre contribution : {fcfa(c.contribution)}</p>
+                    <p className="text-sm text-[#7A6E62] mt-2">{c.cities.join(", ") || "Ville non renseignée"} · du {dateOnly(`${c.date_start}T12:00:00Z`)} au {c.date_end ? dateOnly(`${c.date_end}T12:00:00Z`) : "date de fin non définie"} · votre contribution : {fcfa(c.contribution)}</p>
                 </div>
                 <ExportAction c={c} busy={busy} onRequest={requestExport} />
             </Card>
@@ -165,8 +165,8 @@ export function CampaignView({ id, onBack, onExportsChanged }) {
                 <StatCard label="Inscrits" value={i.registrations} hint={`${i.not_withdrawn} sans retrait`} tone="sand" icon={Megaphone} />
                 <StatCard label="Kits retirés" value={i.withdrawn} hint={`Taux : ${pct(i.withdrawal_rate)} des kits fournis`} tone="rose" icon={Target} />
                 <StatCard label={i.days_remaining === null ? "Délai moyen de retrait" : "Jours restants"}
-                    value={i.days_remaining === null ? (i.average_delay_days === null ? "—" : `${String(i.average_delay_days).replace(".", ",")} j`) : i.days_remaining}
-                    hint={i.days_remaining === null ? "Entre l’inscription et le retrait" : `Délai moyen de retrait : ${i.average_delay_days === null ? "—" : `${String(i.average_delay_days).replace(".", ",")} j`}`}
+                    value={i.days_remaining === null ? (i.average_delay_days === null ? "Aucun retrait" : `${String(i.average_delay_days).replace(".", ",")} j`) : i.days_remaining}
+                    hint={i.days_remaining === null ? "Entre l’inscription et le retrait" : `Délai moyen de retrait : ${i.average_delay_days === null ? "aucun retrait" : `${String(i.average_delay_days).replace(".", ",")} j`}`}
                     tone="sage" icon={i.days_remaining === null ? Clock : CalendarClock} />
             </div>
 
@@ -201,7 +201,7 @@ export function CampaignView({ id, onBack, onExportsChanged }) {
 
 function ExportAction({ c, busy, onRequest }) {
     if (c.export_status === "approved") return <DownloadButton campaignId={c.id} />;
-    if (c.export_status === "pending") return <Badge tone="wait">Export demandé — en attente de validation</Badge>;
+    if (c.export_status === "pending") return <Badge tone="wait">Export demandé : en attente de validation</Badge>;
     if (c.status !== "terminee") return <p className="text-xs text-[#9A8E80] max-w-[220px]">L’export des données sera possible une fois la campagne terminée.</p>;
     return (
         <button onClick={onRequest} disabled={busy} className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#1F1B16] text-white text-sm font-medium disabled:opacity-50">

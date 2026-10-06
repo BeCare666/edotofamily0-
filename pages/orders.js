@@ -215,7 +215,7 @@ export default function OrdersPage() {
     if (values.min_total || values.max_total)
         pills.push({
             k: "amount",
-            label: values.min_total && values.max_total ? `${fcfa(values.min_total)} – ${fcfa(values.max_total)}` : values.min_total ? `≥ ${fcfa(values.min_total)}` : `≤ ${fcfa(values.max_total)}`,
+            label: values.min_total && values.max_total ? `${fcfa(values.min_total)} à ${fcfa(values.max_total)}` : values.min_total ? `≥ ${fcfa(values.min_total)}` : `≤ ${fcfa(values.max_total)}`,
             clear: { min_total: "", max_total: "" },
         });
     const advancedCount = pills.length;
@@ -249,7 +249,7 @@ export default function OrdersPage() {
                             <span className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br ${c.tone} shadow-sm`}>
                                 <c.icon size={19} strokeWidth={1.8} />
                             </span>
-                            <p className="mt-3 text-[26px] font-semibold tabular-nums leading-none text-slate-900">{c.value ?? "—"}</p>
+                            <p className="mt-3 text-[26px] font-semibold tabular-nums leading-none text-slate-900">{c.value ?? "…"}</p>
                             <p className="mt-1.5 text-[13px] font-medium text-slate-700">{c.label}</p>
                             <p className="text-[11px] text-slate-400">{c.sub}</p>
                         </button>
@@ -539,7 +539,7 @@ export default function OrdersPage() {
                                     <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Montant (FCFA)</p>
                                     <div className="flex items-center gap-2">
                                         <input type="number" min={0} inputMode="numeric" placeholder="Min" value={values.min_total} onChange={(e) => set({ min_total: e.target.value })} className="h-11 min-w-0 flex-1 rounded-2xl bg-white px-3 text-sm text-slate-800 ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/50" />
-                                        <span className="text-slate-400">–</span>
+                                        <span className="text-slate-400">à</span>
                                         <input type="number" min={0} inputMode="numeric" placeholder="Max" value={values.max_total} onChange={(e) => set({ max_total: e.target.value })} className="h-11 min-w-0 flex-1 rounded-2xl bg-white px-3 text-sm text-slate-800 ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/50" />
                                     </div>
                                     {facets?.total_range?.max != null && (
