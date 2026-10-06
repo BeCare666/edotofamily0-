@@ -47,7 +47,7 @@ export default function SponsorActivation() {
     const input = "w-full px-4 py-3 rounded-2xl border border-[#E4DBCE] bg-white text-[#1F1B16] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/30";
     return (
         <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center p-6">
-            <Head><title>Activer mon espace sponsor · E.doto</title></Head>
+            <Head><title>Activer mon espace sponsor · E.doto family</title></Head>
             <div className="w-full max-w-md bg-[#FFFDF9] rounded-3xl border border-[#EDE6DC] shadow-xl p-8">
                 <p className="font-serif text-2xl text-[#1F1B16] flex items-center gap-2"><ShieldCheck className="text-[#C2185B]" /> Espace sponsor</p>
                 {done ? (

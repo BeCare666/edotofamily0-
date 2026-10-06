@@ -76,7 +76,7 @@ export default function SponsorPage() {
 
     return (
         <>
-            <Head><title>Espace sponsor · E.doto</title></Head>
+            <Head><title>Espace sponsor · E.doto family</title></Head>
             <SponsorShell sponsor={sponsor} view={view} viewKey={view === "campaign" ? `campaign-${campaignId}` : view} onView={changeView} search={searchInput} onSearch={setSearchInput} notifications={notifications}>
                 {view === "home" && <HomeView onOpenCampaign={openCampaign} />}
                 {view === "campaigns" && <CampaignsView search={search} onOpenCampaign={openCampaign} />}

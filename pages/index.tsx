@@ -38,7 +38,7 @@ export const Home: React.FC<HomeProps> = ({ changeView }) => {
           <div>
             <Reveal>
               <h2 className="text-[44px] font-extralight leading-[1.02] tracking-[-0.04em] text-[#161412] sm:text-[64px]">Nos Services : un univers de soins</h2>
-              <p className="mt-7 max-w-lg text-[16px] leading-[1.8] text-[#6B645D]">E.doto vous accompagne à chaque étape de votre bien-être : de la santé intime à la maternité, avec élégance, innovation et douceur.</p>
+              <p className="mt-7 max-w-lg text-[16px] leading-[1.8] text-[#6B645D]">E.doto family vous accompagne à chaque étape de votre bien-être : de la santé intime à la maternité, avec élégance, innovation et douceur.</p>
             </Reveal>
 
             <div className="mt-14">

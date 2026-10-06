@@ -105,7 +105,7 @@ export default function CourierDeliveryPage() {
         <main className="min-h-screen bg-gradient-to-b from-white to-[#fff5f8] px-4 py-10">
             <div className="max-w-md mx-auto bg-white rounded-3xl border border-gray-100 shadow-xl p-6">
                 <h1 className="text-xl font-bold text-[#0F172A] flex items-center gap-2 mb-4">
-                    <ShieldCheck className="text-[#FF6EA9]" /> Livraison E.doto
+                    <ShieldCheck className="text-[#FF6EA9]" /> Livraison E.doto family
                 </h1>
 
                 {step === "opening" && (

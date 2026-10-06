@@ -108,7 +108,7 @@ export default function ForgotPassword() {
                     }}
                     className="absolute -top-14 left-1/2 -translate-x-1/2 bg-white p-3 rounded-full shadow-lg border border-white/40"
                 >
-                    <Image src={logo} alt="E.doto logo" width={70} height={70} className="rounded-full object-cover" />
+                    <Image src={logo} alt="E.doto family logo" width={70} height={70} className="rounded-full object-cover" />
                 </motion.div>
 
                 <h1 className="text-2xl font-bold text-[#0F172A] text-center">

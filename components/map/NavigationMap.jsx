@@ -583,7 +583,7 @@ export default function NavigationMap({ destLat, destLng, destName, onClose }) {
                 @keyframes edoto-pulse { 0% { transform: scale(1); opacity: .45; } 100% { transform: scale(3.2); opacity: 0; } }
                 .edoto-dest { display: flex; flex-direction: column; align-items: center; cursor: default; }
                 .edoto-dest-label { margin-bottom: 4px; padding: 3px 10px; border-radius: 999px; background: #fff; color: #0F172A;
-                    font: 600 12px/1.4 Poppins, system-ui, sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,.2); white-space: nowrap;
+                    font: 600 12px/1.4 var(--edoto-font); box-shadow: 0 2px 8px rgba(0,0,0,.2); white-space: nowrap;
                     max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
                 @media (prefers-reduced-motion: reduce) { .edoto-user-pulse { animation: none; } }
             `}</style>

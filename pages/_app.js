@@ -1,5 +1,6 @@
 // pages/_app.jsx
 import '../styles/globals.css'
+import '../styles/edoto-font.css' // police unique : en dernier
 import Head from 'next/head'
 import Layout from '../components/Layout'
 import { AuthProvider } from '../context/AuthContext'

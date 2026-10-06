@@ -68,7 +68,7 @@ export default function ObjectifsPage() {
           {
             icon: <Globe className="text-[#FF6EA9]" size={30} />,
             title: "Rayonner à l’échelle africaine",
-            text: "Partager la vision d’E.doto au-delà des frontières, en portant haut la santé et le bien-être féminin."
+            text: "Partager la vision d’E.doto family au-delà des frontières, en portant haut la santé et le bien-être féminin."
           },
           {
             icon: <Sparkles className="text-[#FF6EA9]" size={30} />,

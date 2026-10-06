@@ -7,13 +7,13 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // Une seule police sur tout le site (06/10/2026) : Poppins, y compris pour les classes
-      // font-serif, font-sans et font-brand déjà utilisées dans les pages et les tableaux de bord
+      // Une seule police sur tout le site (06/10/2026) : celle de styles/edoto-font.css
+      // (variable --edoto-font), y compris pour font-serif, font-sans, font-brand et font-poppins
       fontFamily: {
-        poppins: ['Poppins', 'sans-serif'],
-        sans: ['Poppins', 'sans-serif'],
-        serif: ['Poppins', 'sans-serif'],
-        brand: ['Poppins', 'sans-serif']
+        poppins: ['var(--edoto-font)'],
+        sans: ['var(--edoto-font)'],
+        serif: ['var(--edoto-font)'],
+        brand: ['var(--edoto-font)']
       },
       colors: {
         edotoPink: '#FF6EA9',

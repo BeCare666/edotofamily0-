@@ -57,7 +57,7 @@ export default function DashboardFrame({ space, identity, menu, active, onView, 
             >
                 <div className={`pt-8 pb-6 flex items-center justify-between px-7 ${c ? "lg:px-0 lg:justify-center" : ""}`}>
                     <div className={c ? "lg:hidden" : ""}>
-                        <p className="font-serif text-2xl tracking-tight text-white">E.doto</p>
+                        <p className="font-serif text-2xl tracking-tight text-white">E.doto family</p>
                         <p className="text-[11px] uppercase tracking-[0.25em] text-[#B8AC9E] mt-1">{space}</p>
                     </div>
                     <p className={`hidden font-serif text-2xl text-white ${c ? "lg:block" : ""}`} aria-hidden="true">E.</p>
@@ -119,7 +119,7 @@ export default function DashboardFrame({ space, identity, menu, active, onView, 
                 <header className="sticky top-0 z-50 bg-[#FAF7F2]/85 backdrop-blur-xl border-b border-[#EDE6DC]">
                     <div className="px-4 sm:px-8 py-3 sm:py-0 sm:h-20 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-5">
                         <button onClick={() => setOpen(true)} className="lg:hidden w-11 h-11 shrink-0 rounded-2xl bg-[#F6F1EA] flex items-center justify-center text-[#3B342D]" aria-label="Ouvrir le menu" aria-expanded={open}><Menu size={20} /></button>
-                        <p className="sm:hidden font-serif text-xl text-[#1F1B16]">E.doto</p>
+                        <p className="sm:hidden font-serif text-xl text-[#1F1B16]">E.doto family</p>
                         {/* Mobile : la recherche passe sur une 2e ligne, pleine largeur */}
                         <div className="order-last basis-full sm:order-none sm:basis-auto sm:flex-1 flex min-w-0">{search}</div>
                         <div className="ml-auto flex items-center gap-2 sm:gap-3">{actions}</div>

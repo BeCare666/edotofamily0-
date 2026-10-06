@@ -66,7 +66,7 @@ export default function MissionPage() {
         >
           <img
             src="/images/mission-hero.avif"
-            alt="Mission E.doto"
+            alt="Mission E.doto family"
             className="rounded-2xl w-full h-64 object-cover"
           />
         </motion.div>
@@ -82,7 +82,7 @@ export default function MissionPage() {
         >
           <img
             src="/images/vision.png"
-            alt="Vision E.doto"
+            alt="Vision E.doto family"
             className="rounded-2xl w-full h-64 object-cover"
           />
         </motion.div>

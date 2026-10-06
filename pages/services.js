@@ -131,7 +131,7 @@ export default function ServicesPage() {
             <section className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden">
                 <Image
                     src="/images/service-bg.jpg"
-                    alt="E.doto Service"
+                    alt="E.doto family Service"
                     fill
                     className="object-cover opacity-40"
                 />

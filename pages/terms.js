@@ -68,7 +68,7 @@ export default function TermsPage() {
       id: "ip",
       title: "8. Propriété intellectuelle",
       icon: FileText,
-      content: `Tous les contenus du site (textes, images, logos, codes) sont la propriété d'E.doto ou de ses partenaires.
+      content: `Tous les contenus du site (textes, images, logos, codes) sont la propriété d'E.doto family ou de ses partenaires.
         Toute reproduction sans autorisation est interdite.`,
     },
     {

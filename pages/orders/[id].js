@@ -473,7 +473,7 @@ export default function OrderDetailsPage() {
                     {order.pickup_point ? order.pickup_point.name : order.note ? order.note : "Aucun point de retrait"}
                   </p>
                   <p className="mt-0.5 text-[13px] text-[#8A847D]">
-                    {order.pickup_point ? "Point de retrait E.doto" : order.note ? "Lieu personnalisé" : paid ? "Choisissez-le pour recevoir votre commande." : "Disponible après le paiement de la commande."}
+                    {order.pickup_point ? "Point de retrait E.doto family" : order.note ? "Lieu personnalisé" : paid ? "Choisissez-le pour recevoir votre commande." : "Disponible après le paiement de la commande."}
                   </p>
                   {canVisit && (
                     <button onClick={() => setOpenMap(true)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#E2DCD5] px-4 py-3 text-sm font-medium text-[#161412] transition hover:border-[#161412]">

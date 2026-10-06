@@ -204,6 +204,6 @@ body {
 .edoto-zone-dot { width: 10px; height: 10px; border-radius: 9999px; border: 2px solid #fff; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(22, 20, 18, 0.15); }
 .edoto-zone-dot.is-live { background: #D6457F; }
 .edoto-zone-dot.is-soon { background: #6F6A64; }
-.edoto-zone-label { display: flex; flex-direction: column; line-height: 1.1; padding: 5px 9px; border-radius: 8px; background: #fff; color: #161412; font: 600 12px/1.15 Poppins, sans-serif; white-space: nowrap; border: 1px solid #E7E2DC; box-shadow: 0 2px 8px rgba(22, 20, 18, 0.08); text-align: left; }
+.edoto-zone-label { display: flex; flex-direction: column; line-height: 1.1; padding: 5px 9px; border-radius: 8px; background: #fff; color: #161412; font: 600 12px/1.15 var(--edoto-font); white-space: nowrap; border: 1px solid #E7E2DC; box-shadow: 0 2px 8px rgba(22, 20, 18, 0.08); text-align: left; }
 .edoto-zone-label em { font-style: normal; font-weight: 500; font-size: 10px; color: #77716B; margin-top: 2px; }
 .edoto-me { width: 14px; height: 14px; border-radius: 9999px; background: #161412; border: 3px solid #fff; box-shadow: 0 0 0 1px rgba(22, 20, 18, 0.25); }
