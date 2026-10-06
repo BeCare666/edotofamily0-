@@ -32,8 +32,8 @@ export default function MyApp({ Component, pageProps }) {
     pathname === "/forgot-password" ||
     pathname === "/succesregister"
 
-  // Page sans pied de page : « Mes commandes »
-  const hideFooter = pathname === "/orders"
+  // Pages sans pied de page : « Mes commandes » et « Campagnes »
+  const hideFooter = pathname === "/orders" || pathname === "/campaigns"
 
   const isHomePagex =
     pathname === "/" ||

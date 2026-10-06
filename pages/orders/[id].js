@@ -7,20 +7,25 @@ import {
   Package,
   Truck,
   CheckCircle,
+  CheckCircle2,
   XCircle,
   Clock,
   CreditCard,
   MapPin,
   User,
   Loader2,
-  Search,
-  LocateFixed,
+  Check,
+  Wallet,
+  KeyRound,
+  Navigation,
+  PackageCheck,
+  RotateCcw,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import OrderProgressBar from "../../components/OrderProgressBar";
 import PickupPointPicker from "../../components/PickupPointPicker";
-import OrderStepsBar from "../../components/OrderStepsBar";
+import OrderStepsBar, { orderSteps } from "../../components/OrderStepsBar";
 import dynamic from "next/dynamic";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 //import PickupMapModal from "../pickupmap/PickupMapModal";
@@ -28,6 +33,49 @@ const PickupMapModal = dynamic(
   () => import("../../components/pickupmap/PickupMapModal"),
   { ssr: false }
 );
+
+// Libellés identiques à « Mes commandes » (pages/orders.js)
+const ORDER_STATUS = {
+  "order-pending": { label: "En attente", tone: "amber", icon: Clock },
+  "order-processing": { label: "En traitement", tone: "sky", icon: RotateCcw },
+  "order-at-local-facility": { label: "Au point de retrait", tone: "violet", icon: MapPin },
+  "order-out-for-delivery": { label: "En livraison", tone: "violet", icon: Truck },
+  "order-completed": { label: "Retirée / livrée", tone: "green", icon: CheckCircle2 },
+  "order-cancelled": { label: "Annulée", tone: "slate", icon: XCircle },
+  "order-refunded": { label: "Remboursée", tone: "slate", icon: RotateCcw },
+  "order-failed": { label: "Échouée", tone: "red", icon: XCircle },
+};
+const PAYMENT_STATUS = {
+  "payment-success": { label: "Payée", tone: "green" },
+  "payment-pending": { label: "Paiement en attente", tone: "amber" },
+  "payment-processing": { label: "Paiement en cours", tone: "sky" },
+  "payment-failed": { label: "Paiement échoué", tone: "red" },
+  "payment-cash-on-delivery": { label: "Paiement à la livraison", tone: "slate" },
+  "payment-cash": { label: "Espèces", tone: "slate" },
+  "payment-wallet": { label: "Portefeuille", tone: "slate" },
+  "payment-awaiting-for-approval": { label: "En attente de validation", tone: "amber" },
+};
+const TONE = {
+  amber: "bg-amber-50 text-amber-700 ring-amber-200/70",
+  sky: "bg-sky-50 text-sky-700 ring-sky-200/70",
+  violet: "bg-violet-50 text-violet-700 ring-violet-200/70",
+  green: "bg-emerald-50 text-emerald-700 ring-emerald-200/70",
+  slate: "bg-slate-100 text-slate-600 ring-slate-200/70",
+  red: "bg-rose-50 text-rose-700 ring-rose-200/70",
+};
+// Mêmes tons sur fond sombre (carte principale)
+const DARK_TONE = {
+  amber: "bg-amber-400/15 text-amber-200 ring-amber-300/25",
+  sky: "bg-sky-400/15 text-sky-200 ring-sky-300/25",
+  violet: "bg-violet-400/15 text-violet-200 ring-violet-300/25",
+  green: "bg-emerald-400/15 text-emerald-200 ring-emerald-300/25",
+  slate: "bg-white/10 text-white/75 ring-white/15",
+  red: "bg-rose-400/15 text-rose-200 ring-rose-300/25",
+};
+const fcfa = (n) => `${Math.round(Number(n) || 0).toLocaleString("fr-FR")} FCFA`;
+const fmtLong = (d) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+const fmtShortTime = (d) => new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
+const formatDateTime = (d) => d.toLocaleString("fr-FR", { day: "2-digit", month: "long", hour: "2-digit", minute: "2-digit" });
 
 export default function OrderDetailsPage() {
   const router = useRouter();
@@ -201,263 +249,314 @@ export default function OrderDetailsPage() {
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "order-completed":
-        return <CheckCircle className="text-green-500" size={22} />;
-      case "order-processing":
-        return <Clock className="text-blue-500" size={22} />;
-      case "order-out-for-delivery":
-        return <Truck className="text-purple-500" size={22} />;
-      case "order-cancelled":
-        return <XCircle className="text-red-500" size={22} />;
-      default:
-        return <Package className="text-gray-400" size={22} />;
-    }
-  };
-
   if (loading)
     return (
-      <main className="flex items-center justify-center h-screen text-gray-500">
-        <Loader2 className="animate-spin mr-2" /> Chargement de la commande...
+      <main className="min-h-screen bg-[radial-gradient(1200px_500px_at_10%_-10%,#FFE4F0_0%,transparent_60%),radial-gradient(900px_400px_at_100%_0%,#E0F2FE_0%,transparent_55%)] px-4 pt-8">
+        <div className="mx-auto max-w-5xl space-y-4">
+          <div className="h-5 w-40 animate-pulse rounded-full bg-white/80" />
+          <div className="h-56 animate-pulse rounded-[32px] bg-slate-200/70" />
+          <div className="grid gap-4 lg:grid-cols-[1.55fr_1fr]">
+            <div className="h-72 animate-pulse rounded-[28px] bg-white/80" />
+            <div className="h-72 animate-pulse rounded-[28px] bg-white/80" />
+          </div>
+          <p className="flex items-center justify-center gap-2 pt-2 text-sm text-slate-500">
+            <Loader2 size={16} className="animate-spin" /> Chargement de la commande…
+          </p>
+        </div>
       </main>
     );
 
   if (!order)
     return (
-      <main className="flex flex-col items-center justify-center h-screen text-gray-500">
-        <XCircle size={40} className="text-red-400 mb-4" />
-        <p>Commande introuvable</p>
+      <main className="flex min-h-[70vh] flex-col items-center justify-center px-6 text-center">
+        <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-rose-50 text-rose-500">
+          <XCircle size={30} strokeWidth={1.6} />
+        </span>
+        <p className="mt-4 text-[15px] font-semibold text-slate-800">Commande introuvable</p>
+        <button onClick={() => router.push("/orders")} className="mt-5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white">
+          Mes commandes
+        </button>
       </main>
     );
 
+  const st = ORDER_STATUS[order.order_status] || { label: order.order_status || "—", tone: "slate", icon: Package };
+  const pay = PAYMENT_STATUS[order.payment_status] || { label: order.payment_status || "—", tone: "slate" };
+  const StIcon = st.icon;
+  const isCustom = order.delivery_type === "CUSTOM";
+  const products = order.products || [];
+  const itemsTotal = products.reduce((s, p) => s + (Number(p.subtotal) || 0), 0);
+  const itemsCount = products.reduce((s, p) => s + (Number(p.quantity) || 0), 0);
+  const { paid, hasPoint, pointChosen, withdrawn } = orderSteps(order);
+  const stopped = ["order-cancelled", "order-refunded", "order-failed"].includes(order.order_status);
+  const timeline = [
+    { key: "created", label: "Commandée", icon: Package, done: true, date: order.created_at },
+    { key: "paid", label: "Payée", icon: CreditCard, done: paid },
+    { key: "point", label: isCustom ? "Lieu de livraison" : "Point de retrait", icon: isCustom ? Truck : MapPin, done: pointChosen },
+    { key: "out", label: isCustom ? "Livrée" : "Retirée", icon: PackageCheck, done: withdrawn, date: order.delivered_at || order.custom_delivery?.delivered_at },
+  ];
+  const lastDone = timeline.reduce((acc, s, i) => (s.done ? i : acc), 0);
+  const canVisit = hasPoint && !withdrawn && order?.pickup_point?.pickup_lat != null && order?.pickup_point?.pickup_lng != null;
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-white via-[#fff5f8] to-[#ffe4ef] px-4 pt-10 pb-48 sm:pb-36">
-      <div className="max-w-4xl mx-auto bg-white/70 backdrop-blur-2xl border border-white/40  p-6">
-        <div className="flex items-center justify-between mb-8">
+    <main className="min-h-screen bg-[radial-gradient(1200px_500px_at_10%_-10%,#FFE4F0_0%,transparent_60%),radial-gradient(900px_400px_at_100%_0%,#E0F2FE_0%,transparent_55%)] px-4 pb-52 pt-6 sm:px-6 sm:pb-40 sm:pt-10">
+      <div className="mx-auto max-w-5xl">
+        {/* Fil */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-5 flex items-center justify-between">
           <button
-            onClick={() => router.back()}
-            className="flex items-center text-gray-600 hover:text-[#FF6EA9] transition"
+            onClick={() => router.push("/orders")}
+            className="group inline-flex items-center gap-2 rounded-full bg-white/80 py-2 pl-2.5 pr-4 text-[13px] font-medium text-slate-700 ring-1 ring-slate-200/80 backdrop-blur transition hover:text-[#C2185B]"
           >
-            <ArrowLeft size={18} className="mr-2" /> Retour
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 transition group-hover:bg-[#FFE4F0]">
+              <ArrowLeft size={15} />
+            </span>
+            Mes commandes
           </button>
-          <h1 className="text-2xl font-bold text-[#0F172A]">
-            Détails
-          </h1>
-        </div>
-
-        {/* ------------------------------------------------------------------- */}
-        {/* INFOS COMMANDE */}
-        {/* ------------------------------------------------------------------- */}
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <p className="text-sm text-gray-500">Numéro de suivi</p>
-            <p className="font-semibold text-[#0F172A]">{order.tracking_number}</p>
-          </div>
-          <div className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <p className="text-sm text-gray-500">Date</p>
-            <p className="font-semibold">
-              {new Date(order.created_at).toLocaleDateString("fr-FR", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
-          </div>
-          <div className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <p className="text-sm text-gray-500">Statut</p>
-            {order?.order_status && (
-              <div className="flex items-center gap-2 mt-1">
-                {getStatusIcon(order.order_status)}
-                <span className="font-semibold capitalize">
-                  {order.order_status.replace("order-", "").replace(/-/g, " ")}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ------------------------------------------------------------------- **/}
-        {/* PRODUITS */}
-        {/* ------------------------------------------------------------------- */}
-
-        <motion.div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-10">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Package className="text-[#FF6EA9]" /> Produits
-          </h2>
-
-          {order.products?.length > 0 ? (
-            <ul className="divide-y divide-gray-100">
-              {order.products.map((item, index) => (
-                <li
-                  key={index}
-                  className="flex items-center justify-between py-3 flex-wrap"
-                >
-                  <div className="flex items-center gap-3">
-                    {item.image?.[0] ? (
-                      <img
-                        src={item.image[0]}
-                        alt={item.name}
-                        className="w-14 h-14 rounded-xl object-cover border"
-                      />
-                    ) : (
-                      <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400">
-                        <Package size={20} />
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-gray-500">
-                        Qté : {item.quantity} × {item.subtotal.toFixed(2) / item.quantity} FCFA
-                      </p>
-                    </div>
-                  </div>
-
-                  <p className="font-semibold text-[#0F172A]">
-                    {item.subtotal.toFixed(2)} FCFA
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 text-sm">Aucun produit</p>
-          )}
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#E0457F]">Détail de la commande</p>
         </motion.div>
 
-        {/* ------------------------------------------------------------------- */}
-        {/* ADRESSES */}
-        {/* ------------------------------------------------------------------- */}
+        {/* Carte principale */}
+        <motion.section
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden rounded-[32px] bg-slate-950 p-6 text-white shadow-[0_40px_80px_-40px_rgba(15,23,42,0.75)] sm:p-8"
+        >
+          <div className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-[#FF6EA9]/30 blur-[90px]" />
+          <div className="pointer-events-none absolute -bottom-32 -left-20 h-72 w-72 rounded-full bg-sky-400/15 blur-[90px]" />
+          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/50">Commande</p>
+              <h1 className="mt-1.5 break-all text-[26px] font-semibold leading-tight tracking-tight sm:text-[32px]">{order.tracking_number}</h1>
+              <p className="mt-1 text-[13px] text-white/55">
+                Passée le {fmtLong(order.created_at)} · {itemsCount} article{itemsCount > 1 ? "s" : ""}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold ring-1 ${DARK_TONE[st.tone]}`}>
+                  <StIcon size={12} /> {st.label}
+                </span>
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold ring-1 ${DARK_TONE[pay.tone]}`}>
+                  <Wallet size={12} /> {pay.label}
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-white/80 ring-1 ring-white/15">
+                  {isCustom ? <Truck size={12} /> : <MapPin size={12} />} {isCustom ? "Livraison à domicile" : "Point de retrait"}
+                </span>
+              </div>
+            </div>
+            <div className="shrink-0 sm:text-right">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/50">Total</p>
+              <p className="mt-1 text-[34px] font-semibold leading-none tabular-nums sm:text-[40px]">{fcfa(order.total)}</p>
+              {Number(order.delivery_fee) > 0 && <p className="mt-1.5 text-[12px] text-white/50">dont livraison {fcfa(order.delivery_fee)}</p>}
+            </div>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          {order.delivery_type === "CUSTOM" ? (
-            <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <Truck className="text-[#FF6EA9]" /> Livraison à domicile
-              </h2>
-              {order.custom_delivery ? (
-                <>
-                  <p className="text-sm text-gray-700 whitespace-pre-line">{order.custom_delivery.description}</p>
-                  <p className="text-sm text-gray-500 mt-1">Téléphone : {order.custom_delivery.phone}</p>
-                  <p className="text-sm text-gray-500">
-                    Distance : {String(order.custom_delivery.distance_km).replace(".", ",")} km
+          {/* Étapes réelles de la commande */}
+          {stopped ? (
+            <p className="relative mt-7 flex items-center gap-2 rounded-2xl bg-rose-500/10 px-4 py-3 text-sm font-medium text-rose-200 ring-1 ring-rose-400/20">
+              <XCircle size={17} /> Commande {ORDER_STATUS[order.order_status]?.label.toLowerCase() || "arrêtée"}.
+            </p>
+          ) : (
+            <ol className="relative mt-8 grid grid-cols-4">
+              {timeline.map((s, i) => {
+                const Icon = s.icon;
+                const current = !s.done && i === lastDone + 1;
+                return (
+                  <li key={s.key} className="relative flex flex-col items-center text-center">
+                    {i > 0 && (
+                      <span className="absolute right-1/2 top-[19px] h-[3px] w-full overflow-hidden rounded-full bg-white/10">
+                        <motion.span
+                          className="block h-full rounded-full bg-gradient-to-r from-[#FF9CC6] to-[#FF6EA9]"
+                          initial={{ width: 0 }}
+                          animate={{ width: s.done ? "100%" : "0%" }}
+                          transition={{ duration: 0.7, delay: 0.15 * i, ease: [0.22, 1, 0.36, 1] }}
+                        />
+                      </span>
+                    )}
+                    <span
+                      className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition ${
+                        s.done
+                          ? "border-transparent bg-gradient-to-br from-[#FF9CC6] to-[#C2185B] text-white shadow-[0_8px_20px_-6px_rgba(255,110,169,0.7)]"
+                          : current
+                            ? "border-[#FF6EA9] bg-slate-950 text-[#FF9CC6] shadow-[0_0_0_5px_rgba(255,110,169,0.15)]"
+                            : "border-white/15 bg-slate-950 text-white/35"
+                      }`}
+                    >
+                      {s.done ? <Check size={17} strokeWidth={3} /> : <Icon size={16} />}
+                    </span>
+                    <span className={`mt-2 px-1 text-[11px] font-semibold leading-tight sm:text-[12px] ${s.done ? "text-white" : current ? "text-[#FFB8D5]" : "text-white/40"}`}>{s.label}</span>
+                    {s.done && s.date && <span className="mt-0.5 hidden text-[10px] text-white/45 sm:block">{fmtShortTime(s.date)}</span>}
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </motion.section>
+
+        <div className="mt-5 grid gap-5 lg:grid-cols-[1.55fr_1fr]">
+          {/* Colonne principale */}
+          <div className="space-y-5">
+            <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.05 } }} className="overflow-hidden rounded-[28px] bg-white/90 ring-1 ring-slate-100 shadow-[0_18px_44px_-30px_rgba(15,23,42,0.45)] backdrop-blur">
+              <div className="flex items-center justify-between px-5 pb-2 pt-5 sm:px-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Articles</p>
+                <span className="text-[12px] text-slate-400">{products.length} produit{products.length > 1 ? "s" : ""}</span>
+              </div>
+              {products.length > 0 ? (
+                <ul className="divide-y divide-slate-100/80 px-5 sm:px-6">
+                  {products.map((item, index) => {
+                    const unit = item.quantity ? Number(item.subtotal) / Number(item.quantity) : Number(item.price) || 0;
+                    return (
+                      <li key={index} className="flex items-center gap-4 py-4">
+                        {item.image?.[0] ? (
+                          <img src={item.image[0]} alt={item.name} className="h-16 w-16 shrink-0 rounded-2xl object-cover ring-1 ring-slate-100" />
+                        ) : (
+                          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FFE4F0] to-[#FFF6FA] text-[#E0457F]">
+                            <Package size={22} strokeWidth={1.6} />
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[15px] font-semibold text-slate-900">{item.name}</p>
+                          <p className="mt-0.5 text-[12px] text-slate-500">
+                            {item.quantity} × {fcfa(unit)}
+                          </p>
+                        </div>
+                        <p className="shrink-0 text-[15px] font-semibold tabular-nums text-slate-900">{fcfa(item.subtotal)}</p>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="px-6 pb-6 text-sm text-slate-500">Aucun produit</p>
+              )}
+              {/* Récapitulatif */}
+              <dl className="space-y-2.5 border-t border-slate-100 bg-gradient-to-b from-slate-50/70 to-white px-5 py-5 text-[14px] sm:px-6">
+                <div className="flex justify-between text-slate-600">
+                  <dt>Articles</dt>
+                  <dd className="tabular-nums">{fcfa(itemsTotal)}</dd>
+                </div>
+                <div className="flex justify-between text-slate-600">
+                  <dt>{isCustom ? "Livraison à domicile" : "Retrait au point"}</dt>
+                  <dd className="tabular-nums">{Number(order.delivery_fee) > 0 ? fcfa(order.delivery_fee) : "Offert"}</dd>
+                </div>
+                {Number(order.sales_tax) > 0 && (
+                  <div className="flex justify-between text-slate-600">
+                    <dt>Taxe</dt>
+                    <dd className="tabular-nums">{fcfa(order.sales_tax)}</dd>
+                  </div>
+                )}
+                <div className="flex items-baseline justify-between border-t border-dashed border-slate-200 pt-3">
+                  <dt className="text-[15px] font-semibold text-slate-900">Total</dt>
+                  <dd className="text-[20px] font-semibold tabular-nums text-slate-900">{fcfa(order.total)}</dd>
+                </div>
+              </dl>
+            </motion.section>
+          </div>
+
+          {/* Colonne latérale */}
+          <div className="space-y-5">
+            {/* Code de retrait */}
+            {order.payment_status === "payment-success" && (() => {
+              const expiresAt = order.otp_expires_at ? new Date(order.otp_expires_at) : null;
+              const expired = !!expiresAt && expiresAt.getTime() < Date.now();
+              return (
+                <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.08 } }} className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] p-5 text-white shadow-[0_24px_50px_-28px_rgba(194,24,91,0.8)] sm:p-6">
+                  <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/15 blur-2xl" />
+                  <p className="relative flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/75">
+                    <KeyRound size={14} /> Code de retrait
                   </p>
-                  {order.payment_status === "payment-success" && !order.custom_delivery.delivered_at && (
-                    <p className="text-sm mt-2 font-medium text-[#0F172A]">
-                      {order.custom_delivery.courier_assigned
-                        ? "Un livreur a été désigné : il vous demandera votre code de retrait à la remise."
-                        : "Nous cherchons un livreur pour votre colis."}
+                  {withdrawn ? (
+                    <p className="relative mt-3 flex items-center gap-2 text-[15px] font-semibold">
+                      <CheckCircle size={19} /> Commande {isCustom ? "livrée" : "retirée"}
+                      {order.delivered_at ? ` le ${formatDateTime(new Date(order.delivered_at))}` : ""}.
+                    </p>
+                  ) : expired ? (
+                    <div className="relative mt-3">
+                      <p className="text-[14px] leading-relaxed text-white/90">
+                        Votre code a expiré le {formatDateTime(expiresAt)}. Générez-en un nouveau : il vous sera envoyé par e-mail.
+                      </p>
+                      <button
+                        onClick={regenerateOtp}
+                        disabled={regeneratingOtp}
+                        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#C2185B] transition hover:bg-white/90 disabled:opacity-60"
+                      >
+                        {regeneratingOtp && <Loader2 size={16} className="animate-spin" />}
+                        {regeneratingOtp ? "Envoi…" : "Générer un nouveau code"}
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="relative mt-3 text-[14px] leading-relaxed text-white/90">
+                      Votre code vous a été envoyé par e-mail{expiresAt ? `. Il est valable jusqu'au ${formatDateTime(expiresAt)}` : ""}.{" "}
+                      {isCustom ? "Donnez-le au livreur à la remise." : "Présentez-le à votre point de retrait."}
                     </p>
                   )}
-                </>
+                </motion.section>
+              );
+            })()}
+
+            {/* Retrait ou livraison */}
+            <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.11 } }} className="rounded-[28px] bg-white/90 p-5 ring-1 ring-slate-100 shadow-[0_18px_44px_-30px_rgba(15,23,42,0.45)] backdrop-blur sm:p-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{isCustom ? "Livraison à domicile" : "Retrait"}</p>
+              {isCustom ? (
+                order.custom_delivery ? (
+                  <div className="mt-3 space-y-3">
+                    <div className="flex gap-3">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-violet-50 text-violet-600"><Truck size={18} /></span>
+                      <p className="whitespace-pre-line text-[14px] text-slate-700">{order.custom_delivery.description}</p>
+                    </div>
+                    <dl className="grid grid-cols-2 gap-2 text-[13px]">
+                      <div className="rounded-2xl bg-slate-50 p-3"><dt className="text-slate-400">Téléphone</dt><dd className="font-medium text-slate-800">{order.custom_delivery.phone}</dd></div>
+                      <div className="rounded-2xl bg-slate-50 p-3"><dt className="text-slate-400">Distance</dt><dd className="font-medium text-slate-800">{String(order.custom_delivery.distance_km).replace(".", ",")} km</dd></div>
+                    </dl>
+                    {order.payment_status === "payment-success" && !order.custom_delivery.delivered_at && (
+                      <p className="rounded-2xl bg-violet-50/70 p-3 text-[13px] font-medium text-violet-800">
+                        {order.custom_delivery.courier_assigned
+                          ? "Un livreur a été désigné : il vous demandera votre code de retrait à la remise."
+                          : "Nous cherchons un livreur pour votre colis."}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="mt-3 text-sm text-slate-500">Lieu de livraison enregistré.</p>
+                )
               ) : (
-                <p className="text-sm text-gray-500">Lieu de livraison enregistré.</p>
-              )}
-            </div>
-          ) : (
-          <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <MapPin className="text-[#FF6EA9]" /> Adresse de retrait
-            </h2>
-            <p className="text-sm text-gray-700 whitespace-pre-line">
-              {order.pickup_point
-                ? order.pickup_point.name
-                : order.note
-                  ? order.note
-                  : "Non spécifiée"}
-            </p>
-          </div>
-          )}
-          <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <User className="text-[#FF6EA9]" /> Client
-            </h2>
-            <p className="text-sm text-gray-700">
-              {order.pickupRowsCustomer.name || "Non spécifié"}
-            </p>
-            <p className="text-sm text-gray-500">{order.customer_contact}</p>
-          </div>
-        </div>
-
-        {/* ------------------------------------------------------------------- */}
-        {/* PAIEMENT */}
-        {/* ------------------------------------------------------------------- */}
-
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <CreditCard className="text-[#FF6EA9]" /> Paiement
-          </h2>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Montant total</p>
-              <p className="font-semibold">{order.total?.toFixed(2)} FCFA</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Taxe</p>
-              <p className="font-semibold">{order.sales_tax?.toFixed(2)} FCFA</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Frais de livraison</p>
-              <p className="font-semibold">
-                {order.delivery_fee?.toFixed(2) || "0.00"} FCFA
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Statut</p>
-              {order?.payment_status && (
-                <p className="font-semibold capitalize">
-                  {order.payment_status.replace("payment-", "").replace(/-/g, " ")}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ------------------------------------------------------------------- */}
-        {/* CODE DE RETRAIT */}
-        {/* ------------------------------------------------------------------- */}
-
-        {order.payment_status === "payment-success" && (() => {
-          const withdrawn = Number(order.otp_used) === 1 || order.order_status === "order-completed" || !!order.delivered_at;
-          const expiresAt = order.otp_expires_at ? new Date(order.otp_expires_at) : null;
-          const expired = !!expiresAt && expiresAt.getTime() < Date.now();
-          const formatDate = (d) => d.toLocaleString("fr-FR", { day: "2-digit", month: "long", hour: "2-digit", minute: "2-digit" });
-
-          return (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-6">
-              <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <Clock className="text-[#FF6EA9]" /> Code de retrait
-              </h2>
-              {withdrawn ? (
-                <p className="text-sm text-green-700 flex items-center gap-2">
-                  <CheckCircle size={18} /> Commande retirée
-                  {order.delivered_at ? ` le ${formatDate(new Date(order.delivered_at))}` : ""}.
-                </p>
-              ) : expired ? (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <p className="text-sm text-gray-700">
-                    Votre code de retrait a expiré le {formatDate(expiresAt)}. Générez-en un nouveau : il vous sera envoyé par e-mail.
-                  </p>
-                  <button
-                    onClick={regenerateOtp}
-                    disabled={regeneratingOtp}
-                    className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#FF6EA9] text-white text-sm font-semibold hover:bg-[#ff579d] disabled:opacity-60 transition"
-                  >
-                    {regeneratingOtp && <Loader2 size={16} className="animate-spin" />}
-                    {regeneratingOtp ? "Envoi…" : "Générer un nouveau code"}
-                  </button>
+                <div className="mt-3">
+                  <div className="flex gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FFE4F0] to-[#FFF6FA] text-[#E0457F]"><MapPin size={18} /></span>
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-semibold text-slate-900">
+                        {order.pickup_point ? order.pickup_point.name : order.note ? order.note : "Point de retrait à choisir"}
+                      </p>
+                      <p className="text-[12px] text-slate-500">{order.pickup_point ? "Point de retrait E·Doto" : order.note ? "Lieu personnalisé" : "Choisissez-le pour recevoir votre commande."}</p>
+                    </div>
+                  </div>
+                  {canVisit && (
+                    <button onClick={() => setOpenMap(true)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+                      <Navigation size={16} /> Itinéraire vers le point
+                    </button>
+                  )}
+                  {paid && !pointChosen && (
+                    <button onClick={() => setModalOpen(true)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#FF6EA9] to-[#C2185B] px-4 py-3 text-sm font-semibold text-white">
+                      <MapPin size={16} /> Choisir un point de retrait
+                    </button>
+                  )}
                 </div>
-              ) : (
-                <p className="text-sm text-gray-700">
-                  Votre code vous a été envoyé par e-mail
-                  {expiresAt ? `. Il est valable jusqu'au ${formatDate(expiresAt)}` : ""}.
-                  Présentez-le à votre point de retrait.
-                </p>
               )}
-            </div>
-          );
-        })()}
+            </motion.section>
+
+            {/* Client et paiement */}
+            <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.14 } }} className="rounded-[28px] bg-white/90 p-5 ring-1 ring-slate-100 shadow-[0_18px_44px_-30px_rgba(15,23,42,0.45)] backdrop-blur sm:p-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Client et paiement</p>
+              <div className="mt-3 flex items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-100 to-sky-50 text-sky-600"><User size={18} /></span>
+                <div className="min-w-0">
+                  <p className="truncate text-[15px] font-semibold text-slate-900">{order.pickupRowsCustomer?.name || "Non spécifié"}</p>
+                  {order.customer_contact && <p className="truncate text-[12px] text-slate-500">{order.customer_contact}</p>}
+                </div>
+              </div>
+              <div className="mt-4 flex items-center justify-between rounded-2xl bg-slate-50 p-3.5">
+                <span className="flex items-center gap-2 text-[13px] text-slate-600"><CreditCard size={16} className="text-slate-400" /> Paiement</span>
+                <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${TONE[pay.tone]}`}>{pay.label}</span>
+              </div>
+            </motion.section>
+          </div>
+        </div>
       </div>
 
       <motion.button

@@ -196,3 +196,20 @@ body {
   .dash-view-in, .dash-rise, .dash-pop-in, .dash-sheet-in, .dash-stagger > * { animation: none; }
   .dash-grow-h, .dash-reveal, .dash-arc, .dash-grow { transition: none; }
 }
+
+/* -----------------------------------------
+   Page Campagnes : villes encerclées sur la carte
+------------------------------------------*/
+.edoto-zone { display: flex; align-items: center; gap: 8px; background: none; border: 0; padding: 0; cursor: pointer; }
+.edoto-zone-dot { position: relative; width: 14px; height: 14px; border-radius: 9999px; border: 2px solid #fff; flex-shrink: 0; }
+.edoto-zone-dot.is-live { background: #FF6EA9; box-shadow: 0 0 0 0 rgba(255, 110, 169, 0.55); animation: edoto-zone-pulse 2.2s ease-out infinite; }
+.edoto-zone-dot.is-soon { background: #C9A96E; }
+.edoto-zone-label { display: flex; flex-direction: column; line-height: 1.1; padding: 6px 10px; border-radius: 12px; background: rgba(15, 12, 10, 0.78); backdrop-filter: blur(8px); color: #fff; font: 600 12px/1.15 Poppins, sans-serif; white-space: nowrap; border: 1px solid rgba(255, 255, 255, 0.12); text-align: left; }
+.edoto-zone-label em { font-style: normal; font-weight: 500; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #F6C8DB; margin-top: 2px; }
+.edoto-me { width: 16px; height: 16px; border-radius: 9999px; background: #4AB3F4; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(74, 179, 244, 0.25); }
+@keyframes edoto-zone-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 110, 169, 0.55); }
+  70% { box-shadow: 0 0 0 14px rgba(255, 110, 169, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 110, 169, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .edoto-zone-dot.is-live { animation: none; } }

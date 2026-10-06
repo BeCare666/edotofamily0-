@@ -1,10 +1,6 @@
-import CampagnsComponent from "../components/Campagns";
+import CampaignsPage from "../components/campaigns/CampaignsPage";
 
-function Campagns() {
-    return <CampagnsComponent
-        changeView={(view) => console.log(view)}
-        showNotification={(msg) => console.log(msg)}
-    />
+// Page Campagnes (refonte du 06/10/2026) : ancienne version conservée dans components/Campagns.tsx
+export default function Campagns() {
+    return <CampaignsPage />;
 }
-
-export default Campagns;
