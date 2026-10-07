@@ -37,7 +37,7 @@ export const Home: React.FC<HomeProps> = ({ changeView }) => {
 
           <div>
             <Reveal>
-              <h2 className="text-[44px] font-extralight leading-[1.02] tracking-[-0.04em] text-[#161412] sm:text-[64px]">Nos Services : un univers de soins</h2>
+              <h2 className="text-[44px] font-normal leading-[1.02] tracking-[-0.04em] text-[#161412] sm:text-[64px]">Nos Services : un univers de soins</h2>
               <p className="mt-7 max-w-lg text-[16px] leading-[1.8] text-[#6B645D]">E.doto family vous accompagne à chaque étape de votre bien-être : de la santé intime à la maternité, avec élégance, innovation et douceur.</p>
             </Reveal>
 
@@ -126,7 +126,7 @@ const ServiceCard = ({ index, icon: Icon, title, desc }: { index: number, icon: 
       </span>
       <div>
         <p className="text-[12px] font-medium tracking-[0.2em] text-[#A8A29B]">0{index}</p>
-        <h3 className="mt-1.5 text-[24px] font-light leading-[1.25] tracking-[-0.01em] text-[#161412] sm:text-[28px]">{title}</h3>
+        <h3 className="mt-1.5 text-[24px] font-normal leading-[1.25] tracking-[-0.01em] text-[#161412] sm:text-[28px]">{title}</h3>
         <p className="mt-3 max-w-md text-[15px] leading-[1.75] text-[#6B645D]">{desc}</p>
       </div>
     </div>

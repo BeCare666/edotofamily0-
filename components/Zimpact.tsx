@@ -63,7 +63,7 @@ export default function SocialProof() {
         <section className="bg-[#FCFAF8]">
             <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:py-36">
                 <Reveal className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end">
-                    <h2 className="text-[44px] font-extralight leading-none tracking-[-0.04em] text-[#161412] sm:text-[64px]">Notre objectif</h2>
+                    <h2 className="text-[44px] font-normal leading-none tracking-[-0.04em] text-[#161412] sm:text-[64px]">Notre objectif</h2>
                     <p className="max-w-md text-[16px] leading-[1.8] text-[#6B645D]">
                         Aligné avec les standards du Ministère de la Santé et de ses partenaires
                     </p>
@@ -78,9 +78,9 @@ export default function SocialProof() {
                 <dl ref={ref} className="mt-4 grid grid-cols-[minmax(0,1fr)] md:grid-cols-3">
                     {stats.map((stat, i) => (
                         <div key={stat.label} className="border-b border-[#ECE6E0] py-12 md:border-b-0 md:border-l md:px-10 md:first:border-l-0 md:first:pl-0">
-                            <dd className="text-[76px] font-extralight leading-none tracking-[-0.05em] tabular-nums text-[#161412] sm:text-[96px]">
+                            <dd className="text-[76px] font-normal leading-none tracking-[-0.05em] tabular-nums text-[#161412] sm:text-[96px]">
                                 {counts[i].toLocaleString("fr-FR")}
-                                <span className="font-light text-[#D6457F]">{stat.suffix || ""}</span>
+                                <span className="font-normal text-[#D6457F]">{stat.suffix || ""}</span>
                             </dd>
                             <dt className="mt-5 max-w-[16rem] text-[15px] leading-[1.7] text-[#6B645D]">{stat.label}</dt>
                         </div>

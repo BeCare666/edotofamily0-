@@ -1,12 +1,12 @@
 /* =========================================================================================
-   Police unique du site E.doto family (06/10/2026)
-   Cormorant Garamond (la police du nom à côté du logo avant la refonte) imposée à TOUS les
+   Police unique du site E.doto family (06/10/2026, Poppins depuis le 07/10/2026)
+   Poppins imposée à TOUS les
    textes de toutes les pages : titres, paragraphes, boutons, champs, tableaux de bord, cartes,
    graphiques. Pour changer de police partout : modifier uniquement --edoto-font ci-dessous.
    (Chargée dans pages/_document.js ; importée en dernier dans pages/_app.js.)
    ========================================================================================= */
 :root {
-  --edoto-font: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --edoto-font: 'Poppins', Arial, sans-serif;
 }
 
 html,
@@ -17,8 +17,3 @@ body,
   font-family: var(--edoto-font) !important;
 }
 
-/* Chiffres alignés (prix, codes, compteurs) : plus lisibles avec cette police */
-html,
-body {
-  font-feature-settings: 'lnum' 1;
-}

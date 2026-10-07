@@ -42,7 +42,7 @@ function Caption({ index, f }: { index: number; f: (typeof FEATURES)[number] }) 
             </span>
             <div>
                 <p className="text-[12px] font-medium tracking-[0.2em] text-[#A8A29B]">0{index}</p>
-                <h3 className="mt-1.5 text-[22px] font-light leading-[1.25] tracking-[-0.01em] text-[#161412] sm:text-[26px]">{f.title}</h3>
+                <h3 className="mt-1.5 text-[22px] font-normal leading-[1.25] tracking-[-0.01em] text-[#161412] sm:text-[26px]">{f.title}</h3>
                 <p className="mt-3 max-w-xl text-[15px] leading-[1.75] text-[#6B645D]">{f.text}</p>
             </div>
         </div>
@@ -80,12 +80,12 @@ export default function UniversFemme() {
                 {/* 4 : panneau typographique (aucune photo inventée) */}
                 <Reveal className="lg:col-span-7 lg:self-end" delay={0.1}>
                     <div className="relative flex min-h-[420px] flex-col justify-between overflow-hidden rounded-[28px] bg-[#F7E9EE] p-8 sm:aspect-[4/3] sm:p-12">
-                        <span className="text-[120px] font-extralight leading-none tracking-[-0.06em] text-[#D6457F]/25 sm:text-[180px]">04</span>
+                        <span className="text-[120px] font-normal leading-none tracking-[-0.06em] text-[#D6457F]/25 sm:text-[180px]">04</span>
                         <div>
                             <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#D6457F]/30 text-[#B8336A]">
                                 <User size={18} strokeWidth={1.5} />
                             </span>
-                            <h3 className="mt-6 text-[28px] font-light leading-[1.15] tracking-[-0.02em] text-[#161412] sm:text-[38px]">{FEATURES[3].title}</h3>
+                            <h3 className="mt-6 text-[28px] font-normal leading-[1.15] tracking-[-0.02em] text-[#161412] sm:text-[38px]">{FEATURES[3].title}</h3>
                             <p className="mt-4 max-w-lg text-[15px] leading-[1.75] text-[#6B645D]">{FEATURES[3].text}</p>
                         </div>
                     </div>

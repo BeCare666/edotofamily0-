@@ -22,7 +22,7 @@ export default function TermsPage() {
       id: "acceptance",
       title: "1. Acceptation des présentes conditions",
       icon: FileText,
-      content: `En accédant et en utilisant le site et les services E.doto family (ci-après "E.doto"), vous
+      content: `En accédant et en utilisant le site et les services E.doto family (ci-après "E.doto family"), vous
         acceptez d'être lié par les présentes Conditions d'utilisation. Si vous n'êtes pas d'accord, merci de ne pas utiliser nos services.`,
     },
     {
