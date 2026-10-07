@@ -4,9 +4,13 @@
    textes de toutes les pages : titres, paragraphes, boutons, champs, tableaux de bord, cartes,
    graphiques. Pour changer de police partout : modifier uniquement --edoto-font ci-dessous.
    (Chargée dans pages/_document.js ; importée en dernier dans pages/_app.js.)
+   Depuis le 07/10/2026 : la police est choisie par le super admin (admin → Police du site) ;
+   lib/siteFont.js remplace --edoto-font et --edoto-font-adjust à l'ouverture du site.
    ========================================================================================= */
 :root {
   --edoto-font: 'Poppins', Arial, sans-serif;
+  /* Taille visuelle : « none » pour Poppins ; 0.548 (hauteur des minuscules de Poppins) pour les autres */
+  --edoto-font-adjust: none;
 }
 
 html,
@@ -15,5 +19,6 @@ body,
 *::before,
 *::after {
   font-family: var(--edoto-font) !important;
+  font-size-adjust: var(--edoto-font-adjust) !important;
 }
 

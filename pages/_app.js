@@ -18,9 +18,14 @@ const Header = dynamic(() => import("../components/header"), {
   ssr: false,
 });
 import { useEffect } from "react";
+import { syncSiteFont } from "../lib/siteFont";
 
 
 export default function MyApp({ Component, pageProps }) {
+  // Police choisie par le super admin (admin → Police du site) : lue à l'ouverture
+  useEffect(() => {
+    syncSiteFont(process.env.NEXT_PUBLIC_REST_API_ENDPOINT);
+  }, []);
   let pathname = usePathname() || ""
   const isHomePage =
     pathname === "/login" ||
