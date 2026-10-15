@@ -4,7 +4,12 @@ import { useRouter } from "next/router";
 import { Loader2 } from "lucide-react";
 import SponsorShell from "../../components/sponsor-dashboard/SponsorShell";
 import { CampaignsView, CampaignView, ExportsView, HomeView } from "../../components/sponsor-dashboard/views";
+import { ActivityView, CitiesView, LiveView, PointsView } from "../../components/sponsor-dashboard/live-views";
+import { ProfileView, ProposalsView } from "../../components/sponsor-dashboard/proposals";
+import { resetFiltersCache } from "../../components/sponsor-dashboard/filters";
 import { api, token } from "../../components/pickup-dashboard/api";
+
+const VIEWS = ["home", "live", "campaigns", "activity", "points", "cities", "proposals", "exports", "profile"];
 
 // Espace sponsor : campagnes soutenues uniquement, chiffres et graphiques, export validé par l'admin
 export default function SponsorPage() {
@@ -24,6 +29,10 @@ export default function SponsorPage() {
             router.replace("/login");
             return;
         }
+        // Vue demandée dans l'adresse (?vue=proposals après l'inscription, par exemple)
+        const wanted = new URLSearchParams(window.location.search).get("vue");
+        if (VIEWS.includes(wanted)) setView(wanted);
+        resetFiltersCache();
         api("sponsor/me")
             .then(setSponsor)
             .catch((e) => {
@@ -84,6 +93,12 @@ export default function SponsorPage() {
                     <CampaignView id={campaignId} onBack={() => changeView("campaigns")} onExportsChanged={() => setExportsKey((k) => k + 1)} />
                 )}
                 {view === "exports" && <ExportsView refreshKey={exportsKey} onOpenCampaign={openCampaign} />}
+                {view === "live" && <LiveView onOpenCampaign={openCampaign} />}
+                {view === "activity" && <ActivityView />}
+                {view === "points" && <PointsView />}
+                {view === "cities" && <CitiesView />}
+                {view === "proposals" && <ProposalsView onOpenCampaign={openCampaign} onChanged={loadNotifications} />}
+                {view === "profile" && <ProfileView sponsor={sponsor} onSaved={() => api("sponsor/me").then(setSponsor).catch(() => { })} />}
             </SponsorShell>
         </>
     );

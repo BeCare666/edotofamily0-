@@ -136,6 +136,7 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                                 <li><button onClick={() => router.push("/category/categories_id=3")} className="hover:text-pink-500 transition">Boutique</button></li>
                                 <li><button onClick={() => router.push("/compaigns")} className="hover:text-pink-500 transition">Campagnes</button></li>
                                 <li><button onClick={() => router.push("/about")} className="hover:text-pink-500 transition">À propos</button></li>
+                                <li><button onClick={() => router.push("/sponsor/inscription")} className="hover:text-pink-500 transition">Devenir sponsor</button></li>
                             </ul>
                         </div>
 

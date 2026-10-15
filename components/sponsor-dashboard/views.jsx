@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { api, dateOnly, dateTime, fcfa, qs, token, API } from "../pickup-dashboard/api";
 import { Badge, Card, Empty, ErrorBox, SectionTitle, Skeleton, StatCard, Tabs } from "../pickup-dashboard/ui";
 import { Bars, CumulativeLines, Donut, Funnel, HBars, PALETTE } from "../dashboard-ui/charts";
+import { DateField, FilterPanel, SelectField, dateFr, useFilterState, useSponsorFilters } from "./filters";
 
 const STATUS_TONE = { a_venir: "wait", en_cours: "rose", terminee: "ok" };
 const MONTHS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
@@ -82,17 +83,50 @@ export function HomeView({ onOpenCampaign }) {
 }
 
 // ------------------------------------------------------------------ Mes campagnes
+// Filtres avancés (15/10/2026) : statut, ville, période, tri ; options tirées des campagnes du sponsor
+const CAMPAIGN_SORTS = [
+    { value: "", label: "Plus récentes" },
+    { value: "start_asc", label: "Plus anciennes" },
+    { value: "progress", label: "Meilleur avancement" },
+    { value: "registrations", label: "Plus d’inscrits" },
+    { value: "contribution", label: "Contribution la plus élevée" },
+    { value: "title", label: "Nom (A à Z)" },
+];
+const CAMPAIGNS_INITIAL = { city: "", from: "", to: "", sort: "" };
 export function CampaignsView({ search, onOpenCampaign }) {
     const [status, setStatus] = useState("");
-    const { data, error, load } = useLoad(`sponsor/campaigns${qs({ status, q: search })}`, [status, search]);
+    const options = useSponsorFilters();
+    const [f, set, reset] = useFilterState(CAMPAIGNS_INITIAL);
+    const { data, error, load } = useLoad(`sponsor/campaigns${qs({ status, q: search, city: f.city, from: f.from, to: f.to, sort: f.sort })}`, [status, search, f.city, f.from, f.to, f.sort]);
+    const counts = Object.fromEntries((options?.statuses || []).map((s) => [s.value, s.count]));
+    const active = [
+        f.city && { key: "city", label: f.city },
+        f.from && { key: "from", label: `En cours après le ${dateFr(f.from)}` },
+        f.to && { key: "to", label: `En cours avant le ${dateFr(f.to)}` },
+    ].filter(Boolean);
     return (
         <div>
             <SectionTitle
                 title="Mes campagnes"
                 subtitle={search ? `Résultats pour « ${search} »` : "Les campagnes que vous soutenez."}
                 action={<Tabs value={status} onChange={setStatus} items={[
-                    { key: "", label: "Toutes" }, { key: "en_cours", label: "En cours" }, { key: "a_venir", label: "À venir" }, { key: "terminee", label: "Terminées" },
+                    { key: "", label: "Toutes", count: options?.campaigns?.length },
+                    { key: "en_cours", label: "En cours", count: counts.en_cours },
+                    { key: "a_venir", label: "À venir", count: counts.a_venir },
+                    { key: "terminee", label: "Terminées", count: counts.terminee },
                 ]} />}
+            />
+            <FilterPanel
+                main={<>
+                    <SelectField label="Ville" value={f.city} options={options?.cities || []} allLabel="Toutes" onChange={(v) => set({ city: v })} />
+                    <DateField label="En cours entre le" value={f.from} max={f.to} onChange={(v) => set({ from: v })} />
+                    <DateField label="et le" value={f.to} min={f.from} onChange={(v) => set({ to: v })} />
+                    <SelectField label="Trier par" value={f.sort} allLabel={null} options={CAMPAIGN_SORTS} onChange={(v) => set({ sort: v })} />
+                </>}
+                active={active}
+                onRemove={(k) => set({ [k]: "" })}
+                onReset={reset}
+                result={data ? `${data.length} campagne(s)` : ""}
             />
             {error ? <ErrorBox message={error} onRetry={load} />
                 : !data ? <div className="grid md:grid-cols-2 gap-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-44" />)}</div>

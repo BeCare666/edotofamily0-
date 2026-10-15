@@ -11,6 +11,7 @@ import Image from 'next/image';
 import Visions from '../public/icons/edotocenter.gif';
 import SSRAccessDrawer from "../components/SSRAccessDrawer";
 import Reveal, { PhotoFrame, photoClass } from '../components/home/Reveal';
+import Partners from '../components/home/Partners';
 import servicePhoto from '../public/images/service-bg.jpg';
 interface HomeProps {
   changeView: (view: ViewState) => void;
@@ -113,6 +114,9 @@ export const Home: React.FC<HomeProps> = ({ changeView }) => {
           </div>
         </div>
       </section>
+
+      {/* Partenaires techniques et financiers (15/10/2026) */}
+      <Partners />
       <SSRAccessDrawer />
     </>
   );

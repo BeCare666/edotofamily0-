@@ -74,7 +74,7 @@ export default function DashboardFrame({ space, identity, menu, active, onView, 
                     </span>
                 </div>
 
-                <nav className={`flex-1 px-4 space-y-1 ${c ? "lg:px-3" : ""}`}>
+                <nav className={`flex-1 min-h-0 overflow-y-auto px-4 space-y-1 ${c ? "lg:px-3 lg:overflow-visible" : ""}`}>
                     {menu.map((m) => {
                         const Icon = m.icon;
                         const isActive = active === m.key;

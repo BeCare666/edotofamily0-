@@ -209,6 +209,12 @@ export default function LoginPage() {
                         Créez-en un
                     </Link>
                 </p>
+                <p className="text-gray-500 text-sm mt-2 text-center">
+                    Bailleur, entreprise ou institution ?{" "}
+                    <Link href="/sponsor/inscription" className="text-[#FF6EA9] font-medium hover:underline">
+                        Devenir sponsor
+                    </Link>
+                </p>
             </motion.div>
         </main>
     )

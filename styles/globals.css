@@ -207,3 +207,11 @@ body {
 .edoto-zone-label { display: flex; flex-direction: column; line-height: 1.1; padding: 5px 9px; border-radius: 8px; background: #fff; color: #161412; font: 600 12px/1.15 var(--edoto-font); white-space: nowrap; border: 1px solid #E7E2DC; box-shadow: 0 2px 8px rgba(22, 20, 18, 0.08); text-align: left; }
 .edoto-zone-label em { font-style: normal; font-weight: 500; font-size: 10px; color: #77716B; margin-top: 2px; }
 .edoto-me { width: 14px; height: 14px; border-radius: 9999px; background: #161412; border: 3px solid #fff; box-shadow: 0 0 0 1px rgba(22, 20, 18, 0.25); }
+
+/* Carte en direct de l'espace sponsor (15/10/2026) */
+.sponsor-live-point { position: relative; display: flex; align-items: center; justify-content: center; border: 0; padding: 0; background: transparent; cursor: pointer; }
+.sponsor-live-dot { position: relative; z-index: 1; display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; border-radius: 9999px; background: #D6457F; color: #fff; font-size: 11px; font-weight: 600; box-shadow: 0 0 0 3px #fff, 0 6px 16px -6px rgba(31, 27, 22, 0.45); transition: transform 0.2s ease; }
+.sponsor-live-point:hover .sponsor-live-dot, .sponsor-live-point:focus-visible .sponsor-live-dot { transform: scale(1.12); }
+.sponsor-live-pulse { position: absolute; inset: -6px; border-radius: 9999px; border: 2px solid #D6457F; animation: sponsor-live-pulse 1.8s ease-out infinite; }
+@keyframes sponsor-live-pulse { 0% { transform: scale(0.8); opacity: 0.9; } 100% { transform: scale(1.7); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sponsor-live-pulse { animation: none; opacity: 0.6; } }
