@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 
 // Graphiques des dashboards (aucune bibliothèque) : animés à l'apparition, info-bulle au survol,
 // au toucher (mobile) et au clavier. Palette : brun profond, rose E.doto, sauge, sable.
-export const PALETTE = { ink: "#1F1B16", rose: "#FF6EA9", roseDeep: "#C2185B", sage: "#3F6B45", sand: "#C9A96E", grid: "#EFE8DE", muted: "#9A8E80" };
+export const PALETTE = { ink: "#1A1814", rose: "#FF6EA9", roseDeep: "#C2185B", sage: "#3F6B45", sand: "#C9A96E", grid: "#EFECE7", muted: "#8A837A" };
 
 // Passe à true juste après le premier affichage : déclenche les transitions CSS depuis zéro
 export function useAnimateIn() {
@@ -40,14 +40,14 @@ function Tip({ x, children }) {
     const shift = x < 18 ? "0%" : x > 82 ? "-100%" : "-50%";
     return (
         <div className="pointer-events-none absolute top-0 z-10" style={{ left: `${x}%`, transform: `translateX(${shift})` }}>
-            <div className="dash-pop-in rounded-xl bg-[#1F1B16] text-white text-xs px-3 py-2 shadow-xl whitespace-nowrap">{children}</div>
+            <div className="dash-pop-in rounded-xl bg-[#1A1814] text-white text-xs px-3 py-2 shadow-xl whitespace-nowrap">{children}</div>
         </div>
     );
 }
 
 function Legend({ items }) {
     return (
-        <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3 text-xs text-[#7A6E62]">
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3 text-xs text-[#6B655D]">
             {items.map((it) => (
                 <span key={it.label} className="inline-flex items-center gap-1.5">
                     <span className={it.line ? `w-3.5 ${it.dashed ? "border-t border-dashed" : "h-0.5"}` : "w-2.5 h-2.5 rounded-sm"} style={it.dashed ? { borderColor: it.color } : { background: it.color }} />
@@ -76,7 +76,7 @@ export function StackedBars({ data, series, height = 170, label, format = (v) =>
         <div ref={ref}>
             <div className="relative" style={{ height }} role="img" aria-label={label} onMouseLeave={() => setActive(null)}>
                 {[0.25, 0.5, 0.75, 1].map((f) => (
-                    <div key={f} className="absolute inset-x-0 border-t border-[#EFE8DE]" style={{ bottom: `${f * 92}%` }} />
+                    <div key={f} className="absolute inset-x-0 border-t border-[#EFECE7]" style={{ bottom: `${f * 92}%` }} />
                 ))}
                 <div className="absolute inset-0 flex items-end">
                     {data.map((d, i) => {
@@ -113,14 +113,14 @@ export function StackedBars({ data, series, height = 170, label, format = (v) =>
                         <p className="font-medium mb-1">{a.title || a.label}</p>
                         {series.map((se) => (
                             <p key={se.key} className="flex items-center gap-1.5 text-white/80">
-                                <span className="w-2 h-2 rounded-sm" style={{ background: se.color === PALETTE.ink ? "#EDE6DC" : se.color }} />
+                                <span className="w-2 h-2 rounded-sm" style={{ background: se.color === PALETTE.ink ? "#E9E5DF" : se.color }} />
                                 {se.label} : <span className="text-white font-medium">{format(a.values[se.key] || 0)}</span>
                             </p>
                         ))}
                     </Tip>
                 )}
             </div>
-            <div className="flex text-[10px] text-[#9A8E80] mt-1.5">
+            <div className="flex text-[10px] text-[#8A837A] mt-1.5">
                 {data.map((d, i) => (
                     <span key={d.key} className="flex-1 text-center whitespace-nowrap overflow-visible">{i % every === 0 ? d.label : ""}</span>
                 ))}
@@ -151,7 +151,7 @@ export function CumulativeLines({ series, objective, height = 200, colors }) {
     const [ref, width] = useWidth();
     const [active, setActive] = useState(null);
     const clip = `clip${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
-    if (!series.length) return <p className="text-sm text-[#7A6E62]">La campagne n’a pas encore commencé.</p>;
+    if (!series.length) return <p className="text-sm text-[#6B655D]">La campagne n’a pas encore commencé.</p>;
 
     const max = Math.max(1, objective || 0, ...series.map((s) => Math.max(s.registrations, s.withdrawals)));
     const W = 100;
@@ -204,7 +204,7 @@ export function CumulativeLines({ series, objective, height = 200, colors }) {
                 </svg>
                 {a && (
                     <>
-                        <div className="absolute top-0 bottom-0 w-px bg-[#1F1B16]/15 pointer-events-none" style={{ left: `${xp(active)}%` }} />
+                        <div className="absolute top-0 bottom-0 w-px bg-[#1A1814]/15 pointer-events-none" style={{ left: `${xp(active)}%` }} />
                         {[["registrations", C.registrations], ["withdrawals", C.withdrawals]].map(([k, color]) => (
                             <span key={k} className="absolute w-3 h-3 -ml-1.5 -mt-1.5 rounded-full border-2 border-white shadow pointer-events-none" style={{ left: `${xp(active)}%`, top: `${(y(a[k]) / height) * 100}%`, background: color }} />
                         ))}
@@ -217,7 +217,7 @@ export function CumulativeLines({ series, objective, height = 200, colors }) {
                     </>
                 )}
             </div>
-            <div className="flex justify-between text-[10px] text-[#9A8E80] mt-1.5">
+            <div className="flex justify-between text-[10px] text-[#8A837A] mt-1.5">
                 {series.filter((_, i) => i % every === 0 || i === series.length - 1).map((s) => (
                     <span key={s.date}>{dateLabel(s.date, { day: "2-digit", month: "short" })}</span>
                 ))}
@@ -266,11 +266,11 @@ export function Donut({ items, label, unit = "campagnes" }) {
                 {items.map((it, i) => (
                     <li key={it.label}>
                         <button onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)} onBlur={() => setActive(null)} onClick={() => setActive(i)}
-                            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-colors ${active === i ? "bg-[#F6F1EA]" : ""}`}>
+                            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-colors ${active === i ? "bg-[#F3F1EE]" : ""}`}>
                             <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: it.color }} />
-                            <span className="flex-1 text-[#3B342D]">{it.label}</span>
-                            <span className="text-[#1F1B16] font-medium tabular-nums">{it.value}</span>
-                            <span className="text-[#9A8E80] text-xs w-10 text-right tabular-nums">{total ? `${Math.round((it.value / total) * 100)} %` : ""}</span>
+                            <span className="flex-1 text-[#3D3934]">{it.label}</span>
+                            <span className="text-[#1A1814] font-medium tabular-nums">{it.value}</span>
+                            <span className="text-[#8A837A] text-xs w-10 text-right tabular-nums">{total ? `${Math.round((it.value / total) * 100)} %` : ""}</span>
                         </button>
                     </li>
                 ))}
@@ -290,14 +290,14 @@ export function HBars({ rows }) {
                 return (
                     <li key={r.label} className="group" title={`${r.label} : ${r.withdrawn} retiré(s) sur ${r.registrations} inscrit(s) (${rate} %)`}>
                         <div className="flex justify-between text-sm mb-1.5 gap-2">
-                            <span className="text-[#1F1B16] truncate">{r.label}</span>
-                            <span className="text-[#7A6E62] shrink-0 tabular-nums">
+                            <span className="text-[#1A1814] truncate">{r.label}</span>
+                            <span className="text-[#6B655D] shrink-0 tabular-nums">
                                 {r.withdrawn} / {r.registrations}
-                                <span className="ml-1.5 text-[#9A8E80] opacity-0 group-hover:opacity-100 transition-opacity">{rate} %</span>
+                                <span className="ml-1.5 text-[#8A837A] opacity-0 group-hover:opacity-100 transition-opacity">{rate} %</span>
                             </span>
                         </div>
-                        <div className="h-2.5 rounded-full bg-[#F1ECE4] overflow-hidden relative">
-                            <div className="dash-grow absolute inset-y-0 left-0 rounded-full bg-[#1F1B16]/15" style={{ width: on ? `${(r.registrations / max) * 100}%` : 0, transitionDelay: `${i * 60}ms` }} />
+                        <div className="h-2.5 rounded-full bg-[#EFECE7] overflow-hidden relative">
+                            <div className="dash-grow absolute inset-y-0 left-0 rounded-full bg-[#1A1814]/15" style={{ width: on ? `${(r.registrations / max) * 100}%` : 0, transitionDelay: `${i * 60}ms` }} />
                             <div className="dash-grow absolute inset-y-0 left-0 rounded-full bg-[#FF6EA9]" style={{ width: on ? `${(r.withdrawn / max) * 100}%` : 0, transitionDelay: `${i * 60 + 150}ms` }} />
                         </div>
                     </li>
@@ -316,10 +316,10 @@ export function Funnel({ steps, colors = [PALETTE.ink, PALETTE.sand, PALETTE.ros
             {steps.map((s, i) => (
                 <div key={s.step}>
                     <div className="flex justify-between text-sm mb-1">
-                        <span className="text-[#1F1B16]">{s.step}</span>
-                        <span className="text-[#7A6E62] tabular-nums">{s.value}{i > 0 && steps[0].value > 0 ? ` · ${Math.round((s.value / steps[0].value) * 100)} %` : ""}</span>
+                        <span className="text-[#1A1814]">{s.step}</span>
+                        <span className="text-[#6B655D] tabular-nums">{s.value}{i > 0 && steps[0].value > 0 ? ` · ${Math.round((s.value / steps[0].value) * 100)} %` : ""}</span>
                     </div>
-                    <div className="h-8 rounded-xl bg-[#F1ECE4] overflow-hidden">
+                    <div className="h-8 rounded-xl bg-[#EFECE7] overflow-hidden">
                         <div className="dash-grow h-full rounded-xl" style={{ width: on ? `${(s.value / top) * 100}%` : 0, transitionDelay: `${i * 120}ms`, background: colors[i] }} />
                     </div>
                 </div>

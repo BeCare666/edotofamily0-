@@ -8,7 +8,7 @@ import { Card } from "../pickup-dashboard/ui";
 // Filtres de l'espace sponsor (15/10/2026). Les options viennent toujours de l'API (GET sponsor/filters) :
 // campagnes, villes et points de retrait réellement liés au sponsor. Aucune valeur inventée.
 
-const control = "w-full min-w-0 rounded-xl border border-[#E7DFD4] bg-white px-3 py-2.5 text-sm text-[#1F1B16] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/25 focus:border-[#E4DBCE]";
+const control = "w-full min-w-0 rounded-xl border border-[#E6E2DC] bg-white px-3 py-2.5 text-sm text-[#1A1814] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/25 focus:border-[#E0DBD4]";
 
 let cache = null;
 export function useSponsorFilters() {
@@ -32,7 +32,7 @@ export function useFilterState(initial) {
 export function Field({ label, children, className = "" }) {
     return (
         <label className={`block min-w-0 ${className}`}>
-            <span className="block text-[11px] uppercase tracking-[0.12em] text-[#9A8E80] mb-1.5">{label}</span>
+            <span className="block text-[11px] uppercase tracking-[0.12em] text-[#8A837A] mb-1.5">{label}</span>
             {children}
         </label>
     );
@@ -72,7 +72,7 @@ export function SearchField({ label = "Recherche", value, onChange, placeholder 
     return (
         <Field label={label}>
             <span className="relative block">
-                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8E80]" aria-hidden="true" />
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A837A]" aria-hidden="true" />
                 <input type="search" className={`${control} pl-9`} value={text} placeholder={placeholder} onChange={(e) => setText(e.target.value)} />
             </span>
         </Field>
@@ -87,9 +87,9 @@ export function Chips({ value, onChange, items }) {
                 const on = value === it.value;
                 return (
                     <button key={it.value || "all"} role="tab" aria-selected={on} onClick={() => onChange(it.value)}
-                        className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm transition ${on ? "border-[#1F1B16] bg-[#1F1B16] text-white" : "border-[#E7DFD4] bg-white text-[#3B342D] hover:border-[#1F1B16]"}`}>
+                        className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm transition ${on ? "border-[#1A1814] bg-[#1A1814] text-white" : "border-[#E6E2DC] bg-white text-[#3D3934] hover:border-[#1A1814]"}`}>
                         {it.label}
-                        {typeof it.count === "number" && <span className={`ml-2 text-xs ${on ? "text-white/70" : "text-[#9A8E80]"}`}>{it.count.toLocaleString("fr-FR")}</span>}
+                        {typeof it.count === "number" && <span className={`ml-2 text-xs ${on ? "text-white/70" : "text-[#8A837A]"}`}>{it.count.toLocaleString("fr-FR")}</span>}
                     </button>
                 );
             })}
@@ -117,14 +117,14 @@ export function FilterPanel({ main, advanced, active = [], onRemove, onReset, re
             <div className="mt-4 flex flex-wrap items-center gap-2">
                 {advanced && (
                     <button onClick={() => setOpen((v) => !v)} aria-expanded={open}
-                        className="inline-flex items-center gap-2 rounded-full border border-[#E7DFD4] px-3.5 py-1.5 text-xs text-[#3B342D] hover:border-[#1F1B16]">
+                        className="inline-flex items-center gap-2 rounded-full border border-[#E6E2DC] px-3.5 py-1.5 text-xs text-[#3D3934] hover:border-[#1A1814]">
                         <SlidersHorizontal size={14} /> {open ? "Moins de filtres" : "Plus de filtres"}
                     </button>
                 )}
                 {active.map((a) => (
-                    <span key={a.key} className="inline-flex items-center gap-1.5 rounded-full bg-[#F3EEE7] px-3 py-1.5 text-xs text-[#3B342D]">
+                    <span key={a.key} className="inline-flex items-center gap-1.5 rounded-full bg-[#F3F1EE] px-3 py-1.5 text-xs text-[#3D3934]">
                         {a.label}
-                        <button onClick={() => onRemove(a.key)} aria-label={`Retirer le filtre ${a.label}`} className="text-[#9A8E80] hover:text-[#1F1B16]"><X size={13} /></button>
+                        <button onClick={() => onRemove(a.key)} aria-label={`Retirer le filtre ${a.label}`} className="text-[#8A837A] hover:text-[#1A1814]"><X size={13} /></button>
                     </span>
                 ))}
                 {active.length > 0 && (
@@ -132,7 +132,7 @@ export function FilterPanel({ main, advanced, active = [], onRemove, onReset, re
                         <RotateCcw size={13} /> Tout effacer
                     </button>
                 )}
-                {result && <span className="ml-auto text-xs text-[#9A8E80]">{result}</span>}
+                {result && <span className="ml-auto text-xs text-[#8A837A]">{result}</span>}
             </div>
         </Card>
     );

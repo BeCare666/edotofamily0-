@@ -58,27 +58,27 @@ export default function OverviewView({ period, date, onPeriodChange, refreshKey,
                         <StatCard label="Commandes remises" value={t.orders_withdrawn} hint={`Produits : ${fcfa(t.products_amount)}`} icon={Package} tone="ink" />
                         <StatCard label="Kits remis" value={t.kits_withdrawn} icon={Gift} tone="rose" />
                         <StatCard label="Commissions" value={fcfa(t.commission_total)} hint={`Commandes ${fcfa(t.commission_orders)} · Kits ${fcfa(t.commission_kits)}`} icon={Wallet} tone="sage" />
-                        <button onClick={onOpenPending} className="text-left rounded-3xl transition duration-300 hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6EA9]/40">
+                        <button onClick={onOpenPending} className="text-left rounded-2xl transition duration-300 hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6EA9]/40">
                             <StatCard label="En attente de retrait" value={data.pending.orders + data.pending.kits} hint={`${data.pending.orders} commande(s) · ${data.pending.kits} kit(s)`} icon={Hourglass} tone="sand" />
                         </button>
                     </div>
 
                     <div className="dash-stagger grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <Card className="p-6 xl:col-span-2">
-                            <h2 className="font-serif text-lg text-[#1F1B16] mb-4">Activité</h2>
+                            <h2 className="font-serif text-lg text-[#1A1814] mb-4">Activité</h2>
                             <ActivityChart series={data.series} />
                         </Card>
                         <Card className="p-6">
-                            <h2 className="font-serif text-lg text-[#1F1B16] mb-4">Derniers retraits</h2>
+                            <h2 className="font-serif text-lg text-[#1A1814] mb-4">Derniers retraits</h2>
                             {data.latest.length === 0 ? (
                                 <Empty title="Aucun retrait" text="Aucun retrait sur cette période." />
                             ) : (
-                                <ul className="divide-y divide-[#F1ECE4]">
+                                <ul className="divide-y divide-[#EFECE7]">
                                     {data.latest.map((w) => (
                                         <li key={`${w.type}-${w.id}`} className="py-3 flex items-center justify-between gap-3">
                                             <div className="min-w-0">
-                                                <p className="text-sm text-[#1F1B16] truncate">{w.reference}</p>
-                                                <p className="text-xs text-[#9A8E80] truncate">{w.customer || "Client non renseigné"} · {dateTime(w.withdrawn_at)}</p>
+                                                <p className="text-sm text-[#1A1814] truncate">{w.reference}</p>
+                                                <p className="text-xs text-[#8A837A] truncate">{w.customer || "Client non renseigné"} · {dateTime(w.withdrawn_at)}</p>
                                             </div>
                                             <div className="text-right shrink-0">
                                                 <Badge tone={w.type === "kit" ? "rose" : "ink"}>{w.type === "kit" ? "Kit" : "Commande"}</Badge>

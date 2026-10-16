@@ -60,11 +60,11 @@ export default function SponsorSignup() {
         }
     };
 
-    const input = "w-full pl-11 pr-4 py-3 rounded-2xl border border-[#E4DBCE] bg-white text-[#1F1B16] placeholder:text-[#B0A598] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/30";
-    const Icon = ({ as: I }) => <I size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9A8E80]" aria-hidden="true" />;
+    const input = "w-full pl-11 pr-4 py-3 rounded-2xl border border-[#E0DBD4] bg-white text-[#1A1814] placeholder:text-[#A8A29A] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/30";
+    const Icon = ({ as: I }) => <I size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8A837A]" aria-hidden="true" />;
 
     return (
-        <div className="min-h-screen bg-[#FAF7F2]">
+        <div className="min-h-screen bg-[#F9F8F6]">
             <Head><title>Devenir sponsor · E.doto family</title></Head>
             <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 px-5 py-10 sm:px-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-16 lg:py-16">
                 <section className="lg:pt-6">
@@ -86,20 +86,20 @@ export default function SponsorSignup() {
                     </ol>
                 </section>
 
-                <section className="rounded-[28px] border border-[#EDE6DC] bg-[#FFFDF9] p-6 shadow-[0_24px_60px_-40px_rgba(60,40,20,0.45)] sm:p-10">
+                <section className="rounded-[28px] border border-[#E9E5DF] bg-[#FFFFFF] p-6 sm:p-10">
                     {done ? (
                         <div className="py-10 text-center">
                             <CheckCircle2 size={44} className="mx-auto text-[#3F6B45]" strokeWidth={1.5} />
-                            <p className="mt-5 text-2xl text-[#1F1B16]">Votre espace sponsor est créé</p>
+                            <p className="mt-5 text-2xl text-[#1A1814]">Votre espace sponsor est créé</p>
                             <p className="mt-3 text-sm text-[#6B645D]">{done.message}</p>
-                            {done.email_sent === false && <p className="mt-2 text-xs text-[#9A8E80]">L’e-mail de bienvenue n’a pas pu être envoyé, mais votre espace est bien actif.</p>}
-                            <Link href="/login" className="mt-8 inline-flex w-full justify-center rounded-2xl bg-[#1F1B16] py-3.5 text-white">Se connecter</Link>
+                            {done.email_sent === false && <p className="mt-2 text-xs text-[#8A837A]">L’e-mail de bienvenue n’a pas pu être envoyé, mais votre espace est bien actif.</p>}
+                            <Link href="/login" className="mt-8 inline-flex w-full justify-center rounded-2xl bg-[#1A1814] py-3.5 text-white">Se connecter</Link>
                         </div>
                     ) : (
                         <form onSubmit={submit} className="space-y-4" noValidate>
                             <div>
-                                <h2 className="text-2xl text-[#1F1B16]">Créer mon espace sponsor</h2>
-                                <p className="mt-1 text-sm text-[#7A6E62]">Déjà inscrit ? <Link href="/login" className="text-[#C2185B] hover:underline">Se connecter</Link></p>
+                                <h2 className="text-2xl text-[#1A1814]">Créer mon espace sponsor</h2>
+                                <p className="mt-1 text-sm text-[#6B655D]">Déjà inscrit ? <Link href="/login" className="text-[#C2185B] hover:underline">Se connecter</Link></p>
                             </div>
                             <div className="relative"><Icon as={Building} /><input className={input} value={v.organization} onChange={set("organization")} maxLength={255} placeholder="Nom de l’organisation" aria-label="Nom de l’organisation" autoComplete="organization" required /></div>
                             <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
@@ -110,7 +110,7 @@ export default function SponsorSignup() {
                             <div className="relative">
                                 <Icon as={Lock} />
                                 <input type={show ? "text" : "password"} className={`${input} pr-12`} value={v.password} onChange={set("password")} placeholder={`Mot de passe (${MIN} caractères minimum)`} aria-label="Mot de passe" autoComplete="new-password" required />
-                                <button type="button" onClick={() => setShow((s) => !s)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9A8E80]" aria-label={show ? "Masquer le mot de passe" : "Afficher le mot de passe"}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                                <button type="button" onClick={() => setShow((s) => !s)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8A837A]" aria-label={show ? "Masquer le mot de passe" : "Afficher le mot de passe"}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
                             </div>
                             <div className="relative"><Icon as={Lock} /><input type={show ? "text" : "password"} className={input} value={v.confirm} onChange={set("confirm")} placeholder="Confirmer le mot de passe" aria-label="Confirmer le mot de passe" autoComplete="new-password" required /></div>
                             {v.password && v.password.length < MIN && <p className="text-xs text-[#9B2C2C]">Au moins {MIN} caractères.</p>}
@@ -123,7 +123,7 @@ export default function SponsorSignup() {
                             <button type="submit" disabled={!valid || busy} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#C2185B] py-3.5 font-medium text-white transition disabled:opacity-40">
                                 {busy && <Loader2 size={16} className="animate-spin" />} Créer mon espace sponsor
                             </button>
-                            <p className="text-xs text-[#9A8E80]">Votre organisation a déjà été enregistrée par l’équipe E.doto family ? Utilisez le lien d’invitation reçu par e-mail.</p>
+                            <p className="text-xs text-[#8A837A]">Votre organisation a déjà été enregistrée par l’équipe E.doto family ? Utilisez le lien d’invitation reçu par e-mail.</p>
                         </form>
                     )}
                 </section>

@@ -23,7 +23,7 @@ const SORTS = [
     { value: "kits", label: "Plus de kits" },
     { value: "budget", label: "Budget le plus élevé" },
 ];
-const input = "w-full min-w-0 rounded-xl border border-[#E7DFD4] bg-white px-3.5 py-3 text-sm text-[#1F1B16] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/25";
+const input = "w-full min-w-0 rounded-xl border border-[#E6E2DC] bg-white px-3.5 py-3 text-sm text-[#1A1814] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/25";
 const todayBenin = () => new Date(Date.now() + 3_600_000).toISOString().slice(0, 10);
 
 function useLoad(path) {
@@ -52,8 +52,8 @@ function Steps({ status }) {
                 const bad = status === "rejected" && i === 1;
                 return (
                     <li key={it.label} className="min-w-0">
-                        <div className={`h-1.5 rounded-full ${bad ? "bg-[#9B2C2C]" : on ? "bg-[#1F1B16]" : "bg-[#EDE6DC]"}`} />
-                        <p className={`mt-2 text-[11px] leading-tight ${on ? "text-[#1F1B16]" : "text-[#9A8E80]"}`}>{it.label}</p>
+                        <div className={`h-1.5 rounded-full ${bad ? "bg-[#9B2C2C]" : on ? "bg-[#1A1814]" : "bg-[#E9E5DF]"}`} />
+                        <p className={`mt-2 text-[11px] leading-tight ${on ? "text-[#1A1814]" : "text-[#8A837A]"}`}>{it.label}</p>
                     </li>
                 );
             })}
@@ -92,7 +92,7 @@ function ProposalForm({ onCancel, onCreated }) {
     const today = todayBenin();
     return (
         <form onSubmit={submit} className="space-y-6">
-            <button type="button" onClick={onCancel} className="inline-flex items-center gap-2 text-sm text-[#7A6E62] hover:text-[#1F1B16]"><ArrowLeft size={16} /> Mes demandes</button>
+            <button type="button" onClick={onCancel} className="inline-flex items-center gap-2 text-sm text-[#6B655D] hover:text-[#1A1814]"><ArrowLeft size={16} /> Mes demandes</button>
             <SectionTitle title="Nouvelle demande de campagne" subtitle="Décrivez la campagne souhaitée : l’équipe E.doto family l’étudie, la valide puis crée la campagne." />
             <Card className="p-6 sm:p-8 grid grid-cols-[minmax(0,1fr)] gap-5 md:grid-cols-2">
                 <Field label="Nom de la campagne *" className="md:col-span-2">
@@ -117,23 +117,23 @@ function ProposalForm({ onCancel, onCreated }) {
                     <Field label="Villes *">
                         <div className="flex gap-2">
                             <input className={input} list="sponsor-cities" value={city} onChange={(e) => setCity(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCity(); } }} placeholder="Choisissez ou saisissez une ville" />
-                            <button type="button" onClick={() => addCity()} className="shrink-0 rounded-xl bg-[#1F1B16] px-4 text-sm text-white">Ajouter</button>
+                            <button type="button" onClick={() => addCity()} className="shrink-0 rounded-xl bg-[#1A1814] px-4 text-sm text-white">Ajouter</button>
                         </div>
                     </Field>
                     <datalist id="sponsor-cities">{BENIN_CITIES.map((c) => <option key={c} value={c} />)}</datalist>
                     <div className="mt-3 flex flex-wrap gap-2">
                         {v.cities.map((c) => (
-                            <span key={c} className="inline-flex items-center gap-1.5 rounded-full bg-[#F3EEE7] px-3 py-1.5 text-sm text-[#1F1B16]">
+                            <span key={c} className="inline-flex items-center gap-1.5 rounded-full bg-[#F3F1EE] px-3 py-1.5 text-sm text-[#1A1814]">
                                 {c}
-                                <button type="button" onClick={() => set("cities", v.cities.filter((x) => x !== c))} aria-label={`Retirer ${c}`} className="text-[#9A8E80] hover:text-[#1F1B16]"><X size={14} /></button>
+                                <button type="button" onClick={() => set("cities", v.cities.filter((x) => x !== c))} aria-label={`Retirer ${c}`} className="text-[#8A837A] hover:text-[#1A1814]"><X size={14} /></button>
                             </span>
                         ))}
-                        {!v.cities.length && <span className="text-xs text-[#9A8E80]">Aucune ville ajoutée.</span>}
+                        {!v.cities.length && <span className="text-xs text-[#8A837A]">Aucune ville ajoutée.</span>}
                     </div>
                 </div>
             </Card>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
-                <button type="button" onClick={onCancel} className="rounded-2xl border border-[#E7DFD4] px-5 py-3 text-sm text-[#3B342D]">Annuler</button>
+                <button type="button" onClick={onCancel} className="rounded-2xl border border-[#E6E2DC] px-5 py-3 text-sm text-[#3D3934]">Annuler</button>
                 <button type="submit" disabled={busy} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#C2185B] px-6 py-3 text-sm font-medium text-white disabled:opacity-50">
                     {busy ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} Envoyer la demande
                 </button>
@@ -164,35 +164,35 @@ function ProposalDetail({ id, onBack, onOpenCampaign, onChanged }) {
     };
     return (
         <div className="space-y-6">
-            <button onClick={onBack} className="inline-flex items-center gap-2 text-sm text-[#7A6E62] hover:text-[#1F1B16]"><ArrowLeft size={16} /> Mes demandes</button>
+            <button onClick={onBack} className="inline-flex items-center gap-2 text-sm text-[#6B655D] hover:text-[#1A1814]"><ArrowLeft size={16} /> Mes demandes</button>
             <Card className="p-6 sm:p-8 space-y-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
-                        <h1 className="font-serif text-2xl sm:text-3xl text-[#1F1B16]">{p.title}</h1>
-                        <p className="text-sm text-[#7A6E62] mt-1">Envoyée le {dateTime(p.created_at)}</p>
+                        <h1 className="font-serif text-2xl sm:text-3xl text-[#1A1814]">{p.title}</h1>
+                        <p className="text-sm text-[#6B655D] mt-1">Envoyée le {dateTime(p.created_at)}</p>
                     </div>
                     <Badge tone={S.tone}>{S.label}</Badge>
                 </div>
                 <Steps status={p.status} />
                 {p.admin_note && (
-                    <div className={`rounded-2xl p-4 text-sm ${p.status === "rejected" ? "bg-[#F5E4E4] text-[#9B2C2C]" : "bg-[#F3EEE7] text-[#3B342D]"}`}>
+                    <div className={`rounded-2xl p-4 text-sm ${p.status === "rejected" ? "bg-[#F5E4E4] text-[#9B2C2C]" : "bg-[#F3F1EE] text-[#3D3934]"}`}>
                         <p className="font-medium">{p.status === "rejected" ? "Motif du refus" : "Message de l’équipe"}</p>
                         <p className="mt-1 whitespace-pre-line">{p.admin_note}</p>
                     </div>
                 )}
                 <dl className="grid grid-cols-[minmax(0,1fr)] sm:grid-cols-2 gap-4 text-sm">
-                    <div className="flex gap-3"><CalendarRange size={18} className="text-[#9A8E80] shrink-0" /><div><dt className="text-[#9A8E80] text-xs">Période souhaitée</dt><dd className="text-[#1F1B16]">du {dateFr(p.date_start)} au {dateFr(p.date_end)}</dd></div></div>
-                    <div className="flex gap-3"><MapPin size={18} className="text-[#9A8E80] shrink-0" /><div><dt className="text-[#9A8E80] text-xs">Villes</dt><dd className="text-[#1F1B16]">{p.cities.join(", ")}</dd></div></div>
-                    <div className="flex gap-3"><Package size={18} className="text-[#9A8E80] shrink-0" /><div><dt className="text-[#9A8E80] text-xs">Kits</dt><dd className="text-[#1F1B16]">{Number(p.objective_kits).toLocaleString("fr-FR")}</dd></div></div>
-                    <div className="flex gap-3"><Wallet size={18} className="text-[#9A8E80] shrink-0" /><div><dt className="text-[#9A8E80] text-xs">Budget proposé</dt><dd className="text-[#1F1B16]">{p.budget ? fcfa(p.budget) : "Non renseigné"}</dd></div></div>
+                    <div className="flex gap-3"><CalendarRange size={18} className="text-[#8A837A] shrink-0" /><div><dt className="text-[#8A837A] text-xs">Période souhaitée</dt><dd className="text-[#1A1814]">du {dateFr(p.date_start)} au {dateFr(p.date_end)}</dd></div></div>
+                    <div className="flex gap-3"><MapPin size={18} className="text-[#8A837A] shrink-0" /><div><dt className="text-[#8A837A] text-xs">Villes</dt><dd className="text-[#1A1814]">{p.cities.join(", ")}</dd></div></div>
+                    <div className="flex gap-3"><Package size={18} className="text-[#8A837A] shrink-0" /><div><dt className="text-[#8A837A] text-xs">Kits</dt><dd className="text-[#1A1814]">{Number(p.objective_kits).toLocaleString("fr-FR")}</dd></div></div>
+                    <div className="flex gap-3"><Wallet size={18} className="text-[#8A837A] shrink-0" /><div><dt className="text-[#8A837A] text-xs">Budget proposé</dt><dd className="text-[#1A1814]">{p.budget ? fcfa(p.budget) : "Non renseigné"}</dd></div></div>
                 </dl>
-                {p.description && <div><p className="text-xs text-[#9A8E80] mb-1">Description et objectifs</p><p className="text-sm text-[#3B342D] whitespace-pre-line">{p.description}</p></div>}
+                {p.description && <div><p className="text-xs text-[#8A837A] mb-1">Description et objectifs</p><p className="text-sm text-[#3D3934] whitespace-pre-line">{p.description}</p></div>}
                 <div className="flex flex-wrap gap-3 pt-2">
                     {p.status === "created" && p.campaign_id && (
-                        <button onClick={() => onOpenCampaign(p.campaign_id)} className="inline-flex items-center gap-2 rounded-2xl bg-[#1F1B16] px-5 py-3 text-sm text-white"><Megaphone size={16} /> Suivre la campagne</button>
+                        <button onClick={() => onOpenCampaign(p.campaign_id)} className="inline-flex items-center gap-2 rounded-2xl bg-[#1A1814] px-5 py-3 text-sm text-white"><Megaphone size={16} /> Suivre la campagne</button>
                     )}
                     {p.status === "pending" && (
-                        <button onClick={withdraw} disabled={busy} className="inline-flex items-center gap-2 rounded-2xl border border-[#E7DFD4] px-5 py-3 text-sm text-[#9B2C2C] disabled:opacity-50">
+                        <button onClick={withdraw} disabled={busy} className="inline-flex items-center gap-2 rounded-2xl border border-[#E6E2DC] px-5 py-3 text-sm text-[#9B2C2C] disabled:opacity-50">
                             {busy ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />} {confirming ? "Confirmer le retrait" : "Retirer la demande"}
                         </button>
                     )}
@@ -257,13 +257,13 @@ export function ProposalsView({ onOpenCampaign, onChanged }) {
                         const S = STATUS[p.status];
                         return (
                             <button key={p.id} onClick={() => setMode({ view: "detail", id: p.id })} className="text-left">
-                                <Card className="p-6 h-full transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_-20px_rgba(60,40,20,0.35)]">
+                                <Card className="p-6 h-full transition duration-300 hover:border-[#D6D2CB]">
                                     <div className="flex items-start justify-between gap-3">
-                                        <h3 className="font-serif text-lg text-[#1F1B16] min-w-0 break-words">{p.title}</h3>
+                                        <h3 className="font-serif text-lg text-[#1A1814] min-w-0 break-words">{p.title}</h3>
                                         <Badge tone={S.tone}>{S.label}</Badge>
                                     </div>
-                                    <p className="text-sm text-[#7A6E62] mt-1">{p.cities.join(", ")} · du {dateFr(p.date_start)} au {dateFr(p.date_end)}</p>
-                                    <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-xs text-[#7A6E62]">
+                                    <p className="text-sm text-[#6B655D] mt-1">{p.cities.join(", ")} · du {dateFr(p.date_start)} au {dateFr(p.date_end)}</p>
+                                    <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-xs text-[#6B655D]">
                                         <span>{Number(p.objective_kits).toLocaleString("fr-FR")} kit(s)</span>
                                         <span>Budget : {p.budget ? fcfa(p.budget) : "non renseigné"}</span>
                                         <span>Envoyée le {dateOnly(p.created_at)}</span>
@@ -301,21 +301,21 @@ export function ProfileView({ sponsor, onSaved }) {
             <SectionTitle title="Mon organisation" subtitle="Les informations de votre espace sponsor." />
             <Card className="p-6 sm:p-8">
                 <dl className="grid grid-cols-[minmax(0,1fr)] sm:grid-cols-2 gap-5 text-sm">
-                    <div><dt className="text-xs text-[#9A8E80]">Organisation</dt><dd className="text-[#1F1B16] mt-1">{sponsor?.name}</dd></div>
-                    <div><dt className="text-xs text-[#9A8E80]">E-mail de connexion</dt><dd className="text-[#1F1B16] mt-1 break-all">{sponsor?.email}</dd></div>
-                    <div><dt className="text-xs text-[#9A8E80]">Espace créé</dt><dd className="text-[#1F1B16] mt-1">{sponsor?.created_at ? dateOnly(sponsor.created_at) : "Non renseigné"}</dd></div>
-                    <div><dt className="text-xs text-[#9A8E80]">Origine</dt><dd className="text-[#1F1B16] mt-1">{sponsor?.self_registered ? "Inscription en ligne" : "Invitation de l’équipe E.doto family"}</dd></div>
+                    <div><dt className="text-xs text-[#8A837A]">Organisation</dt><dd className="text-[#1A1814] mt-1">{sponsor?.name}</dd></div>
+                    <div><dt className="text-xs text-[#8A837A]">E-mail de connexion</dt><dd className="text-[#1A1814] mt-1 break-all">{sponsor?.email}</dd></div>
+                    <div><dt className="text-xs text-[#8A837A]">Espace créé</dt><dd className="text-[#1A1814] mt-1">{sponsor?.created_at ? dateOnly(sponsor.created_at) : "Non renseigné"}</dd></div>
+                    <div><dt className="text-xs text-[#8A837A]">Origine</dt><dd className="text-[#1A1814] mt-1">{sponsor?.self_registered ? "Inscription en ligne" : "Invitation de l’équipe E.doto family"}</dd></div>
                 </dl>
-                <p className="mt-5 text-xs text-[#9A8E80]">Pour modifier le nom de l’organisation ou l’e-mail, contactez l’équipe E.doto family.</p>
+                <p className="mt-5 text-xs text-[#8A837A]">Pour modifier le nom de l’organisation ou l’e-mail, contactez l’équipe E.doto family.</p>
             </Card>
             <form onSubmit={save}>
                 <Card className="p-6 sm:p-8 grid grid-cols-[minmax(0,1fr)] sm:grid-cols-2 gap-5">
-                    <h2 className="sm:col-span-2 font-serif text-lg text-[#1F1B16]">Personne de contact</h2>
+                    <h2 className="sm:col-span-2 font-serif text-lg text-[#1A1814]">Personne de contact</h2>
                     <Field label="Nom et prénom *"><input className={input} value={v.contact_name} maxLength={255} required onChange={(e) => setV((p) => ({ ...p, contact_name: e.target.value }))} /></Field>
                     <Field label="Téléphone *"><input className={input} value={v.phone} maxLength={40} required inputMode="tel" onChange={(e) => setV((p) => ({ ...p, phone: e.target.value }))} placeholder="+229 01 00 00 00 00" /></Field>
                     <div className="sm:col-span-2 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <Link href="/forgot-password" className="inline-flex items-center gap-2 text-sm text-[#7A6E62] hover:text-[#1F1B16]"><KeyRound size={15} /> Changer de mot de passe</Link>
-                        <button type="submit" disabled={busy} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#1F1B16] px-6 py-3 text-sm text-white disabled:opacity-50">
+                        <Link href="/forgot-password" className="inline-flex items-center gap-2 text-sm text-[#6B655D] hover:text-[#1A1814]"><KeyRound size={15} /> Changer de mot de passe</Link>
+                        <button type="submit" disabled={busy} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#1A1814] px-6 py-3 text-sm text-white disabled:opacity-50">
                             {busy ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} Enregistrer
                         </button>
                     </div>

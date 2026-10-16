@@ -76,15 +76,15 @@ function EventRow({ e, now }) {
     const Icon = EVENT_ICON[e.type] || Radio;
     return (
         <li className="flex gap-3 py-3">
-            <span className={`mt-0.5 w-9 h-9 shrink-0 rounded-xl flex items-center justify-center ${e.type === "withdrawn" ? "bg-[#FCE8F0] text-[#C2185B]" : e.type === "validated" ? "bg-[#FDF1E0] text-[#9A5B13]" : "bg-[#EDEAE6] text-[#3B342D]"}`}>
+            <span className={`mt-0.5 w-9 h-9 shrink-0 rounded-xl flex items-center justify-center ${e.type === "withdrawn" ? "bg-[#FBEEF3] text-[#C2185B]" : e.type === "validated" ? "bg-[#FDF1E0] text-[#9A5B13]" : "bg-[#ECE9E4] text-[#3D3934]"}`}>
                 <Icon size={16} />
             </span>
             <span className="min-w-0 flex-1">
-                <span className="block text-sm text-[#1F1B16]">{e.label}</span>
-                <span className="block text-xs text-[#7A6E62] truncate">{[e.point_name, e.city].filter(Boolean).join(" · ") || "Lieu non renseigné"}</span>
-                <span className="block text-[11px] text-[#9A8E80] truncate">{e.campaign_title}</span>
+                <span className="block text-sm text-[#1A1814]">{e.label}</span>
+                <span className="block text-xs text-[#6B655D] truncate">{[e.point_name, e.city].filter(Boolean).join(" · ") || "Lieu non renseigné"}</span>
+                <span className="block text-[11px] text-[#8A837A] truncate">{e.campaign_title}</span>
             </span>
-            <span className="shrink-0 text-[11px] text-[#9A8E80] whitespace-nowrap">{ago(e.at, now)}</span>
+            <span className="shrink-0 text-[11px] text-[#8A837A] whitespace-nowrap">{ago(e.at, now)}</span>
         </li>
     );
 }
@@ -92,10 +92,10 @@ function EventRow({ e, now }) {
 function Pager({ page, last, onPage }) {
     if (last <= 1) return null;
     return (
-        <div className="flex items-center justify-between gap-3 px-5 py-4 border-t border-[#F1ECE4] text-sm">
-            <button disabled={page <= 1} onClick={() => onPage(page - 1)} className="inline-flex items-center gap-1 text-[#3B342D] disabled:opacity-30"><ChevronLeft size={16} /> Précédent</button>
-            <span className="text-[#9A8E80]">Page {page} sur {last}</span>
-            <button disabled={page >= last} onClick={() => onPage(page + 1)} className="inline-flex items-center gap-1 text-[#3B342D] disabled:opacity-30">Suivant <ChevronRight size={16} /></button>
+        <div className="flex items-center justify-between gap-3 px-5 py-4 border-t border-[#EFECE7] text-sm">
+            <button disabled={page <= 1} onClick={() => onPage(page - 1)} className="inline-flex items-center gap-1 text-[#3D3934] disabled:opacity-30"><ChevronLeft size={16} /> Précédent</button>
+            <span className="text-[#8A837A]">Page {page} sur {last}</span>
+            <button disabled={page >= last} onClick={() => onPage(page + 1)} className="inline-flex items-center gap-1 text-[#3D3934] disabled:opacity-30">Suivant <ChevronRight size={16} /></button>
         </div>
     );
 }
@@ -122,14 +122,14 @@ export function LiveView({ onOpenCampaign }) {
                 subtitle="Le déroulement de vos campagnes, point de retrait par point de retrait, mis à jour automatiquement."
                 action={
                     <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-2 rounded-full bg-white border border-[#EDE6DC] px-3 py-2 text-xs text-[#3B342D]">
-                            <span className={`h-2 w-2 rounded-full ${auto ? "bg-[#3F6B45] animate-pulse" : "bg-[#9A8E80]"}`} />
+                        <span className="inline-flex items-center gap-2 rounded-full bg-white border border-[#E9E5DF] px-3 py-2 text-xs text-[#3D3934]">
+                            <span className={`h-2 w-2 rounded-full ${auto ? "bg-[#3F6B45] animate-pulse" : "bg-[#8A837A]"}`} />
                             {data ? `Mis à jour ${ago(data.generated_at, now)}` : "Chargement"}
                         </span>
-                        <button onClick={() => setAuto((v) => !v)} className="w-10 h-10 rounded-2xl bg-white border border-[#EDE6DC] flex items-center justify-center text-[#3B342D]" aria-label={auto ? "Suspendre la mise à jour automatique" : "Reprendre la mise à jour automatique"} title={auto ? "Suspendre" : "Reprendre"}>
+                        <button onClick={() => setAuto((v) => !v)} className="w-10 h-10 rounded-2xl bg-white border border-[#E9E5DF] flex items-center justify-center text-[#3D3934]" aria-label={auto ? "Suspendre la mise à jour automatique" : "Reprendre la mise à jour automatique"} title={auto ? "Suspendre" : "Reprendre"}>
                             {auto ? <Pause size={16} /> : <Play size={16} />}
                         </button>
-                        <button onClick={load} className="w-10 h-10 rounded-2xl bg-white border border-[#EDE6DC] flex items-center justify-center text-[#3B342D]" aria-label="Actualiser maintenant" title="Actualiser">
+                        <button onClick={load} className="w-10 h-10 rounded-2xl bg-white border border-[#E9E5DF] flex items-center justify-center text-[#3D3934]" aria-label="Actualiser maintenant" title="Actualiser">
                             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
                         </button>
                     </div>
@@ -165,14 +165,14 @@ export function LiveView({ onOpenCampaign }) {
                             <div className="space-y-4 min-w-0">
                                 <LiveMap cities={data.cities} points={data.points} focus={focus} />
                                 {data.points.some((p) => p.lat === null) && (
-                                    <p className="text-xs text-[#9A8E80]">Certains points de retrait n’ont pas encore de position GPS : ils figurent dans la liste mais pas sur la carte.</p>
+                                    <p className="text-xs text-[#8A837A]">Certains points de retrait n’ont pas encore de position GPS : ils figurent dans la liste mais pas sur la carte.</p>
                                 )}
                             </div>
                             <Card className="p-5 min-w-0">
-                                <h2 className="font-serif text-lg text-[#1F1B16] flex items-center gap-2"><Radio size={17} className="text-[#C2185B]" /> En direct</h2>
-                                <p className="text-xs text-[#9A8E80] mt-1">Les 15 derniers événements, sans aucune donnée personnelle.</p>
+                                <h2 className="font-serif text-lg text-[#1A1814] flex items-center gap-2"><Radio size={17} className="text-[#C2185B]" /> En direct</h2>
+                                <p className="text-xs text-[#8A837A] mt-1">Les 15 derniers événements, sans aucune donnée personnelle.</p>
                                 {data.recent.length ? (
-                                    <ul className="divide-y divide-[#F1ECE4] mt-2 max-h-[420px] overflow-y-auto pr-1">{data.recent.map((e, i) => <EventRow key={`${e.type}-${e.at}-${i}`} e={e} now={now} />)}</ul>
+                                    <ul className="divide-y divide-[#EFECE7] mt-2 max-h-[420px] overflow-y-auto pr-1">{data.recent.map((e, i) => <EventRow key={`${e.type}-${e.at}-${i}`} e={e} now={now} />)}</ul>
                                 ) : <Empty title="Aucune activité" text="Les inscriptions et retraits apparaîtront ici." />}
                             </Card>
                         </div>
@@ -182,21 +182,21 @@ export function LiveView({ onOpenCampaign }) {
                         <div className="grid grid-cols-[minmax(0,1fr)] xl:grid-cols-2 gap-6">
                             <Card className="p-0 overflow-hidden">
                                 <div className="px-5 pt-5 pb-3">
-                                    <h2 className="font-serif text-lg text-[#1F1B16]">Points de retrait</h2>
-                                    <p className="text-xs text-[#9A8E80]">Cliquez sur un point pour le centrer sur la carte.</p>
+                                    <h2 className="font-serif text-lg text-[#1A1814]">Points de retrait</h2>
+                                    <p className="text-xs text-[#8A837A]">Cliquez sur un point pour le centrer sur la carte.</p>
                                 </div>
                                 {data.points.length ? (
-                                    <ul className="divide-y divide-[#F1ECE4] max-h-[360px] overflow-y-auto">
+                                    <ul className="divide-y divide-[#EFECE7] max-h-[360px] overflow-y-auto">
                                         {data.points.map((p) => (
                                             <li key={p.id ?? p.name}>
-                                                <button disabled={p.lat === null} onClick={() => setFocus({ lat: p.lat, lng: p.lng, t: Date.now() })} className="w-full text-left px-5 py-3 flex items-center gap-3 hover:bg-[#FAF7F2] disabled:cursor-default">
+                                                <button disabled={p.lat === null} onClick={() => setFocus({ lat: p.lat, lng: p.lng, t: Date.now() })} className="w-full text-left px-5 py-3 flex items-center gap-3 hover:bg-[#F9F8F6] disabled:cursor-default">
                                                     <MapPin size={16} className={p.lat === null ? "text-[#C9C0B4]" : "text-[#C2185B]"} />
                                                     <span className="min-w-0 flex-1">
-                                                        <span className="block text-sm text-[#1F1B16] truncate">{p.name}</span>
-                                                        <span className="block text-xs text-[#9A8E80] truncate">{p.address || "Adresse non renseignée"}</span>
+                                                        <span className="block text-sm text-[#1A1814] truncate">{p.name}</span>
+                                                        <span className="block text-xs text-[#8A837A] truncate">{p.address || "Adresse non renseignée"}</span>
                                                     </span>
                                                     <span className="shrink-0 text-right text-xs tabular-nums">
-                                                        <span className="block text-[#1F1B16]">{p.withdrawn} / {p.registrations}</span>
+                                                        <span className="block text-[#1A1814]">{p.withdrawn} / {p.registrations}</span>
                                                         {p.today_withdrawn > 0 && <span className="block text-[#C2185B]">+{p.today_withdrawn} aujourd’hui</span>}
                                                     </span>
                                                 </button>
@@ -206,8 +206,8 @@ export function LiveView({ onOpenCampaign }) {
                                 ) : <Empty title="Aucun point de retrait choisi" text="Aucun inscrit pour le moment." />}
                             </Card>
                             <Card className="p-5">
-                                <h2 className="font-serif text-lg text-[#1F1B16] mb-1">Campagnes suivies</h2>
-                                <p className="text-xs text-[#9A8E80] mb-4">Kits retirés sur kits fournis</p>
+                                <h2 className="font-serif text-lg text-[#1A1814] mb-1">Campagnes suivies</h2>
+                                <p className="text-xs text-[#8A837A] mb-4">Kits retirés sur kits fournis</p>
                                 <ul className="space-y-4">
                                     {data.campaigns.map((c) => {
                                         const r = c.objective_kits ? Math.min(100, (c.withdrawn / c.objective_kits) * 100) : 0;
@@ -215,11 +215,11 @@ export function LiveView({ onOpenCampaign }) {
                                             <li key={c.id}>
                                                 <button onClick={() => onOpenCampaign(c.id)} className="w-full text-left group">
                                                     <div className="flex items-center justify-between gap-3 text-sm">
-                                                        <span className="truncate text-[#1F1B16] group-hover:text-[#C2185B]">{c.title}</span>
+                                                        <span className="truncate text-[#1A1814] group-hover:text-[#C2185B]">{c.title}</span>
                                                         <Badge tone={STATUS_TONE[c.status]}>{c.status_label}</Badge>
                                                     </div>
-                                                    <div className="h-2 rounded-full bg-[#F1ECE4] mt-2 overflow-hidden"><div className="dash-grow h-full rounded-full bg-[#FF6EA9]" style={{ width: `${r}%` }} /></div>
-                                                    <p className="mt-1 text-xs text-[#9A8E80]">{n(c.withdrawn)} / {n(c.objective_kits)} · {n(c.registrations)} inscrit(s) · {c.cities.join(", ") || "Ville non renseignée"}</p>
+                                                    <div className="h-2 rounded-full bg-[#EFECE7] mt-2 overflow-hidden"><div className="dash-grow h-full rounded-full bg-[#FF6EA9]" style={{ width: `${r}%` }} /></div>
+                                                    <p className="mt-1 text-xs text-[#8A837A]">{n(c.withdrawn)} / {n(c.objective_kits)} · {n(c.registrations)} inscrit(s) · {c.cities.join(", ") || "Ville non renseignée"}</p>
                                                 </button>
                                             </li>
                                         );
@@ -283,7 +283,7 @@ export function ActivityView() {
             {error ? <ErrorBox message={error} onRetry={load} /> : !data ? <Skeleton className="h-72" /> : (
                 <>
                     <Card className="p-6">
-                        <h2 className="font-serif text-lg text-[#1F1B16] mb-4">Par jour</h2>
+                        <h2 className="font-serif text-lg text-[#1A1814] mb-4">Par jour</h2>
                         {daily.length ? (
                             <StackedBars label="Événements par jour" data={daily} series={[
                                 { key: "registration", label: "Inscriptions", color: PALETTE.ink },
@@ -294,7 +294,7 @@ export function ActivityView() {
                     </Card>
                     <Card className="overflow-hidden">
                         {data.data.length ? (
-                            <ul className="divide-y divide-[#F1ECE4] px-5">{data.data.map((e, i) => <EventRow key={`${e.type}-${e.at}-${i}`} e={e} now={now} />)}</ul>
+                            <ul className="divide-y divide-[#EFECE7] px-5">{data.data.map((e, i) => <EventRow key={`${e.type}-${e.at}-${i}`} e={e} now={now} />)}</ul>
                         ) : <Empty title="Aucun événement" text="Modifiez les filtres pour élargir la recherche." />}
                         <Pager page={data.page} last={data.last_page} onPage={(p) => set({ page: p })} />
                     </Card>
@@ -343,7 +343,7 @@ export function PointsView() {
             ) : (
                 <Card className="overflow-x-auto p-0">
                     <table className="w-full min-w-[820px] text-sm">
-                        <thead className="text-left text-[11px] uppercase tracking-[0.12em] text-[#9A8E80] border-b border-[#F1ECE4]">
+                        <thead className="text-left text-[11px] uppercase tracking-[0.12em] text-[#8A837A] border-b border-[#EFECE7]">
                             <tr>
                                 <th className="px-5 py-4 font-medium">Point de retrait</th>
                                 <th className="px-4 py-4 font-medium text-right">Inscrits</th>
@@ -354,24 +354,24 @@ export function PointsView() {
                                 <th className="px-5 py-4 font-medium text-right">Dernière activité</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#F1ECE4]">
+                        <tbody className="divide-y divide-[#EFECE7]">
                             {data.data.map((p) => (
-                                <tr key={p.id ?? p.name} className="hover:bg-[#FAF7F2]">
+                                <tr key={p.id ?? p.name} className="hover:bg-[#F9F8F6]">
                                     <td className="px-5 py-3.5">
-                                        <p className="text-[#1F1B16]">{p.name}</p>
-                                        <p className="text-xs text-[#9A8E80]">{p.address || "Adresse non renseignée"}{p.lat === null ? " · sans position GPS" : ""}</p>
+                                        <p className="text-[#1A1814]">{p.name}</p>
+                                        <p className="text-xs text-[#8A837A]">{p.address || "Adresse non renseignée"}{p.lat === null ? " · sans position GPS" : ""}</p>
                                     </td>
                                     <td className="px-4 py-3.5 text-right tabular-nums">{n(p.registrations)}</td>
                                     <td className="px-4 py-3.5 text-right tabular-nums">{n(p.validated)}</td>
                                     <td className="px-4 py-3.5 text-right tabular-nums font-medium">{n(p.withdrawn)}</td>
                                     <td className="px-4 py-3.5">
                                         <div className="flex items-center gap-2">
-                                            <div className="h-1.5 flex-1 rounded-full bg-[#F1ECE4] overflow-hidden"><div className="h-full rounded-full bg-[#FF6EA9]" style={{ width: `${p.rate || 0}%` }} /></div>
-                                            <span className="text-xs text-[#7A6E62] tabular-nums w-12 text-right">{p.rate === null ? "0 %" : pct(p.rate)}</span>
+                                            <div className="h-1.5 flex-1 rounded-full bg-[#EFECE7] overflow-hidden"><div className="h-full rounded-full bg-[#FF6EA9]" style={{ width: `${p.rate || 0}%` }} /></div>
+                                            <span className="text-xs text-[#6B655D] tabular-nums w-12 text-right">{p.rate === null ? "0 %" : pct(p.rate)}</span>
                                         </div>
                                     </td>
-                                    <td className={`px-4 py-3.5 text-right tabular-nums ${p.today_withdrawn ? "text-[#C2185B] font-medium" : "text-[#9A8E80]"}`}>{p.today_withdrawn}</td>
-                                    <td className="px-5 py-3.5 text-right text-xs text-[#7A6E62] whitespace-nowrap">{ago(p.last_activity_at, now)}</td>
+                                    <td className={`px-4 py-3.5 text-right tabular-nums ${p.today_withdrawn ? "text-[#C2185B] font-medium" : "text-[#8A837A]"}`}>{p.today_withdrawn}</td>
+                                    <td className="px-5 py-3.5 text-right text-xs text-[#6B655D] whitespace-nowrap">{ago(p.last_activity_at, now)}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -417,20 +417,20 @@ export function CitiesView() {
             ) : (
                 <div className="grid grid-cols-[minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-6">
                     <Card className="p-6">
-                        <h2 className="font-serif text-lg text-[#1F1B16] mb-1">Retirés / inscrits</h2>
-                        <p className="text-xs text-[#9A8E80] mb-4">Barre claire : inscrits · barre rose : kits retirés</p>
+                        <h2 className="font-serif text-lg text-[#1A1814] mb-1">Retirés / inscrits</h2>
+                        <p className="text-xs text-[#8A837A] mb-4">Barre claire : inscrits · barre rose : kits retirés</p>
                         <HBars rows={data.data.map((c) => ({ label: c.city, registrations: c.registrations, withdrawn: c.withdrawn }))} />
                     </Card>
                     <Card className="overflow-hidden">
-                        <ul className="divide-y divide-[#F1ECE4]">
+                        <ul className="divide-y divide-[#EFECE7]">
                             {data.data.map((c) => (
                                 <li key={c.city} className="px-5 py-4 flex items-start gap-3">
-                                    <Building2 size={17} className={`mt-0.5 shrink-0 ${c.in_progress ? "text-[#C2185B]" : "text-[#9A8E80]"}`} />
+                                    <Building2 size={17} className={`mt-0.5 shrink-0 ${c.in_progress ? "text-[#C2185B]" : "text-[#8A837A]"}`} />
                                     <span className="min-w-0 flex-1">
-                                        <span className="block text-[#1F1B16]">{c.city}</span>
-                                        <span className="block text-xs text-[#9A8E80] truncate">{c.campaigns.length ? c.campaigns.join(", ") : "Ville déclarée par des inscrits"}</span>
+                                        <span className="block text-[#1A1814]">{c.city}</span>
+                                        <span className="block text-xs text-[#8A837A] truncate">{c.campaigns.length ? c.campaigns.join(", ") : "Ville déclarée par des inscrits"}</span>
                                     </span>
-                                    <span className="shrink-0 text-right text-xs tabular-nums text-[#3B342D]">
+                                    <span className="shrink-0 text-right text-xs tabular-nums text-[#3D3934]">
                                         <span className="block">{n(c.registrations)} inscrit(s)</span>
                                         <span className="block">{n(c.validated)} code(s) validé(s)</span>
                                         <span className="block text-[#C2185B]">{n(c.withdrawn)} retiré(s) · {c.rate === null ? "0 %" : pct(c.rate)}</span>

@@ -46,9 +46,9 @@ export default function HistoryView({ period, date, onPeriodChange, search, refr
             ) : (
                 <>
                     <div className="dash-stagger grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                        <Card className="p-5"><p className="text-xs uppercase tracking-[0.12em] text-[#9A8E80]">Retraits</p><p className="mt-2 text-2xl font-semibold text-[#1F1B16]">{data.totals.count}</p></Card>
-                        <Card className="p-5"><p className="text-xs uppercase tracking-[0.12em] text-[#9A8E80]">Montant des produits remis</p><p className="mt-2 text-2xl font-semibold text-[#1F1B16]">{fcfa(data.totals.products_amount)}</p></Card>
-                        <Card className="p-5"><p className="text-xs uppercase tracking-[0.12em] text-[#9A8E80]">Commissions</p><p className="mt-2 text-2xl font-semibold text-[#3F6B45]">{fcfa(data.totals.commission)}</p></Card>
+                        <Card className="p-5"><p className="text-xs uppercase tracking-[0.12em] text-[#8A837A]">Retraits</p><p className="mt-2 text-2xl font-semibold text-[#1A1814]">{data.totals.count}</p></Card>
+                        <Card className="p-5"><p className="text-xs uppercase tracking-[0.12em] text-[#8A837A]">Montant des produits remis</p><p className="mt-2 text-2xl font-semibold text-[#1A1814]">{fcfa(data.totals.products_amount)}</p></Card>
+                        <Card className="p-5"><p className="text-xs uppercase tracking-[0.12em] text-[#8A837A]">Commissions</p><p className="mt-2 text-2xl font-semibold text-[#3F6B45]">{fcfa(data.totals.commission)}</p></Card>
                     </div>
                     <Card className="overflow-x-auto">
                         {data.data.length === 0 ? (
@@ -56,18 +56,18 @@ export default function HistoryView({ period, date, onPeriodChange, search, refr
                         ) : (
                             <>
                             {/* Mobile : une carte par retrait */}
-                            <ul className="md:hidden divide-y divide-[#F1ECE4]">
+                            <ul className="md:hidden divide-y divide-[#EFECE7]">
                                 {data.data.map((w) => (
                                     <li key={`m-${w.type}-${w.id}`} className="px-5 py-4 flex items-start justify-between gap-3">
                                         <div className="min-w-0">
                                             <div className="flex items-center gap-2">
                                                 <Badge tone={w.type === "kit" ? "rose" : "ink"}>{w.type === "kit" ? "Kit" : "Commande"}</Badge>
-                                                <span className="text-sm text-[#1F1B16] truncate">{w.reference}</span>
+                                                <span className="text-sm text-[#1A1814] truncate">{w.reference}</span>
                                             </div>
-                                            <p className="text-xs text-[#9A8E80] mt-1 truncate">{w.customer || "Client non renseigné"} · {dateTime(w.withdrawn_at)}</p>
+                                            <p className="text-xs text-[#8A837A] mt-1 truncate">{w.customer || "Client non renseigné"} · {dateTime(w.withdrawn_at)}</p>
                                         </div>
                                         <div className="text-right shrink-0">
-                                            <p className="text-sm text-[#1F1B16]">{w.amount === null ? "Kit gratuit" : fcfa(w.amount)}</p>
+                                            <p className="text-sm text-[#1A1814]">{w.amount === null ? "Kit gratuit" : fcfa(w.amount)}</p>
                                             <p className="text-xs text-[#3F6B45] mt-0.5">{w.commission === null ? "Non calculée" : `+${fcfa(w.commission)}`}</p>
                                         </div>
                                     </li>
@@ -75,7 +75,7 @@ export default function HistoryView({ period, date, onPeriodChange, search, refr
                             </ul>
                             <table className="hidden md:table w-full min-w-[640px] text-sm">
                                 <thead>
-                                    <tr className="text-left text-xs uppercase tracking-wider text-[#9A8E80] border-b border-[#F1ECE4]">
+                                    <tr className="text-left text-xs uppercase tracking-wider text-[#8A837A] border-b border-[#EFECE7]">
                                         <th className="px-6 py-4 font-medium">Date</th>
                                         <th className="px-6 py-4 font-medium">Type</th>
                                         <th className="px-6 py-4 font-medium">Référence</th>
@@ -84,14 +84,14 @@ export default function HistoryView({ period, date, onPeriodChange, search, refr
                                         <th className="px-6 py-4 font-medium text-right">Commission</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-[#F1ECE4]">
+                                <tbody className="divide-y divide-[#EFECE7]">
                                     {data.data.map((w) => (
-                                        <tr key={`${w.type}-${w.id}`} className="hover:bg-[#FBF8F4]">
-                                            <td className="px-6 py-3.5 text-[#7A6E62] whitespace-nowrap">{dateTime(w.withdrawn_at)}</td>
+                                        <tr key={`${w.type}-${w.id}`} className="hover:bg-[#FBFAF8]">
+                                            <td className="px-6 py-3.5 text-[#6B655D] whitespace-nowrap">{dateTime(w.withdrawn_at)}</td>
                                             <td className="px-6 py-3.5"><Badge tone={w.type === "kit" ? "rose" : "ink"}>{w.type === "kit" ? "Kit" : "Commande"}</Badge></td>
-                                            <td className="px-6 py-3.5 text-[#1F1B16]">{w.reference}</td>
-                                            <td className="px-6 py-3.5 text-[#1F1B16]">{w.customer || "Client non renseigné"}</td>
-                                            <td className="px-6 py-3.5 text-right text-[#1F1B16]">{w.amount === null ? "Kit gratuit" : fcfa(w.amount)}</td>
+                                            <td className="px-6 py-3.5 text-[#1A1814]">{w.reference}</td>
+                                            <td className="px-6 py-3.5 text-[#1A1814]">{w.customer || "Client non renseigné"}</td>
+                                            <td className="px-6 py-3.5 text-right text-[#1A1814]">{w.amount === null ? "Kit gratuit" : fcfa(w.amount)}</td>
                                             <td className="px-6 py-3.5 text-right text-[#3F6B45]">{w.commission === null ? "Non calculée" : fcfa(w.commission)}</td>
                                         </tr>
                                     ))}
@@ -100,7 +100,7 @@ export default function HistoryView({ period, date, onPeriodChange, search, refr
                             </>
                         )}
                     </Card>
-                    <p className="text-xs text-[#9A8E80] mt-3">« Non calculée » : retrait antérieur à la mise en place des commissions.</p>
+                    <p className="text-xs text-[#8A837A] mt-3">« Non calculée » : retrait antérieur à la mise en place des commissions.</p>
                 </>
             )}
         </div>

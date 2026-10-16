@@ -102,13 +102,13 @@ export default function LiveMap({ cities = [], points = [], focus, onSelectPoint
             el.style.height = `${size}px`;
             el.innerHTML = `${p.today_withdrawn > 0 ? '<span class="sponsor-live-pulse"></span>' : ""}<span class="sponsor-live-dot">${p.registrations}</span>`;
             const popup = new maplibregl.Popup({ offset: size / 2 + 4, closeButton: false, maxWidth: "260px" }).setHTML(`
-                <div style="font-family: inherit; color:#1F1B16">
+                <div style="font-family: inherit; color:#1A1814">
                   <p style="font-weight:600; margin:0 0 2px">${esc(p.name)}</p>
-                  ${p.address ? `<p style="margin:0 0 8px; color:#7A6E62; font-size:12px">${esc(p.address)}</p>` : ""}
+                  ${p.address ? `<p style="margin:0 0 8px; color:#6B655D; font-size:12px">${esc(p.address)}</p>` : ""}
                   <p style="margin:0; font-size:12px">Inscrits : <b>${p.registrations}</b></p>
                   <p style="margin:0; font-size:12px">Codes validés : <b>${p.validated}</b></p>
                   <p style="margin:0; font-size:12px">Kits retirés : <b>${p.withdrawn}</b> (${pct(p.rate)})</p>
-                  <p style="margin:6px 0 0; font-size:12px; color:${p.today_withdrawn ? ROSE : "#9A8E80"}">Retirés aujourd’hui : <b>${p.today_withdrawn}</b></p>
+                  <p style="margin:6px 0 0; font-size:12px; color:${p.today_withdrawn ? ROSE : "#8A837A"}">Retirés aujourd’hui : <b>${p.today_withdrawn}</b></p>
                 </div>`);
             el.addEventListener("click", () => onSelectPoint?.(p));
             markers.current.push(new maplibregl.Marker({ element: el }).setLngLat([p.lng, p.lat]).setPopup(popup).addTo(map));
@@ -128,9 +128,9 @@ export default function LiveMap({ cities = [], points = [], focus, onSelectPoint
     }, [focus, ready]);
 
     return (
-        <div className="relative overflow-hidden rounded-3xl border border-[#EDE6DC] bg-[#F1ECE6]" style={{ height }}>
+        <div className="relative overflow-hidden rounded-2xl border border-[#E9E5DF] bg-[#F1ECE6]" style={{ height }}>
             <div ref={box} className="absolute inset-0" />
-            <div className="pointer-events-none absolute left-3 top-3 rounded-2xl bg-white/90 px-3 py-2 text-[11px] text-[#3B342D] shadow-sm backdrop-blur">
+            <div className="pointer-events-none absolute left-3 top-3 rounded-2xl bg-white/90 px-3 py-2 text-[11px] text-[#3D3934] shadow-sm backdrop-blur">
                 <p className="flex items-center gap-2"><span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: ROSE }} /> Point de retrait (taille : inscrits)</p>
                 <p className="mt-1 flex items-center gap-2"><span className="inline-block h-2.5 w-2.5 rounded-full border-2" style={{ borderColor: ROSE }} /> Kit retiré aujourd’hui</p>
                 <p className="mt-1 flex items-center gap-2"><span className="inline-block h-0 w-4 border-t border-dashed" style={{ borderColor: ROSE }} /> Ville de campagne</p>

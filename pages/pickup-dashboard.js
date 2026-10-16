@@ -77,17 +77,17 @@ export default function PickupDashboardPage() {
 
     if (denied) {
         return (
-            <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center p-6 text-center">
+            <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center p-6 text-center">
                 <div>
-                    <p className="font-serif text-2xl text-[#1F1B16]">Accès impossible</p>
-                    <p className="text-[#7A6E62] mt-2">{denied}</p>
+                    <p className="font-serif text-2xl text-[#1A1814]">Accès impossible</p>
+                    <p className="text-[#6B655D] mt-2">{denied}</p>
                 </div>
             </div>
         );
     }
     if (!me) {
         return (
-            <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center">
+            <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-[#C2185B]" />
             </div>
         );

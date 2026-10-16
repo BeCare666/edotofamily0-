@@ -4,7 +4,7 @@ import { Tabs } from "./ui";
 
 // Filtre jour / mois / année (dates réelles des retraits, heure du Bénin)
 export default function PeriodFilter({ period, date, onChange }) {
-    const input = "px-3 py-2 rounded-xl border border-[#E4DBCE] bg-white text-sm text-[#1F1B16] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/30";
+    const input = "px-3 py-2 rounded-xl border border-[#E0DBD4] bg-white text-sm text-[#1A1814] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/30";
     const setPeriod = (p) => {
         // On garde la même date de référence, au bon format
         const ref = date.length >= 10 ? date : date.length === 7 ? `${date}-01` : `${date}-01-01`;

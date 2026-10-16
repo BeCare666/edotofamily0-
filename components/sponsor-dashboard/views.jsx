@@ -48,7 +48,7 @@ export function HomeView({ onOpenCampaign }) {
             </div>
             <div className="dash-stagger grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <Card className="p-6">
-                    <h2 className="font-serif text-lg text-[#1F1B16] mb-4">Campagnes par statut</h2>
+                    <h2 className="font-serif text-lg text-[#1A1814] mb-4">Campagnes par statut</h2>
                     <Donut label="Campagnes par statut" items={[
                         { label: "En cours", value: t.en_cours, color: PALETTE.rose },
                         { label: "À venir", value: t.a_venir, color: PALETTE.sand },
@@ -56,17 +56,17 @@ export function HomeView({ onOpenCampaign }) {
                     ]} />
                 </Card>
                 <Card className="p-6 xl:col-span-2">
-                    <h2 className="font-serif text-lg text-[#1F1B16] mb-4">Kits retirés par mois</h2>
+                    <h2 className="font-serif text-lg text-[#1A1814] mb-4">Kits retirés par mois</h2>
                     <Bars label="Kits retirés par mois" color={PALETTE.rose} seriesLabel="Kits retirés"
                         data={data.monthly_withdrawals.map((m) => ({ label: MONTHS[Number(m.month.slice(5, 7)) - 1], title: `${MONTHS[Number(m.month.slice(5, 7)) - 1]} ${m.month.slice(0, 4)}`, value: m.withdrawn }))} />
                 </Card>
             </div>
             <Card className="p-6">
-                <h2 className="font-serif text-lg text-[#1F1B16] mb-4">Vos contributions par campagne</h2>
+                <h2 className="font-serif text-lg text-[#1A1814] mb-4">Vos contributions par campagne</h2>
                 {data.contributions_by_campaign.length === 0 ? (
                     <Empty title="Aucune campagne" text="Aucune campagne n’est encore rattachée à votre espace." />
                 ) : (
-                    <ul className="divide-y divide-[#F1ECE4]">
+                    <ul className="divide-y divide-[#EFECE7]">
                         {data.contributions_by_campaign.map((c) => (
                             <li key={c.id}>
                                 <button onClick={() => onOpenCampaign(c.id)} className="w-full text-left py-3 flex items-center justify-between gap-3 hover:text-[#C2185B]">
@@ -137,15 +137,15 @@ export function CampaignsView({ search, onOpenCampaign }) {
                                     const rate = c.objective_kits ? Math.min(100, (c.withdrawn / c.objective_kits) * 100) : 0;
                                     return (
                                         <button key={c.id} onClick={() => onOpenCampaign(c.id)} className="text-left">
-                                            <Card className="p-6 h-full transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_-20px_rgba(60,40,20,0.35)]">
+                                            <Card className="p-6 h-full transition duration-300 hover:border-[#D6D2CB]">
                                                 <div className="flex items-start justify-between gap-3">
-                                                    <h3 className="font-serif text-lg text-[#1F1B16]">{c.title}</h3>
+                                                    <h3 className="font-serif text-lg text-[#1A1814]">{c.title}</h3>
                                                     <Badge tone={STATUS_TONE[c.status]}>{c.status_label}</Badge>
                                                 </div>
-                                                <p className="text-sm text-[#7A6E62] mt-1">{c.cities.join(", ") || "Ville non renseignée"} · {dateOnly(`${c.date_start}T12:00:00Z`)} → {c.date_end ? dateOnly(`${c.date_end}T12:00:00Z`) : "date de fin non définie"}</p>
-                                                <div className="mt-5 flex justify-between text-sm"><span className="text-[#7A6E62]">Kits retirés</span><span className="text-[#1F1B16] font-medium">{c.withdrawn} / {c.objective_kits}</span></div>
-                                                <div className="h-2 rounded-full bg-[#F1ECE4] mt-2 overflow-hidden"><div className="dash-grow h-full rounded-full bg-[#FF6EA9]" style={{ width: `${rate}%` }} /></div>
-                                                <div className="mt-4 flex justify-between text-xs text-[#9A8E80]"><span>{c.registrations} inscrit(s)</span><span>Votre contribution : {fcfa(c.contribution)}</span></div>
+                                                <p className="text-sm text-[#6B655D] mt-1">{c.cities.join(", ") || "Ville non renseignée"} · {dateOnly(`${c.date_start}T12:00:00Z`)} → {c.date_end ? dateOnly(`${c.date_end}T12:00:00Z`) : "date de fin non définie"}</p>
+                                                <div className="mt-5 flex justify-between text-sm"><span className="text-[#6B655D]">Kits retirés</span><span className="text-[#1A1814] font-medium">{c.withdrawn} / {c.objective_kits}</span></div>
+                                                <div className="h-2 rounded-full bg-[#EFECE7] mt-2 overflow-hidden"><div className="dash-grow h-full rounded-full bg-[#FF6EA9]" style={{ width: `${rate}%` }} /></div>
+                                                <div className="mt-4 flex justify-between text-xs text-[#8A837A]"><span>{c.registrations} inscrit(s)</span><span>Votre contribution : {fcfa(c.contribution)}</span></div>
                                             </Card>
                                         </button>
                                     );
@@ -182,14 +182,14 @@ export function CampaignView({ id, onBack, onExportsChanged }) {
 
     return (
         <div className="space-y-6">
-            <button onClick={onBack} className="inline-flex items-center gap-2 text-sm text-[#7A6E62] hover:text-[#1F1B16]"><ArrowLeft size={16} /> Mes campagnes</button>
+            <button onClick={onBack} className="inline-flex items-center gap-2 text-sm text-[#6B655D] hover:text-[#1A1814]"><ArrowLeft size={16} /> Mes campagnes</button>
             <Card className="p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center gap-5">
                 <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="font-serif text-2xl sm:text-3xl text-[#1F1B16]">{c.title}</h1>
+                        <h1 className="font-serif text-2xl sm:text-3xl text-[#1A1814]">{c.title}</h1>
                         <Badge tone={STATUS_TONE[c.status]}>{c.status_label}</Badge>
                     </div>
-                    <p className="text-sm text-[#7A6E62] mt-2">{c.cities.join(", ") || "Ville non renseignée"} · du {dateOnly(`${c.date_start}T12:00:00Z`)} au {c.date_end ? dateOnly(`${c.date_end}T12:00:00Z`) : "date de fin non définie"} · votre contribution : {fcfa(c.contribution)}</p>
+                    <p className="text-sm text-[#6B655D] mt-2">{c.cities.join(", ") || "Ville non renseignée"} · du {dateOnly(`${c.date_start}T12:00:00Z`)} au {c.date_end ? dateOnly(`${c.date_end}T12:00:00Z`) : "date de fin non définie"} · votre contribution : {fcfa(c.contribution)}</p>
                 </div>
                 <ExportAction c={c} busy={busy} onRequest={requestExport} />
             </Card>
@@ -206,28 +206,28 @@ export function CampaignView({ id, onBack, onExportsChanged }) {
 
             <div className="dash-stagger grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <Card className="p-6 xl:col-span-2">
-                    <h2 className="font-serif text-lg text-[#1F1B16] mb-4">Évolution</h2>
+                    <h2 className="font-serif text-lg text-[#1A1814] mb-4">Évolution</h2>
                     <CumulativeLines series={data.daily} objective={i.objective_kits} />
                 </Card>
                 <Card className="p-6">
-                    <h2 className="font-serif text-lg text-[#1F1B16] mb-4 flex items-center gap-2"><TrendingUp size={18} className="text-[#C2185B]" /> Prévision</h2>
+                    <h2 className="font-serif text-lg text-[#1A1814] mb-4 flex items-center gap-2"><TrendingUp size={18} className="text-[#C2185B]" /> Prévision</h2>
                     {p.available ? (
                         <div>
-                            <p className="text-sm text-[#7A6E62]">Kits retirés estimés à la date de fin</p>
-                            <p className="font-serif text-4xl text-[#1F1B16] mt-2">{p.projected_withdrawals}</p>
+                            <p className="text-sm text-[#6B655D]">Kits retirés estimés à la date de fin</p>
+                            <p className="font-serif text-4xl text-[#1A1814] mt-2">{p.projected_withdrawals}</p>
                             <p className="text-sm text-[#3F6B45] mt-1">{p.projected_percent_of_objective === null ? "" : `soit ${pct(p.projected_percent_of_objective)} des kits fournis`}</p>
-                            <p className="text-xs text-[#9A8E80] mt-4">{p.method} Rythme actuel : {String(p.rate_per_day).replace(".", ",")} kit(s) par jour sur {p.days_elapsed} jours ; {p.days_remaining} jour(s) restant(s).</p>
+                            <p className="text-xs text-[#8A837A] mt-4">{p.method} Rythme actuel : {String(p.rate_per_day).replace(".", ",")} kit(s) par jour sur {p.days_elapsed} jours ; {p.days_remaining} jour(s) restant(s).</p>
                         </div>
                     ) : (
-                        <p className="text-sm text-[#7A6E62]">{p.reason}</p>
+                        <p className="text-sm text-[#6B655D]">{p.reason}</p>
                     )}
                 </Card>
             </div>
 
             <div className="dash-stagger grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <Card className="p-6"><h2 className="font-serif text-lg text-[#1F1B16] mb-4">Parcours</h2><Funnel steps={data.funnel} /></Card>
-                <Card className="p-6"><h2 className="font-serif text-lg text-[#1F1B16] mb-1">Par ville</h2><p className="text-xs text-[#9A8E80] mb-4">Retirés / inscrits</p>{data.by_city.length ? <HBars rows={data.by_city} /> : <Empty title="Aucun inscrit" />}</Card>
-                <Card className="p-6"><h2 className="font-serif text-lg text-[#1F1B16] mb-1">Par point de retrait</h2><p className="text-xs text-[#9A8E80] mb-4">Retirés / inscrits</p>{data.by_pickup_point.length ? <HBars rows={data.by_pickup_point} /> : <Empty title="Aucun inscrit" />}</Card>
+                <Card className="p-6"><h2 className="font-serif text-lg text-[#1A1814] mb-4">Parcours</h2><Funnel steps={data.funnel} /></Card>
+                <Card className="p-6"><h2 className="font-serif text-lg text-[#1A1814] mb-1">Par ville</h2><p className="text-xs text-[#8A837A] mb-4">Retirés / inscrits</p>{data.by_city.length ? <HBars rows={data.by_city} /> : <Empty title="Aucun inscrit" />}</Card>
+                <Card className="p-6"><h2 className="font-serif text-lg text-[#1A1814] mb-1">Par point de retrait</h2><p className="text-xs text-[#8A837A] mb-4">Retirés / inscrits</p>{data.by_pickup_point.length ? <HBars rows={data.by_pickup_point} /> : <Empty title="Aucun inscrit" />}</Card>
             </div>
         </div>
     );
@@ -236,9 +236,9 @@ export function CampaignView({ id, onBack, onExportsChanged }) {
 function ExportAction({ c, busy, onRequest }) {
     if (c.export_status === "approved") return <DownloadButton campaignId={c.id} />;
     if (c.export_status === "pending") return <Badge tone="wait">Export demandé : en attente de validation</Badge>;
-    if (c.status !== "terminee") return <p className="text-xs text-[#9A8E80] max-w-[220px]">L’export des données sera possible une fois la campagne terminée.</p>;
+    if (c.status !== "terminee") return <p className="text-xs text-[#8A837A] max-w-[220px]">L’export des données sera possible une fois la campagne terminée.</p>;
     return (
-        <button onClick={onRequest} disabled={busy} className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#1F1B16] text-white text-sm font-medium disabled:opacity-50">
+        <button onClick={onRequest} disabled={busy} className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#1A1814] text-white text-sm font-medium disabled:opacity-50">
             {busy ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
             {c.export_status === "rejected" ? "Redemander l’export" : "Demander l’export Excel"}
         </button>
@@ -291,12 +291,12 @@ export function ExportsView({ refreshKey, onOpenCampaign }) {
                 : !data ? <Skeleton className="h-48" />
                     : data.length === 0 ? <Card><Empty title="Aucune demande" text="Ouvrez une campagne terminée pour demander l’export de ses données." /></Card>
                         : (
-                            <Card className="divide-y divide-[#F1ECE4] overflow-hidden">
+                            <Card className="divide-y divide-[#EFECE7] overflow-hidden">
                                 {data.map((r) => (
                                     <div key={r.id} className="px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
                                         <button onClick={() => onOpenCampaign(r.campaign_id)} className="flex-1 text-left min-w-0">
-                                            <p className="font-medium text-[#1F1B16] truncate">{r.title}</p>
-                                            <p className="text-xs text-[#9A8E80] mt-0.5">Demandé le {dateTime(r.requested_at)}{r.decided_at ? ` · décidé le ${dateTime(r.decided_at)}` : ""}</p>
+                                            <p className="font-medium text-[#1A1814] truncate">{r.title}</p>
+                                            <p className="text-xs text-[#8A837A] mt-0.5">Demandé le {dateTime(r.requested_at)}{r.decided_at ? ` · décidé le ${dateTime(r.decided_at)}` : ""}</p>
                                             {r.status === "rejected" && r.reason && <p className="text-xs text-[#9B2C2C] mt-1">Motif : {r.reason}</p>}
                                         </button>
                                         <div className="flex items-center gap-3 shrink-0">

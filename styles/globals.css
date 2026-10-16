@@ -215,3 +215,18 @@ body {
 .sponsor-live-pulse { position: absolute; inset: -6px; border-radius: 9999px; border: 2px solid #D6457F; animation: sponsor-live-pulse 1.8s ease-out infinite; }
 @keyframes sponsor-live-pulse { 0% { transform: scale(0.8); opacity: 0.9; } 100% { transform: scale(1.7); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .sponsor-live-pulse { animation: none; opacity: 0.6; } }
+
+/* Refonte 16/10/2026 : tableaux des espaces point de retrait et sponsor (en-tête discret, filet plein, survol léger) */
+.dash-content table > thead { background: #f9f8f6; }
+.dash-content table > thead th {
+  color: #8a837a;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-bottom: 1px solid #e9e5df;
+}
+.dash-content table > tbody > tr { transition: background-color 0.15s ease; }
+.dash-content table > tbody > tr:hover { background: #fbfaf8; }
+.dash-content table td { font-variant-numeric: tabular-nums; }

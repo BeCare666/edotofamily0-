@@ -60,35 +60,35 @@ export default function ValidateModal({ item, onClose, onDone }) {
 
     return (
         <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="validate-title">
-            <div className="dash-view-in absolute inset-0 bg-[#1F1B16]/40 backdrop-blur-sm" onClick={() => !busy && onClose()} />
-            <div className="dash-sheet-in relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-[#FFFDF9] rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#EDE6DC] p-6 sm:p-8" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
-                <span className="sm:hidden block mx-auto -mt-2 mb-4 w-10 h-1 rounded-full bg-[#E4DBCE]" aria-hidden="true" />
-                <button onClick={() => !busy && onClose()} className="absolute right-5 top-5 p-2 rounded-full hover:bg-[#F3EEE7] text-[#7A6E62]" aria-label="Fermer">
+            <div className="dash-view-in absolute inset-0 bg-[#1A1814]/40 backdrop-blur-sm" onClick={() => !busy && onClose()} />
+            <div className="dash-sheet-in relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-[#FFFFFF] rounded-t-3xl sm:rounded-2xl shadow-[0_12px_32px_-12px_rgba(26,24,20,0.18)] border border-[#E9E5DF] p-6 sm:p-8" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
+                <span className="sm:hidden block mx-auto -mt-2 mb-4 w-10 h-1 rounded-full bg-[#E0DBD4]" aria-hidden="true" />
+                <button onClick={() => !busy && onClose()} className="absolute right-5 top-5 p-2 rounded-full hover:bg-[#F3F1EE] text-[#6B655D]" aria-label="Fermer">
                     <X size={18} />
                 </button>
                 <div className="flex items-start gap-4 pr-10">
-                    <span className="w-12 h-12 rounded-2xl bg-[#FCE8F0] text-[#C2185B] flex items-center justify-center shrink-0">
+                    <span className="w-12 h-12 rounded-2xl bg-[#FBEEF3] text-[#C2185B] flex items-center justify-center shrink-0">
                         {isKit ? <Gift size={22} /> : <Package size={22} />}
                     </span>
                     <div className="min-w-0">
-                        <h2 id="validate-title" className="font-serif text-xl text-[#1F1B16] truncate">
+                        <h2 id="validate-title" className="font-serif text-xl text-[#1A1814] truncate">
                             {isKit ? d.campaign_title : `Commande ${d.tracking_number}`}
                         </h2>
-                        <p className="text-sm text-[#7A6E62] mt-0.5">{isKit ? d.full_name : d.customer_name || "Client"}</p>
+                        <p className="text-sm text-[#6B655D] mt-0.5">{isKit ? d.full_name : d.customer_name || "Client"}</p>
                     </div>
                 </div>
 
                 <dl className="grid grid-cols-2 gap-4 mt-6 text-sm">
                     <div>
-                        <dt className="text-[#9A8E80] text-xs uppercase tracking-wider">{isKit ? "Inscrit le" : "Commandé le"}</dt>
-                        <dd className="text-[#1F1B16] mt-1">{dateTime(d.created_at)}</dd>
+                        <dt className="text-[#8A837A] text-xs uppercase tracking-wider">{isKit ? "Inscrit le" : "Commandé le"}</dt>
+                        <dd className="text-[#1A1814] mt-1">{dateTime(d.created_at)}</dd>
                     </div>
                     <div>
-                        <dt className="text-[#9A8E80] text-xs uppercase tracking-wider">{isKit ? "Ville" : "Montant des produits"}</dt>
-                        <dd className="text-[#1F1B16] mt-1">{isKit ? d.city || "Non renseignée" : fcfa(d.products_amount)}</dd>
+                        <dt className="text-[#8A837A] text-xs uppercase tracking-wider">{isKit ? "Ville" : "Montant des produits"}</dt>
+                        <dd className="text-[#1A1814] mt-1">{isKit ? d.city || "Non renseignée" : fcfa(d.products_amount)}</dd>
                     </div>
                     <div className="col-span-2">
-                        <dt className="text-[#9A8E80] text-xs uppercase tracking-wider">État</dt>
+                        <dt className="text-[#8A837A] text-xs uppercase tracking-wider">État</dt>
                         <dd className="mt-1">
                             {withdrawn ? (
                                 <Badge tone="ok">Remis le {dateTime(isKit ? d.picked_up_at : d.delivered_at)}</Badge>
@@ -107,7 +107,7 @@ export default function ValidateModal({ item, onClose, onDone }) {
                     <form onSubmit={submit} className="mt-7">
                         {!codeAlreadyValidated && (
                             <>
-                                <label htmlFor="otp" className="text-sm font-medium text-[#1F1B16]">Code du client</label>
+                                <label htmlFor="otp" className="text-sm font-medium text-[#1A1814]">Code du client</label>
                                 <input
                                     id="otp"
                                     ref={inputRef}
@@ -117,19 +117,19 @@ export default function ValidateModal({ item, onClose, onDone }) {
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                                     placeholder="000000"
-                                    className="mt-2 w-full px-4 py-3.5 rounded-2xl border border-[#E4DBCE] bg-white text-center text-2xl tracking-[0.5em] text-[#1F1B16] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/40"
+                                    className="mt-2 w-full px-4 py-3.5 rounded-2xl border border-[#E0DBD4] bg-white text-center text-2xl tracking-[0.5em] text-[#1A1814] focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/40"
                                 />
                             </>
                         )}
                         <button
                             type="submit"
                             disabled={busy || (!codeAlreadyValidated && otp.length !== 6)}
-                            className="mt-4 w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#1F1B16] text-white font-medium hover:bg-[#2E2822] disabled:opacity-40 transition"
+                            className="mt-4 w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#1A1814] text-white font-medium hover:bg-[#2E2822] disabled:opacity-40 transition"
                         >
                             {busy ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
                             {codeAlreadyValidated ? "Enregistrer le retrait" : "Valider et remettre"}
                         </button>
-                        <p className="text-xs text-[#9A8E80] mt-3 text-center">Seuls les retraits rattachés à votre point peuvent être validés.</p>
+                        <p className="text-xs text-[#8A837A] mt-3 text-center">Seuls les retraits rattachés à votre point peuvent être validés.</p>
                     </form>
                 )}
             </div>
