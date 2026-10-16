@@ -1,44 +1,124 @@
 "use client"
 
 import { useAuthContext } from "../context/AuthContext"
-import { motion } from "framer-motion"
 import {
     User,
     Mail,
     ShieldCheck,
     Calendar,
-    CheckCircle2,
-    XCircle,
     LogOut,
     KeyRound,
     Trash2,
+    Phone,
+    CalendarDays,
+    Lock,
+    ShoppingBag,
+    Gift,
+    ChevronRight,
+    CheckCircle2,
+    Loader2,
 } from "lucide-react"
-import Image from "next/image"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { apiRequest } from "../lib/api" // ✅ On réutilise ton helper existant
+import { authService } from "../services/authService"
+import ProfilePhoto from "../components/profile/ProfilePhoto"
+import { AuthField, ChoiceField, PasswordField, inputClass } from "../components/auth/AuthShell"
+import {
+    ageOn, birthDateError, birthDateLimits, nameError, nameInput, passwordError, passwordInput,
+    phoneError, phoneInput, SEX_OPTIONS,
+} from "../lib/fieldRules"
+
+const ROLE_LABEL = {
+    customer: "Utilisateur",
+    sponsor: "Sponsor",
+    super_pickuppoint: "Point de retrait",
+    super_admin: "Administration",
+    store_owner: "Boutique",
+    staff: "Équipe boutique",
+}
+const SEX_LABEL = { female: "Féminin", male: "Masculin" }
+const longDate = (d) => new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })
+
+function Section({ title, subtitle, children, action }) {
+    return (
+        <section className="rounded-2xl border border-[#E9E5DF] bg-white">
+            <header className="flex flex-wrap items-start justify-between gap-3 border-b border-[#EFECE7] px-5 py-4 sm:px-7">
+                <div>
+                    <h2 className="text-[15px] font-semibold text-[#1A1814]">{title}</h2>
+                    {subtitle && <p className="mt-0.5 text-[13px] text-[#8A837A]">{subtitle}</p>}
+                </div>
+                {action}
+            </header>
+            <div className="px-5 py-5 sm:px-7 sm:py-6">{children}</div>
+        </section>
+    )
+}
+
+function Row({ icon: Icon, label, value }) {
+    return (
+        <div className="flex items-center gap-3.5 py-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#57524B]"><Icon size={17} strokeWidth={1.8} /></span>
+            <div className="min-w-0">
+                <p className="text-[12px] text-[#8A837A]">{label}</p>
+                <p className="truncate text-[14.5px] font-medium text-[#1A1814]">{value}</p>
+            </div>
+        </div>
+    )
+}
 
 export default function ProfilePage() {
-    const { user, logout } = useAuthContext()
+    const { user, setUser, logout, loading } = useAuthContext() || {}
     const router = useRouter()
+    const [editing, setEditing] = useState(false)
+    const [form, setForm] = useState({ name: "", phone: "", birth_date: "", sex: "" })
+    const [touched, setTouched] = useState(false)
+    const [saving, setSaving] = useState(false)
     const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [loadingDelete, setLoadingDelete] = useState(false)
-    const [passwords, setPasswords] = useState({
-        old_password: "",
-        new_password: "",
-        confirm_password: "",
-    })
+    const [passwords, setPasswords] = useState({ old_password: "", new_password: "", confirm_password: "" })
+    const [pwdTouched, setPwdTouched] = useState(false)
     const [loadingPwd, setLoadingPwd] = useState(false)
+
+    useEffect(() => {
+        if (!loading && !user) router.push("/login")
+    }, [loading, user, router])
+
+    const startEdit = () => {
+        setForm({ name: user.name || "", phone: user.profile?.contact || "", birth_date: user.birth_date || "", sex: user.sex || "" })
+        setTouched(false)
+        setEditing(true)
+    }
 
     if (!user) {
         return (
-            <main className="flex h-screen items-center justify-center text-gray-500">
-                <p>Chargement du profil...</p>
+            <main className="flex min-h-[60vh] items-center justify-center gap-2 text-[#8A837A]">
+                <Loader2 size={18} className="animate-spin" /> <p>Chargement du profil...</p>
             </main>
         )
     }
-    //console.log("users", user);
+
+    const isPerson = !["sponsor", "super_pickuppoint"].includes(user.role)
+    const birthLocked = !!user.birth_date
+    const sexLocked = !!user.sex
+    const limits = birthDateLimits()
+    const errors = {
+        name: nameError(form.name, "Le nom complet"),
+        phone: phoneError(form.phone, { required: false }),
+        birth_date: !isPerson || birthLocked || !form.birth_date ? "" : birthDateError(form.birth_date),
+    }
+    const pwdErrors = {
+        old: passwords.old_password ? "" : "Indiquez votre mot de passe actuel.",
+        new: passwordError(passwords.new_password),
+        confirm: passwords.confirm_password === passwords.new_password ? "" : "Les mots de passe ne correspondent pas.",
+    }
+
+    const refreshUser = async () => {
+        try { setUser?.(await authService.me()) } catch { }
+    }
+
     // --- Déconnexion
     const handleLogout = async () => {
         await logout()
@@ -46,14 +126,32 @@ export default function ProfilePage() {
         router.push("/login")
     }
 
+    // --- Modification du profil (nom, téléphone ; date de naissance et sexe s'ils manquent)
+    const handleSave = async (e) => {
+        e.preventDefault()
+        setTouched(true)
+        if (Object.values(errors).some(Boolean)) return
+        setSaving(true)
+        try {
+            const body = { name: form.name.trim().replace(/\s+/g, " "), phone: form.phone }
+            if (isPerson && !birthLocked && form.birth_date) body.birth_date = form.birth_date
+            if (isPerson && !sexLocked && form.sex) body.sex = form.sex
+            await apiRequest("/me/profile", { method: "PATCH", body: JSON.stringify(body) })
+            await refreshUser()
+            toast.success("Profil mis à jour ✅")
+            setEditing(false)
+        } catch (err) {
+            toast.error(err.message || "Le profil n'a pas pu être mis à jour.")
+        } finally {
+            setSaving(false)
+        }
+    }
+
     // --- Changement de mot de passe
     const handlePasswordChange = async (e) => {
         e.preventDefault()
-
-        if (passwords.new_password !== passwords.confirm_password) {
-            toast.error("Les mots de passe ne correspondent pas ⚠️")
-            return
-        }
+        setPwdTouched(true)
+        if (Object.values(pwdErrors).some(Boolean)) return
 
         try {
             setLoadingPwd(true)
@@ -66,6 +164,7 @@ export default function ProfilePage() {
             })
             toast.success("Mot de passe modifié avec succès ✅")
             setShowPasswordModal(false)
+            setPwdTouched(false)
             setPasswords({ old_password: "", new_password: "", confirm_password: "" })
         } catch (err) {
             toast.error(err.message || "Erreur lors du changement de mot de passe")
@@ -92,261 +191,182 @@ export default function ProfilePage() {
         }
     }
 
+    const age = user.birth_date ? ageOn(user.birth_date) : null
+
     return (
-        <main className="min-h-screen bg-gradient-to-br from-white via-[#fff5f8] to-[#ffe4ef] px-4 py-16 flex items-center justify-center">
-            <motion.div
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="bg-white/80 backdrop-blur-2xl border border-white/40 p-8 w-full max-w-2xl relative"
-            >
-                {/* --- Avatar --- */}
-                <div className="flex flex-col items-center text-center">
-                    <div className="relative">
-                        <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-[#FF6EA9]/50 shadow-md">
-                            {user?.profile?.avatar ? (
-                                <Image
-                                    src={user.profile.avatar}
-                                    alt={user.name}
-                                    width={120}
-                                    height={120}
-                                    className="object-cover w-full h-full"
-                                />
-                            ) : (
-                                <div className="bg-gradient-to-br from-[#FF6EA9]/70 to-[#ffb3cc] w-full h-full flex items-center justify-center text-white text-4xl font-semibold">
-                                    {user.name?.[0]?.toUpperCase()}
-                                </div>
-                            )}
-                        </div>
-
-                        <span className="absolute bottom-1 right-1 bg-green-500 border-2 border-white rounded-full w-5 h-5" />
-                    </div>
-
-                    <h1 className="text-2xl font-bold mt-4 text-[#0F172A]">{user.name}</h1>
-                    <p className="text-sm text-gray-500 flex items-center gap-1">
-                        <ShieldCheck size={15} className="text-[#FF6EA9]" /> {user.role || "Utilisateur"}
-                    </p>
-                </div>
-
-                {/* --- Informations --- */}
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6 text-gray-700">
-                    <motion.div whileHover={{ scale: 1.02 }} className="flex items-center gap-3 p-4 rounded-2xl bg-white/70 border border-gray-100 shadow-sm">
-                        <Mail size={20} className="text-[#FF6EA9]" />
-                        <div>
-                            <p className="text-xs text-gray-500">Adresse e-mail</p>
-                            <p className="font-medium">{user.email}</p>
-                        </div>
-                    </motion.div>
-
-                    <motion.div whileHover={{ scale: 1.02 }} className="flex items-center gap-3 p-4 rounded-2xl bg-white/70 border border-gray-100 shadow-sm">
-                        <Calendar size={20} className="text-[#FF6EA9]" />
-                        <div>
-                            <p className="text-xs text-gray-500">Inscrit le</p>
-                            <p className="font-medium">
-                                {new Date(user.created_at).toLocaleDateString("fr-FR", {
-                                    day: "2-digit",
-                                    month: "long",
-                                    year: "numeric",
-                                })}
+        <main className="min-h-screen bg-[#F9F8F6] px-4 pb-16 pt-8 sm:pt-12">
+            <div className="mx-auto max-w-4xl space-y-6">
+                {/* --- En-tête : photo, nom, rôle --- */}
+                <section className="rounded-2xl border border-[#E9E5DF] bg-white px-5 py-6 sm:px-8 sm:py-8">
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                        <ProfilePhoto user={user} onChange={refreshUser} />
+                        <div className="sm:text-right">
+                            <h1 className="text-2xl font-semibold tracking-tight text-[#1A1814]">{user.name}</h1>
+                            <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-[#6B655D]">
+                                <ShieldCheck size={15} className="text-[#C2185B]" /> {ROLE_LABEL[user.role] || "Utilisateur"}
                             </p>
+                            {user.created_at && <p className="mt-1 text-[13px] text-[#8A837A]">Inscrit le {longDate(user.created_at)}</p>}
                         </div>
-                    </motion.div>
+                    </div>
+                </section>
 
-                    <motion.div whileHover={{ scale: 1.02 }} className="flex items-center gap-3 p-4 rounded-2xl bg-white/70 border border-gray-100 shadow-sm">
-                        <User size={20} className="text-[#FF6EA9]" />
-                        <div>
-                            <p className="text-xs text-gray-500">Compte</p>
-                            <p className="font-medium capitalize">{user.is_active ? "Actif" : "Inactif"}</p>
-                        </div>
-                    </motion.div>
-
-                    <motion.div whileHover={{ scale: 1.02 }} className="flex items-center gap-3 p-4 rounded-2xl bg-white/70 border border-gray-100 shadow-sm">
-                        {user.is_active ? (
-                            <CheckCircle2 size={20} className="text-green-500" />
-                        ) : (
-                            <XCircle size={20} className="text-red-400" />
+                <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+                    {/* --- Informations personnelles --- */}
+                    <Section
+                        title="Informations personnelles"
+                        subtitle="Mettez à jour vos informations personnelles"
+                        action={!editing && (
+                            <button type="button" onClick={startEdit} className="h-9 rounded-lg border border-[#E6E2DC] px-3.5 text-[13px] font-medium text-[#1A1814] transition hover:border-[#1A1814]">
+                                Modifier mon profil
+                            </button>
                         )}
-                        <div>
-                            <p className="text-xs text-gray-500">Compte vérifié</p>
-                            <p className="font-medium">{user.is_active ? "Oui" : "Non"}</p>
+                    >
+                        {editing ? (
+                            <form onSubmit={handleSave} noValidate className="space-y-5">
+                                <AuthField id="p-name" label="Nom complet" icon={User} value={form.name} autoComplete="name"
+                                    onChange={(e) => setForm({ ...form, name: nameInput(e.target.value) })} error={touched ? errors.name : ""} />
+                                <AuthField id="p-phone" label="Téléphone" icon={Phone} value={form.phone} inputMode="tel" autoComplete="tel" placeholder="0197000000"
+                                    onChange={(e) => setForm({ ...form, phone: phoneInput(e.target.value) })} error={touched ? errors.phone : ""}
+                                    hint="Chiffres uniquement, 8 à 15 chiffres." />
+                                {isPerson && (
+                                    birthLocked ? (
+                                        <div>
+                                            <p className="text-sm font-medium text-[#3D3934]">Date de naissance</p>
+                                            <div className="relative mt-2">
+                                                <Lock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A29A]" />
+                                                <input disabled value={longDate(`${user.birth_date}T00:00:00`)} className={inputClass(false, true)} />
+                                            </div>
+                                            <p className="mt-1.5 text-[13px] text-[#8A837A]">Pour la corriger, contactez E.doto family.</p>
+                                        </div>
+                                    ) : (
+                                        <AuthField id="p-birth" label="Date de naissance" icon={CalendarDays} type="date" min={limits.min} max={limits.max}
+                                            value={form.birth_date} onChange={(e) => setForm({ ...form, birth_date: e.target.value })} error={touched ? errors.birth_date : ""} />
+                                    )
+                                )}
+                                {isPerson && (
+                                    sexLocked ? (
+                                        <div>
+                                            <p className="text-sm font-medium text-[#3D3934]">Sexe</p>
+                                            <div className="relative mt-2">
+                                                <Lock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A29A]" />
+                                                <input disabled value={SEX_LABEL[user.sex] || user.sex} className={inputClass(false, true)} />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <ChoiceField label="Sexe" name="p-sex" options={SEX_OPTIONS} value={form.sex} onChange={(v) => setForm({ ...form, sex: v })} />
+                                    )
+                                )}
+                                <div className="flex flex-wrap justify-end gap-2 pt-1">
+                                    <button type="button" onClick={() => setEditing(false)} className="h-11 rounded-xl px-5 text-sm font-medium text-[#57524B] hover:bg-[#F3F1EE]">Annuler</button>
+                                    <button type="submit" disabled={saving} className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#1A1814] px-6 text-sm font-medium text-white transition hover:bg-[#3D3934] disabled:opacity-60">
+                                        {saving && <Loader2 size={16} className="animate-spin" />} Enregistrer
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <div className="divide-y divide-[#F1EFEB]">
+                                <Row icon={User} label="Nom complet" value={user.name} />
+                                <Row icon={Mail} label="Adresse e-mail" value={user.email} />
+                                <Row icon={Phone} label="Téléphone" value={user.profile?.contact || "Non renseigné"} />
+                                {isPerson && <Row icon={CalendarDays} label="Date de naissance" value={user.birth_date ? `${longDate(`${user.birth_date}T00:00:00`)} (${age} ans)` : "Non renseignée"} />}
+                                {isPerson && <Row icon={User} label="Sexe" value={SEX_LABEL[user.sex] || "Non renseigné"} />}
+                                <Row icon={Calendar} label="Inscrit le" value={user.created_at ? longDate(user.created_at) : "Non renseigné"} />
+                            </div>
+                        )}
+                    </Section>
+
+                    <div className="space-y-6">
+                        {/* --- Compte --- */}
+                        <Section title="Compte">
+                            <div className="divide-y divide-[#F1EFEB]">
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-sm text-[#57524B]">Compte</span>
+                                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium ${user.is_active ? "bg-[#EEF6F0] text-[#2F5D3A]" : "bg-[#FDF1EF] text-[#9B2C2C]"}`}>
+                                        {user.is_active ? "Actif" : "Inactif"}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-sm text-[#57524B]">Compte vérifié</span>
+                                    <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1A1814]">
+                                        {Number(user.email_verified) === 1 || user.is_verified ? <><CheckCircle2 size={15} className="text-[#2F5D3A]" /> Oui</> : "Non"}
+                                    </span>
+                                </div>
+                            </div>
+                        </Section>
+
+                        {/* --- Raccourcis --- */}
+                        {user.role === "customer" && (
+                            <nav className="overflow-hidden rounded-2xl border border-[#E9E5DF] bg-white" aria-label="Raccourcis">
+                                {[
+                                    ["/orders", ShoppingBag, "Mes commandes", "Suivi, codes de retrait et factures"],
+                                    ["/campaigns", Gift, "Campagnes", "Demander un kit gratuit"],
+                                ].map(([href, Icon, label, text]) => (
+                                    <Link key={href} href={href} className="flex items-center gap-4 border-b border-[#F1EFEB] px-5 py-4 transition last:border-0 hover:bg-[#FBFAF8]">
+                                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FBEEF3] text-[#C2185B]"><Icon size={17} strokeWidth={1.8} /></span>
+                                        <span className="min-w-0 flex-1">
+                                            <span className="block text-sm font-medium text-[#1A1814]">{label}</span>
+                                            <span className="block text-[12.5px] text-[#8A837A]">{text}</span>
+                                        </span>
+                                        <ChevronRight size={16} className="text-[#A8A29A]" />
+                                    </Link>
+                                ))}
+                            </nav>
+                        )}
+
+                        {/* --- Sécurité et session --- */}
+                        <div className="overflow-hidden rounded-2xl border border-[#E9E5DF] bg-white">
+                            <button type="button" onClick={() => setShowPasswordModal(true)} className="flex w-full items-center gap-4 border-b border-[#F1EFEB] px-5 py-4 text-left transition hover:bg-[#FBFAF8]">
+                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#57524B]"><KeyRound size={17} strokeWidth={1.8} /></span>
+                                <span className="min-w-0 flex-1">
+                                    <span className="block text-sm font-medium text-[#1A1814]">Changer mon mot de passe</span>
+                                    <span className="block text-[12.5px] text-[#8A837A]">Sécurisez à nouveau votre compte</span>
+                                </span>
+                                <ChevronRight size={16} className="text-[#A8A29A]" />
+                            </button>
+                            <button type="button" onClick={handleLogout} className="flex w-full items-center gap-4 border-b border-[#F1EFEB] px-5 py-4 text-left transition hover:bg-[#FBFAF8]">
+                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#57524B]"><LogOut size={17} strokeWidth={1.8} /></span>
+                                <span className="min-w-0 flex-1">
+                                    <span className="block text-sm font-medium text-[#1A1814]">Se déconnecter</span>
+                                    <span className="block text-[12.5px] text-[#8A837A]">Quitter votre session actuelle</span>
+                                </span>
+                                <ChevronRight size={16} className="text-[#A8A29A]" />
+                            </button>
+                            <button type="button" onClick={handleDeleteAccount} disabled={loadingDelete} className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-[#FDF1EF]">
+                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FDF1EF] text-[#9B2C2C]"><Trash2 size={17} strokeWidth={1.8} /></span>
+                                <span className="min-w-0 flex-1">
+                                    <span className="block text-sm font-medium text-[#9B2C2C]">{loadingDelete ? "Suppression..." : "Supprimer mon compte"}</span>
+                                    <span className="block text-[12.5px] text-[#8A837A]">Action irréversible : soyez prudent</span>
+                                </span>
+                                <ChevronRight size={16} className="text-[#D6B4B0]" />
+                            </button>
                         </div>
-                    </motion.div>
-                </div>
-
-                {/* --- Actions en liste --- */}
-                <div className="mt-12 space-y-3 max-w-xl mx-auto w-full">
-                    <div className="bg-white/80 backdrop-blur-lg rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-100">
-
-                        {/* Modifier mon profil */}
-                        <motion.button
-                            whileHover={{ x: 4 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => toast("Fonctionnalité à venir 🚧")}
-                            className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#fff5f9] transition-all"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="p-2 rounded-xl bg-[#FF6EA9]/10 text-[#FF6EA9]">
-                                    <User size={20} />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-[#0F172A]">Modifier mon profil</p>
-                                    <p className="text-sm text-gray-500">Mettez à jour vos informations personnelles</p>
-                                </div>
-                            </div>
-                            <span className="text-gray-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </span>
-                        </motion.button>
-
-                        {/* Changer mon mot de passe */}
-                        <motion.button
-                            whileHover={{ x: 4 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => setShowPasswordModal(true)}
-                            className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#fff5f9] transition-all"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="p-2 rounded-xl bg-[#FF6EA9]/10 text-[#FF6EA9]">
-                                    <KeyRound size={20} />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-[#0F172A]">Changer mon mot de passe</p>
-                                    <p className="text-sm text-gray-500">Sécurisez à nouveau votre compte</p>
-                                </div>
-                            </div>
-                            <span className="text-gray-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </span>
-                        </motion.button>
-
-                        {/* Supprimer mon compte */}
-                        <motion.button
-                            whileHover={{ x: 4 }}
-                            whileTap={{ scale: 0.98 }}
-                            disabled={loadingDelete}
-                            onClick={handleDeleteAccount}
-                            className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-red-50 transition-all"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="p-2 rounded-xl bg-red-100 text-red-500">
-                                    <Trash2 size={20} />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-red-600">
-                                        {loadingDelete ? "Suppression..." : "Supprimer mon compte"}
-                                    </p>
-                                    <p className="text-sm text-gray-500">Action irréversible : soyez prudent</p>
-                                </div>
-                            </div>
-                            <span className="text-red-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </span>
-                        </motion.button>
-
-                        {/* Déconnexion */}
-                        <motion.button
-                            whileHover={{ x: 4 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={handleLogout}
-                            className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#f9f9f9] transition-all"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="p-2 rounded-xl bg-gray-100 text-[#FF6EA9]">
-                                    <LogOut size={20} />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-[#0F172A]">Se déconnecter</p>
-                                    <p className="text-sm text-gray-500">Quitter votre session actuelle</p>
-                                </div>
-                            </div>
-                            <span className="text-gray-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </span>
-                        </motion.button>
                     </div>
                 </div>
+            </div>
 
-
-                {/* --- Decorative blob --- */}
-                <motion.div
-                    className="absolute -z-10 top-0 right-0 w-64 h-64 bg-[#FF6EA9]/20 rounded-full blur-3xl"
-                    animate={{ y: [0, 20, 0], opacity: [0.4, 0.6, 0.4] }}
-                    transition={{ duration: 6, repeat: Infinity }}
-                />
-            </motion.div>
-
-            {/* --- Modal changement mot de passe --- */}
+            {/* --- Fenêtre : changement de mot de passe --- */}
             {showPasswordModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl"
-                    >
-                        <h2 className="text-xl font-bold mb-4 text-center text-[#0F172A]">
-                            🔐 Changer mon mot de passe
-                        </h2>
-
-                        <form onSubmit={handlePasswordChange} className="space-y-4">
-                            <div>
-                                <label className="block text-sm text-gray-500 mb-1">Ancien mot de passe</label>
-                                <input
-                                    type="password"
-                                    required
-                                    value={passwords.old_password}
-                                    onChange={(e) => setPasswords({ ...passwords, old_password: e.target.value })}
-                                    className="w-full border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/40"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm text-gray-500 mb-1">Nouveau mot de passe</label>
-                                <input
-                                    type="password"
-                                    required
-                                    value={passwords.new_password}
-                                    onChange={(e) => setPasswords({ ...passwords, new_password: e.target.value })}
-                                    className="w-full border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/40"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm text-gray-500 mb-1">Confirmer le mot de passe</label>
-                                <input
-                                    type="password"
-                                    required
-                                    value={passwords.confirm_password}
-                                    onChange={(e) => setPasswords({ ...passwords, confirm_password: e.target.value })}
-                                    className="w-full border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#FF6EA9]/40"
-                                />
-                            </div>
-
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPasswordModal(false)}
-                                    className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200"
-                                >
+                <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#1A1814]/40 p-0 sm:items-center sm:p-4" onClick={() => setShowPasswordModal(false)}>
+                    <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-t-2xl border border-[#E9E5DF] bg-white p-6 sm:rounded-2xl sm:p-7">
+                        <h2 className="mb-5 text-lg font-semibold text-[#1A1814]">Changer mon mot de passe</h2>
+                        <form onSubmit={handlePasswordChange} noValidate className="space-y-4">
+                            <PasswordField id="old_password" label="Ancien mot de passe" icon={Lock} value={passwords.old_password} autoComplete="current-password"
+                                onChange={(e) => setPasswords({ ...passwords, old_password: e.target.value })} error={pwdTouched ? pwdErrors.old : ""} />
+                            <PasswordField id="new_password" label="Nouveau mot de passe" icon={Lock} value={passwords.new_password} autoComplete="new-password" showRules
+                                onChange={(e) => setPasswords({ ...passwords, new_password: passwordInput(e.target.value) })} error={pwdTouched ? pwdErrors.new : ""} />
+                            <PasswordField id="confirm_password" label="Confirmer le mot de passe" icon={Lock} value={passwords.confirm_password} autoComplete="new-password"
+                                onChange={(e) => setPasswords({ ...passwords, confirm_password: passwordInput(e.target.value) })}
+                                error={pwdTouched || passwords.confirm_password ? pwdErrors.confirm : ""} />
+                            <div className="flex justify-end gap-2 pt-2">
+                                <button type="button" onClick={() => setShowPasswordModal(false)} className="h-11 rounded-xl px-5 text-sm font-medium text-[#57524B] hover:bg-[#F3F1EE]">
                                     Annuler
                                 </button>
-                                <button
-                                    type="submit"
-                                    disabled={loadingPwd}
-                                    className="px-4 py-2 rounded-lg bg-[#FF6EA9] text-white font-semibold hover:bg-[#ff579d] disabled:opacity-50"
-                                >
-                                    {loadingPwd ? "En cours..." : "Valider"}
+                                <button type="submit" disabled={loadingPwd} className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#1A1814] px-6 text-sm font-medium text-white hover:bg-[#3D3934] disabled:opacity-60">
+                                    {loadingPwd && <Loader2 size={16} className="animate-spin" />} {loadingPwd ? "En cours..." : "Valider"}
                                 </button>
                             </div>
                         </form>
-                    </motion.div>
+                    </div>
                 </div>
             )}
         </main>

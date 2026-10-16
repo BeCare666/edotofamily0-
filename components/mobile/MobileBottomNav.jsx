@@ -58,16 +58,15 @@ export default function MobileBottomNav() {
   return (
     <>
       {/* Réserve la hauteur de la barre pour que le bas des pages reste lisible */}
-      <div aria-hidden className="h-[calc(5.75rem+env(safe-area-inset-bottom))] md:hidden" />
+      <div aria-hidden className="h-[calc(4.5rem+env(safe-area-inset-bottom))] md:hidden" />
 
       <nav
         aria-label="Navigation principale"
-        className="fixed inset-x-0 bottom-0 z-[28] px-3 pb-[calc(0.6rem+env(safe-area-inset-bottom))] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-[28] w-full border-t border-[#E9E5DF] bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
       >
-        <div className="relative mx-auto max-w-md">
-          {/* Halo doux sous la barre */}
-          <div className="pointer-events-none absolute inset-x-6 -bottom-1 h-10 rounded-full bg-[#FF6EA9]/25 blur-2xl" />
-          <div className="relative grid grid-cols-4 items-stretch rounded-[26px] border border-white/70 bg-white/85 p-1.5 shadow-[0_18px_40px_-14px_rgba(15,23,42,0.28),0_2px_6px_rgba(15,23,42,0.06)] ring-1 ring-[#F5D6E3]/60 backdrop-blur-xl">
+        {/* Pleine largeur, collée en bas, sans coins arrondis (16/10/2026) */}
+        <div className="relative w-full">
+          <div className="relative grid grid-cols-4 items-stretch px-1.5 py-1.5">
             {items.map((it) => (
               <Link
                 key={it.key}
@@ -78,7 +77,7 @@ export default function MobileBottomNav() {
                 {it.active && (
                   <motion.span
                     layoutId="mobile-nav-active"
-                    className="absolute inset-0 rounded-[20px] bg-gradient-to-b from-[#FFF1F7] to-[#FFE4F0] ring-1 ring-[#FFD0E4]"
+                    className="absolute inset-0 rounded-[20px] bg-[#FBEEF3]"
                     transition={{ type: "spring", stiffness: 420, damping: 34 }}
                   />
                 )}
@@ -112,7 +111,7 @@ export default function MobileBottomNav() {
               aria-expanded={menuOpen}
               className="relative flex flex-col items-center justify-center gap-1 rounded-[20px] py-2 outline-none focus-visible:ring-2 focus-visible:ring-[#FF6EA9]/40"
             >
-              {menuOpen && <span className="absolute inset-0 rounded-[20px] bg-gradient-to-b from-[#FFF1F7] to-[#FFE4F0] ring-1 ring-[#FFD0E4]" />}
+              {menuOpen && <span className="absolute inset-0 rounded-[20px] bg-[#FBEEF3]" />}
               <MenuNavIcon filled={menuOpen} className={`relative h-[23px] w-[23px] ${menuOpen ? "text-[#E0457F]" : "text-slate-500"}`} />
               <span className={`relative text-[10.5px] font-semibold tracking-wide ${menuOpen ? "text-[#C2185B]" : "text-slate-500"}`}>Menu</span>
             </button>

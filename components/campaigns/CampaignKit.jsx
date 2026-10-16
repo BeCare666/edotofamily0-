@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { Check, Mail, MapPin, PackageCheck, Send, ShieldCheck, X, Loader2, ChevronLeft, ArrowRight, Lock } from "lucide-react";
+import { Check, Mail, MapPin, PackageCheck, Send, ShieldCheck, X, Loader2, ChevronLeft, ArrowRight, Lock, LocateFixed, Users } from "lucide-react";
 import PickupPointPicker from "../PickupPointPicker";
 import { deviceMarks } from "../../lib/deviceIdentity";
+import { birthDateError, birthDateLimits, SEX_OPTIONS, sexError } from "../../lib/fieldRules";
 
 const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
 const fmt = (d) => new Date(d).toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -87,17 +88,73 @@ export function KitStepsTracker({ reg, onRegenerate, regenerating }) {
 
 const FLOW = ["Votre ville", "Point de retrait", "Confirmation"];
 
+// Position du téléphone, demandée à l'étape « Votre ville »
+function currentPosition() {
+    return new Promise((resolve, reject) => {
+        if (typeof navigator === "undefined" || !navigator.geolocation) return reject({ code: 0 });
+        navigator.geolocation.getCurrentPosition(
+            (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+            (e) => reject(e),
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
+        );
+    });
+}
+
+const apiMessage = (data, fallback) => (Array.isArray(data?.message) ? data.message[0] : data?.message || fallback);
+
 /**
  * Demande de kit en 3 étapes (ville → point de retrait → confirmation), puis écran de réussite.
  * Les règles sont revérifiées par l'API (campagne en cours, ville, point validé, une demande par personne).
+ * 16/10/2026 : la ville n'est plus choisie, elle est lue à partir de la position GPS (obligatoire) ;
+ * seuls les points de retrait de cette ville sont proposés ; les comptes sans date de naissance
+ * ni sexe les complètent ici une seule fois (public ciblé de la campagne).
  */
-export function CampaignRequestFlow({ campaign, initialCity, onClose, onDone }) {
+export function CampaignRequestFlow({ campaign, onClose, onDone }) {
     const cities = campaign.cities || [];
+    const needProfile = !!campaign.profile_incomplete;
     const [step, setStep] = useState(0);
-    const [city, setCity] = useState(initialCity || (cities.length === 1 ? cities[0] : ""));
+    const [city, setCity] = useState("");
+    const [position, setPosition] = useState(null);
+    const [locating, setLocating] = useState(false);
+    const [locError, setLocError] = useState("");
+    const [birthDate, setBirthDate] = useState("");
+    const [sex, setSex] = useState("");
+    const [profileTouched, setProfileTouched] = useState(false);
     const [point, setPoint] = useState(null);
     const [sending, setSending] = useState(false);
     const [done, setDone] = useState(null);
+    const limits = birthDateLimits();
+    const profileErrors = needProfile ? { birthDate: birthDateError(birthDate), sex: sexError(sex) } : { birthDate: "", sex: "" };
+    const profileOk = !profileErrors.birthDate && !profileErrors.sex;
+
+    // Position → ville de la campagne, vérifiée par l'API (même contrôle qu'à l'envoi)
+    const locate = async () => {
+        setLocating(true);
+        setLocError("");
+        setCity("");
+        setPoint(null);
+        try {
+            const pos = await currentPosition();
+            const res = await fetch(`${API}/campaigns/${campaign.id}/locate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+                body: JSON.stringify(pos),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                setLocError(apiMessage(data, "Vérification de votre position impossible."));
+                return;
+            }
+            setPosition(pos);
+            setCity(data.city);
+        } catch (e) {
+            setLocError(e?.code === 1
+                ? "Autorisez la localisation de votre téléphone : elle est obligatoire pour demander un kit."
+                : "Position introuvable. Activez la localisation puis réessayez.");
+        } finally {
+            setLocating(false);
+        }
+    };
 
     const submit = async () => {
         if (sending) return;
@@ -106,11 +163,19 @@ export function CampaignRequestFlow({ campaign, initialCity, onClose, onDone }) 
             const res = await fetch(`${API}/campaigns/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
-                body: JSON.stringify({ campaign_id: campaign.id, pickup_center: String(point.id), city, ...(await deviceMarks()) }),
+                body: JSON.stringify({
+                    campaign_id: campaign.id,
+                    pickup_center: String(point.id),
+                    city,
+                    lat: position?.lat,
+                    lng: position?.lng,
+                    ...(needProfile ? { birth_date: birthDate, sex } : {}),
+                    ...(await deviceMarks()),
+                }),
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                toast.error(Array.isArray(data?.message) ? data.message[0] : data?.message || "La demande n'a pas pu être envoyée.");
+                toast.error(apiMessage(data, "La demande n'a pas pu être envoyée."));
                 return;
             }
             setDone(data);
@@ -123,6 +188,15 @@ export function CampaignRequestFlow({ campaign, initialCity, onClose, onDone }) 
     };
 
     const canNext = step === 0 ? !!city : step === 1 ? !!point : true;
+    const next = () => {
+        if (step === 0 && !profileOk) {
+            setProfileTouched(true);
+            return;
+        }
+        setStep((s) => s + 1);
+    };
+    const field = (bad) =>
+        `mt-2 h-12 w-full rounded-xl border bg-white px-4 text-[15px] text-[#161412] focus:outline-none focus:ring-2 ${bad ? "border-[#D9534F] focus:ring-[#D9534F]/20" : "border-[#E2DCD5] focus:border-[#C2185B] focus:ring-[#C2185B]/15"}`;
 
     return (
         <motion.div className="fixed inset-0 z-[300] flex items-end justify-center bg-[#161412]/40 sm:items-center sm:p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -182,29 +256,69 @@ export function CampaignRequestFlow({ campaign, initialCity, onClose, onDone }) 
                         ) : step === 0 ? (
                             <motion.div key="city" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }}>
                                 <p className="text-[17px] font-medium text-[#161412]">Dans quelle ville retirerez-vous votre kit ?</p>
-                                <p className="mt-1 text-sm text-[#77716B]">La campagne se déroule dans {cities.length > 1 ? "ces villes" : "cette ville"}.</p>
-                                <div className="mt-5 grid gap-2 sm:grid-cols-2">
-                                    {cities.map((c) => (
-                                        <button
-                                            key={c}
-                                            type="button"
-                                            onClick={() => setCity(c)}
-                                            className={`flex items-center justify-between rounded-xl border px-4 py-3.5 text-left transition ${city === c ? "border-[#161412] bg-[#161412] text-white" : "border-[#E2DCD5] bg-white text-[#161412] hover:border-[#161412]"}`}
-                                        >
+                                <p className="mt-1 text-sm text-[#77716B]">
+                                    La campagne se déroule dans {cities.length > 1 ? "ces villes" : "cette ville"} : {cities.join(", ")}. Seules les personnes qui s’y trouvent peuvent obtenir un kit, votre position est vérifiée.
+                                </p>
+                                {campaign.target_label && campaign.target_label !== "Tout public" && (
+                                    <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#FBEEF3] px-3 py-1.5 text-[12.5px] font-medium text-[#A0124A]">
+                                        <Users size={14} strokeWidth={1.8} /> Campagne réservée : {campaign.target_label}
+                                    </p>
+                                )}
+
+                                <div className={`mt-5 rounded-xl border p-4 ${city ? "border-[#161412] bg-[#161412] text-white" : "border-[#E2DCD5]"}`}>
+                                    {city ? (
+                                        <div className="flex items-center justify-between gap-3">
                                             <span className="flex items-center gap-3">
-                                                <MapPin size={16} strokeWidth={1.8} className={city === c ? "text-white/70" : "text-[#8A847D]"} />
-                                                <span className="font-medium">{c}</span>
+                                                <MapPin size={16} strokeWidth={1.8} className="text-white/70" />
+                                                <span>
+                                                    <span className="block text-[12px] text-white/60">Votre position est à</span>
+                                                    <span className="font-medium">{city}</span>
+                                                </span>
                                             </span>
-                                            {city === c && <Check size={16} />}
+                                            <Check size={16} />
+                                        </div>
+                                    ) : (
+                                        <button type="button" onClick={locate} disabled={locating}
+                                            className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#161412] text-sm font-medium text-[#161412] transition hover:bg-[#161412] hover:text-white disabled:opacity-60">
+                                            {locating ? <Loader2 size={16} className="animate-spin" /> : <LocateFixed size={16} />}
+                                            {locating ? "Vérification de votre position…" : "Utiliser ma position"}
                                         </button>
-                                    ))}
+                                    )}
                                 </div>
+                                {locError && <p role="alert" className="mt-3 rounded-xl bg-[#FDF1EF] px-4 py-3 text-[13px] text-[#9B2C2C]">{locError}</p>}
+                                {city && (
+                                    <button type="button" onClick={locate} className="mt-2 text-[12.5px] text-[#77716B] underline-offset-4 hover:underline">
+                                        Vérifier à nouveau ma position
+                                    </button>
+                                )}
+
+                                {needProfile && (
+                                    <div className="mt-6 border-t border-[#EDE8E2] pt-5">
+                                        <p className="text-[15px] font-medium text-[#161412]">Complétez votre profil</p>
+                                        <p className="mt-1 text-sm text-[#77716B]">Une seule fois : certaines campagnes sont réservées à un âge ou à un sexe.</p>
+                                        <label htmlFor="kit-birth" className="mt-4 block text-sm font-medium text-[#3D3934]">Date de naissance</label>
+                                        <input id="kit-birth" type="date" min={limits.min} max={limits.max} value={birthDate}
+                                            onChange={(e) => setBirthDate(e.target.value)} className={field(profileTouched && profileErrors.birthDate)} />
+                                        {profileTouched && profileErrors.birthDate && <p className="mt-1.5 text-[13px] text-[#B42318]">{profileErrors.birthDate}</p>}
+                                        <p className="mt-4 text-sm font-medium text-[#3D3934]">Sexe</p>
+                                        <div className="mt-2 grid grid-cols-2 gap-2.5" role="radiogroup" aria-label="Sexe">
+                                            {SEX_OPTIONS.map((o) => (
+                                                <button key={o.value} type="button" role="radio" aria-checked={sex === o.value} onClick={() => setSex(o.value)}
+                                                    className={`rounded-xl border px-4 py-3 text-left transition ${sex === o.value ? "border-[#C2185B] bg-[#FBEEF3]" : "border-[#E2DCD5] hover:border-[#161412]"}`}>
+                                                    <span className={`block text-[15px] font-medium ${sex === o.value ? "text-[#A0124A]" : "text-[#161412]"}`}>{o.label}</span>
+                                                    <span className="block text-[12.5px] text-[#8A847D]">{o.hint}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {profileTouched && profileErrors.sex && <p className="mt-1.5 text-[13px] text-[#B42318]">{profileErrors.sex}</p>}
+                                    </div>
+                                )}
                             </motion.div>
                         ) : step === 1 ? (
                             <motion.div key="point" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }}>
                                 <p className="mb-1 text-[17px] font-medium text-[#161412]">Choisissez votre point de retrait</p>
                                 <p className="mb-4 text-sm text-[#77716B]">Votre kit y sera remis contre votre code.</p>
-                                <PickupPointPicker selectedId={point?.id} onSelect={(p) => setPoint(p)} />
+                                <PickupPointPicker city={city} selectedId={point?.id} onSelect={(p) => setPoint(p)} />
                             </motion.div>
                         ) : (
                             <motion.div key="confirm" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }}>
@@ -239,7 +353,7 @@ export function CampaignRequestFlow({ campaign, initialCity, onClose, onDone }) 
                             </button>
                         )}
                         {step < 2 ? (
-                            <button type="button" disabled={!canNext} onClick={() => setStep((s) => s + 1)} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-[#161412] text-sm font-medium text-white transition disabled:opacity-30">
+                            <button type="button" disabled={!canNext} onClick={next} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-[#161412] text-sm font-medium text-white transition disabled:opacity-30">
                                 Continuer <ArrowRight size={16} />
                             </button>
                         ) : (

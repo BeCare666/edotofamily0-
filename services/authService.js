@@ -2,10 +2,11 @@ import { apiRequest } from "../lib/api"
 import { useRouter } from "next/navigation"
 export const authService = {
 
-    async register(name, email, password) {
+    // Date de naissance (AAAA-MM-JJ) et sexe (female | male) obligatoires depuis le 16/10/2026
+    async register(name, email, password, birth_date, sex) {
         const res = await apiRequest("/register", {
             method: "POST",
-            body: JSON.stringify({ name, email, password }),
+            body: JSON.stringify({ name, email, password, birth_date, sex }),
         })
 
         return res

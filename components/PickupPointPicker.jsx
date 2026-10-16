@@ -30,11 +30,13 @@ async function fetchPoints(params) {
  * Choix d'un point de retrait : les points à moins de 5 km de l'utilisateur, triés par distance,
  * en liste ou sur carte. Si aucun point proche : message + recherche parmi tous les points.
  * Les points bloqués restent visibles mais ne sont pas sélectionnables.
+ * Kit de campagne (prop « city », 16/10/2026) : uniquement les points de la ville de la campagne,
+ * avec une recherche parmi eux ; achat de produits (sans « city ») : comportement inchangé.
  */
-export default function PickupPointPicker({ selectedId, onSelect }) {
+export default function PickupPointPicker({ selectedId, onSelect, city = null }) {
     const [view, setView] = useState("list"); // list | map
     const [geo, setGeo] = useState({ status: "locating", position: null });
-    const [scope, setScope] = useState("nearby"); // nearby | all
+    const [scope, setScope] = useState(city ? "city" : "nearby"); // nearby | all | city
     const [points, setPoints] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -44,22 +46,22 @@ export default function PickupPointPicker({ selectedId, onSelect }) {
     const locate = useCallback(() => {
         if (!navigator.geolocation) {
             setGeo({ status: "unavailable", position: null });
-            setScope("all");
+            if (!city) setScope("all");
             return;
         }
         setGeo({ status: "locating", position: null });
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 setGeo({ status: "ok", position: { lat: pos.coords.latitude, lng: pos.coords.longitude } });
-                setScope("nearby");
+                if (!city) setScope("nearby");
             },
             (err) => {
                 setGeo({ status: err.code === 1 ? "denied" : "unavailable", position: null });
-                setScope("all");
+                if (!city) setScope("all");
             },
             { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
         );
-    }, []);
+    }, [city]);
 
     useEffect(() => { locate(); }, [locate]);
 
@@ -75,6 +77,7 @@ export default function PickupPointPicker({ selectedId, onSelect }) {
             params.lng = String(geo.position.lng);
         }
         if (scope === "nearby" && geo.position) params.radius_km = String(NEARBY_RADIUS_KM);
+        if (scope === "city" && city) params.city = city;
         fetchPoints(params)
             .then((rows) => { if (!cancelled) setPoints(rows); })
             .catch(() => { if (!cancelled) setError("Impossible de charger les points de retrait."); })
@@ -86,7 +89,7 @@ export default function PickupPointPicker({ selectedId, onSelect }) {
 
     const filtered = useMemo(() => {
         const q = search.trim().toLowerCase();
-        if (scope !== "all" || !q) return points;
+        if ((scope !== "all" && scope !== "city") || !q) return points;
         return points.filter((p) =>
             (p.name || "").toLowerCase().includes(q) || (p.pickup_address || "").toLowerCase().includes(q));
     }, [points, search, scope]);
@@ -107,6 +110,8 @@ export default function PickupPointPicker({ selectedId, onSelect }) {
                 <p className="text-sm text-gray-600 flex items-center gap-1.5 min-w-0">
                     {geo.status === "locating" ? (
                         <><Loader2 size={15} className="animate-spin shrink-0" /> Recherche de votre position…</>
+                    ) : scope === "city" ? (
+                        <><Navigation size={15} className="text-[#FF6EA9] shrink-0" /> <span className="truncate">Points de retrait à {city}</span></>
                     ) : scope === "nearby" ? (
                         <><Navigation size={15} className="text-[#FF6EA9] shrink-0" /> Points à moins de {NEARBY_RADIUS_KM} km</>
                     ) : (
@@ -123,7 +128,7 @@ export default function PickupPointPicker({ selectedId, onSelect }) {
                 </div>
             </div>
 
-            {(geo.status === "denied" || geo.status === "unavailable") && (
+            {!city && (geo.status === "denied" || geo.status === "unavailable") && (
                 <div className="rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm px-3 py-2 flex items-center justify-between gap-2">
                     <span>
                         {geo.status === "denied"
@@ -136,7 +141,7 @@ export default function PickupPointPicker({ selectedId, onSelect }) {
                 </div>
             )}
 
-            {scope === "all" && (
+            {(scope === "all" || scope === "city") && (
                 <div className="relative">
                     <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
                     <input type="search" placeholder="Rechercher un point de retrait ou un quartier…"
@@ -151,6 +156,12 @@ export default function PickupPointPicker({ selectedId, onSelect }) {
                 <div className="py-10 flex justify-center"><Loader2 className="animate-spin text-[#FF6EA9]" /></div>
             ) : error ? (
                 <p className="py-6 text-center text-sm text-red-600">{error}</p>
+            ) : scope === "city" && !loading && points.length === 0 ? (
+                <div className="py-8 px-4 text-center">
+                    <MapPinOff className="mx-auto text-gray-300 mb-3" size={40} />
+                    <p className="font-semibold text-[#0F172A]">Aucun point de retrait à {city}</p>
+                    <p className="text-sm text-gray-500 mt-1">Aucun point de retrait n’est encore ouvert dans la ville de la campagne.</p>
+                </div>
             ) : noNearby ? (
                 <div className="py-8 px-4 text-center">
                     <MapPinOff className="mx-auto text-gray-300 mb-3" size={40} />
@@ -214,7 +225,7 @@ export default function PickupPointPicker({ selectedId, onSelect }) {
                 </>
             )}
 
-            {scope === "all" && geo.status === "ok" && (
+            {!city && scope === "all" && geo.status === "ok" && (
                 <button onClick={() => setScope("nearby")} className="text-sm text-[#FF6EA9] font-medium hover:underline self-center">
                     Revenir aux points les plus proches
                 </button>

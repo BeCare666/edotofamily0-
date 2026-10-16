@@ -6,6 +6,7 @@ import { Home, Megaphone, FileSpreadsheet, Search, Bell, LogOut, CheckCircle2, X
 import { useAuthContext } from "../../context/AuthContext";
 import { dateTime } from "../pickup-dashboard/api";
 import DashboardFrame from "../dashboard-ui/DashboardFrame";
+import { avatarUrl as avatarOf } from "../profile/ProfilePhoto";
 
 export const SPONSOR_MENU = [
     { key: "home", label: "Accueil", icon: Home },
@@ -72,7 +73,8 @@ function Avatar({ sponsor, onProfile }) {
     const [open, setOpen] = useState(false);
     const ref = useRef(null);
     const router = useRouter();
-    const { logout } = useAuthContext() || {};
+    const auth = useAuthContext() || {};
+    const { logout } = auth;
     useClickOutside(ref, () => setOpen(false));
     const signOut = async () => {
         try { await logout?.(); } catch { localStorage.removeItem("token"); }
@@ -81,7 +83,11 @@ function Avatar({ sponsor, onProfile }) {
     return (
         <div ref={ref} className="relative">
             <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-3 pl-1 pr-1 md:pr-3 py-1 rounded-2xl hover:bg-[#F3F1EE]" aria-haspopup="menu" aria-expanded={open}>
-                <span className="w-10 h-10 rounded-xl bg-[#1A1814] text-white text-sm font-semibold flex items-center justify-center">{initials(sponsor?.name)}</span>
+                {avatarOf(auth?.user) ? (
+                    <img src={avatarOf(auth.user)} alt="" className="w-10 h-10 rounded-xl object-cover" />
+                ) : (
+                    <span className="w-10 h-10 rounded-xl bg-[#1A1814] text-white text-sm font-semibold flex items-center justify-center">{initials(sponsor?.name)}</span>
+                )}
                 <span className="hidden md:block text-left">
                     <span className="block text-sm text-[#1A1814] max-w-[160px] truncate">{sponsor?.name}</span>
                     <span className="block text-xs text-[#8A837A]">Sponsor</span>

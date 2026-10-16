@@ -325,7 +325,8 @@ export default function CampaignsPage() {
                 return;
             }
             setDetail(null);
-            setFlow(c);
+            // Public ciblé et profil à compléter (16/10/2026), renvoyés par l'API
+            setFlow({ ...c, profile_incomplete: !!data.profile_incomplete, target_label: data.target || c.target_label });
         } catch (e) {
             toast.error(e?.message || "Vérification impossible. Réessayez.");
         } finally {
@@ -684,7 +685,6 @@ export default function CampaignsPage() {
                 {flow && (
                     <CampaignRequestFlow
                         campaign={flow}
-                        initialCity={(flow.cities || []).find((c) => me.city && normCity(c) === normCity(me.city)) || ""}
                         onClose={() => setFlow(null)}
                         onDone={() => {
                             loadRegs();
@@ -698,7 +698,7 @@ export default function CampaignsPage() {
                 {blocked && (
                     <motion.div className="fixed inset-0 z-[300] flex items-center justify-center bg-[#161412]/40 p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setBlocked(null)}>
                         <motion.div onClick={(e) => e.stopPropagation()} initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }} className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">
-                            <p className="font-brand text-[28px] font-semibold leading-tight text-[#161412]">{blocked.reason === "not_active" ? "Demandes fermées" : "Demande déjà faite"}</p>
+                            <p className="font-brand text-[28px] font-semibold leading-tight text-[#161412]">{blocked.reason === "not_active" ? "Demandes fermées" : blocked.reason === "not_targeted" ? "Campagne réservée" : "Demande déjà faite"}</p>
                             <p className="mt-3 text-[14px] leading-relaxed text-[#5E5953]">{blocked.message}</p>
                             <button type="button" onClick={() => setBlocked(null)} className="mt-7 h-12 w-full rounded-full bg-[#161412] text-sm font-medium text-white">J’ai compris</button>
                         </motion.div>

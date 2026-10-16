@@ -2,26 +2,39 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { Mail, Lock, User, Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react"
-import Image from "next/image"
+import { Mail, Lock, User, CalendarDays } from "lucide-react"
 import Link from "next/link"
-import { useApi } from "../lib/api"
-import logo from "../public/logo/favicon.png"
 import { authService } from "../services/authService"
-import { useAuthContext } from "../context/AuthContext" // ✅ import du contexte
+import AuthShell, { AuthAlert, AuthField, AuthLink, AuthSubmit, ChoiceField, PasswordField } from "../components/auth/AuthShell"
+import {
+    birthDateError, birthDateLimits, emailError, emailInput, nameError, nameInput,
+    passwordError, passwordInput, SEX_OPTIONS, sexError,
+} from "../lib/fieldRules"
+
 export default function RegisterPage() {
-    //const { apiRequest } = useApi()
     const router = useRouter()
 
-    const [showPassword, setShowPassword] = useState(false)
     const [acceptedTerms, setAcceptedTerms] = useState(false)
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    // Date de naissance et sexe (16/10/2026) : servent au ciblage des campagnes (âge, sexe)
+    const [birthDate, setBirthDate] = useState("")
+    const [sex, setSex] = useState("")
+    const [touched, setTouched] = useState(false)
     const [loading, setLoading] = useState(false)
     const [alert, setAlert] = useState({ type: "", message: "" })
     const [resendState, setResendState] = useState({ loading: false, message: "" })
+
+    const limits = birthDateLimits()
+    const errors = {
+        name: nameError(name, "Le nom complet"),
+        email: emailError(email),
+        password: passwordError(password),
+        birthDate: birthDateError(birthDate),
+        sex: sexError(sex),
+    }
+    const hasErrors = Object.values(errors).some(Boolean)
 
     // Compte créé mais e-mail non parti : l'utilisateur redemande le lien de confirmation
     const handleResendVerification = async () => {
@@ -36,15 +49,16 @@ export default function RegisterPage() {
 
     const handleRegister = async (e) => {
         e.preventDefault()
+        setTouched(true)
+        if (hasErrors) return
         setAlert({ type: "", message: "" })
         setLoading(true)
 
         try {
-            const res = await authService.register(name, email, password)
-            console.log("Réponse d'inscription :", res);
+            const res = await authService.register(name.trim().replace(/\s+/g, " "), email.trim(), password, birthDate, sex)
 
             // Stockage temporaire (session uniquement)
-            sessionStorage.setItem("register_email", email);
+            sessionStorage.setItem("register_email", email.trim());
 
             if (res?.verified === true) {
                 sessionStorage.setItem("register_verified", "true");
@@ -65,167 +79,57 @@ export default function RegisterPage() {
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-[#fff5f8] to-[#ffe4ef] relative overflow-visible px-4 py-12">
-            {/* Orbes décoratives */}
-            <motion.div
-                className="absolute top-[-120px] left-[-100px] bg-[#FF6EA9]/30 rounded-full blur-3xl"
-                animate={{ y: [0, 25, 0], opacity: [0.5, 0.8, 0.5] }}
-                transition={{ repeat: Infinity, duration: 6 }}
-            />
-            <motion.div
-                className="absolute bottom-[-120px] right-[-100px] bg-[#FF6EA9]/40 rounded-full blur-3xl"
-                animate={{ y: [0, -25, 0], opacity: [0.4, 0.7, 0.4] }}
-                transition={{ repeat: Infinity, duration: 8 }}
-            />
-
-            {/* Carte principale */}
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                transition={{ duration: 0.7, ease: "easeOut" }}
-                className="relative z-10 bg-white/70 backdrop-blur-2xl border border-white/40 mt-7 px-8 pt-20 pb-10 w-full max-w-md mx-auto rounded-2xl shadow-lg"
-            >
-                {/* Logo animé */}
-                <motion.div
-                    initial={{ opacity: 0, y: -6, scale: 0.9 }}
-                    animate={{ opacity: 1, y: [0, -8, 0], scale: 1 }}
-                    transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 1.6, ease: "easeInOut" }}
-                    className="absolute -top-14 left-1/2 -translate-x-1/2 bg-white pt-2.5 pr-2 pb-2.5 pl-2 rounded-full shadow-lg border border-white/40"
-                >
-                    <Image src={logo} alt="E.doto family logo" width={70} height={70} className="rounded-full object-cover" />
-                </motion.div>
-
-                <h1 className="text-2xl font-bold text-[#0F172A] mt-2 text-center">
-                    <span className="text-[#FF6EA9]">E.doto</span> family
-                </h1>
-                <strong className="text-black mt-2 mb-4 text-sm text-center item-center flex gap-2 justify-center">
-                    Créez votre compte
-                </strong>
-
-                {/* 🔔 Alertes professionnelles.    */}
-                {alert.message && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`flex items-center gap-2 p-3 mb-5 rounded-xl text-sm font-medium ${alert.type === "success"
-                            ? "bg-green-100 text-green-700 border border-green-300"
-                            : "bg-red-100 text-red-700 border border-red-300"
-                            }`}
-                    >
-                        {alert.type === "success" ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
-                        {alert.message}
-                    </motion.div>
-                )}
-
+        <AuthShell
+            title="Créez votre compte"
+            footer={
+                <>
+                    <p>Déjà membre ? <AuthLink href="/login">Connectez-vous</AuthLink></p>
+                    <p>Vous êtes un établissement ? <AuthLink href="/devenir-point-de-retrait">Devenir point de retrait</AuthLink></p>
+                </>
+            }
+        >
+            <AuthAlert type={alert.type} message={alert.message}>
                 {alert.type === "error" && alert.message.includes("Votre compte est créé") && (
-                    <div className="-mt-3 mb-5 text-sm text-gray-600">
-                        <button
-                            type="button"
-                            onClick={handleResendVerification}
-                            disabled={resendState.loading}
-                            className="text-[#FF6EA9] font-medium hover:underline disabled:opacity-50"
-                        >
+                    <div className="mt-2">
+                        <button type="button" onClick={handleResendVerification} disabled={resendState.loading}
+                            className="font-medium text-[#C2185B] hover:underline disabled:opacity-50">
                             {resendState.loading ? "Envoi…" : "Renvoyer l'e-mail de confirmation"}
                         </button>
-                        {resendState.message && <p role="status" className="text-xs mt-1 text-gray-500">{resendState.message}</p>}
+                        {resendState.message && <p role="status" className="mt-1 text-xs text-[#8A837A]">{resendState.message}</p>}
                     </div>
                 )}
+            </AuthAlert>
 
-                {/* Formulaire */}
-                <form onSubmit={handleRegister} className="space-y-6 text-left">
-                    <div>
-                        <label className="text-sm text-gray-700 font-medium">Nom complet</label>
-                        <div className="relative mt-2">
-                            <User className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                            <input
-                                type="text"
-                                required
-                                placeholder="Votre nom"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6EA9] text-gray-800 transition"
-                            />
-                        </div>
-                    </div>
+            <form onSubmit={handleRegister} noValidate className="space-y-5">
+                <AuthField id="name" label="Nom complet" icon={User} autoComplete="name" placeholder="Votre nom"
+                    value={name} onChange={(e) => setName(nameInput(e.target.value))} error={touched ? errors.name : ""} />
 
-                    <div>
-                        <label className="text-sm text-gray-700 font-medium">Adresse e-mail</label>
-                        <div className="relative mt-2">
-                            <Mail className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                            <input
-                                type="email"
-                                required
-                                placeholder="exemple@email.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6EA9] text-gray-800 transition"
-                            />
-                        </div>
-                    </div>
+                <AuthField id="email" label="Adresse e-mail" icon={Mail} type="email" inputMode="email" autoComplete="email"
+                    placeholder="exemple@email.com" value={email} onChange={(e) => setEmail(emailInput(e.target.value))}
+                    error={touched ? errors.email : ""} />
 
-                    <div>
-                        <label className="text-sm text-gray-700 font-medium">Mot de passe</label>
-                        <div className="relative mt-2">
-                            <Lock className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                required
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6EA9] text-gray-800 transition"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-3.5 text-gray-400 hover:text-[#FF6EA9] transition"
-                            >
-                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                            </button>
-                        </div>
-                    </div>
+                <AuthField id="birth_date" label="Date de naissance" icon={CalendarDays} type="date" autoComplete="bday"
+                    min={limits.min} max={limits.max} value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
+                    error={touched ? errors.birthDate : ""} hint="Certaines campagnes sont réservées à une tranche d’âge." />
 
-                    <div className="flex items-center gap-2 mt-4 text-sm text-gray-600">
-                        <input
-                            type="checkbox"
-                            id="terms"
-                            checked={acceptedTerms}
-                            onChange={() => setAcceptedTerms(!acceptedTerms)}
-                            className="accent-[#FF6EA9] w-4 h-4"
-                        />
-                        <label htmlFor="terms" className="cursor-pointer">
-                            J’accepte les{" "}
-                            <Link href="/terms" className="text-[#FF6EA9] hover:underline">
-                                termes et conditions d’utilisation
-                            </Link>
-                        </label>
-                    </div>
+                <ChoiceField label="Sexe" name="sex" options={SEX_OPTIONS} value={sex} onChange={setSex} error={touched ? errors.sex : ""} />
 
-                    <button
-                        type="submit"
-                        disabled={!acceptedTerms || loading}
-                        className={`w-full py-3 rounded-xl font-semibold shadow-md transition-all ${acceptedTerms && !loading
-                            ? "bg-[#FF6EA9] text-white hover:bg-[#ff579d] hover:shadow-lg"
-                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            }`}
-                    >
-                        {loading ? "Création en cours..." : "Créer mon compte"}
-                    </button>
-                </form>
+                <PasswordField icon={Lock} value={password} onChange={(e) => setPassword(passwordInput(e.target.value))}
+                    autoComplete="new-password" placeholder="••••••••" showRules error={touched ? errors.password : ""} />
 
-                <p className="text-gray-500 text-sm mt-6 text-center">
-                    Déjà membre ?{" "}
-                    <Link href="/login" className="text-[#FF6EA9] font-medium hover:underline">
-                        Connectez-vous
-                    </Link>
-                </p>
-                <p className="text-gray-500 text-sm mt-2 text-center">
-                    Vous êtes un établissement ?{" "}
-                    <Link href="/devenir-point-de-retrait" className="text-[#FF6EA9] font-medium hover:underline">
-                        Devenir point de retrait
-                    </Link>
-                </p>
-            </motion.div>
-        </main >
+                <label htmlFor="terms" className="flex cursor-pointer items-start gap-2.5 text-sm text-[#57524B]">
+                    <input type="checkbox" id="terms" checked={acceptedTerms} onChange={() => setAcceptedTerms(!acceptedTerms)}
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-[#C2185B]" />
+                    <span>
+                        J’accepte les{" "}
+                        <Link href="/terms" className="text-[#C2185B] hover:underline underline-offset-4">
+                            termes et conditions d’utilisation
+                        </Link>
+                    </span>
+                </label>
+
+                <AuthSubmit loading={loading} disabled={!acceptedTerms} loadingText="Création en cours...">Créer mon compte</AuthSubmit>
+            </form>
+        </AuthShell>
     )
 }

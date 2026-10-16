@@ -8,6 +8,10 @@ import { api, dateOnly, dateTime, fcfa, qs } from "../pickup-dashboard/api";
 import { Badge, Card, Empty, ErrorBox, SectionTitle, Skeleton } from "../pickup-dashboard/ui";
 import { BENIN_CITIES } from "../../lib/beninCities";
 import { Chips, DateField, Field, FilterPanel, SearchField, SelectField, dateFr, useFilterState } from "./filters";
+import ProfilePhoto from "../profile/ProfilePhoto";
+import { useAuthContext } from "../../context/AuthContext";
+import { authService } from "../../services/authService";
+import { nameError, nameInput, phoneError, phoneInput } from "../../lib/fieldRules";
 
 // Demandes de campagne (15/10/2026) : le sponsor soumet → E.doto family valide ou refuse → E.doto family crée la campagne.
 const STATUS = {
@@ -281,10 +285,16 @@ export function ProposalsView({ onOpenCampaign, onChanged }) {
 
 // ------------------------------------------------------------------ Mon organisation
 export function ProfileView({ sponsor, onSaved }) {
+    const auth = useAuthContext() || {};
     const [v, setV] = useState({ contact_name: sponsor?.contact_name || "", phone: sponsor?.phone || "" });
+    const [touched, setTouched] = useState(false);
     const [busy, setBusy] = useState(false);
+    // Mêmes règles que partout (16/10/2026) : nom en lettres, téléphone en chiffres
+    const errors = { contact_name: nameError(v.contact_name, "Le nom de la personne de contact"), phone: phoneError(v.phone) };
     const save = async (e) => {
         e.preventDefault();
+        setTouched(true);
+        if (errors.contact_name || errors.phone) return;
         setBusy(true);
         try {
             const r = await api("sponsor/profile", { method: "PATCH", body: JSON.stringify(v) });
@@ -300,6 +310,9 @@ export function ProfileView({ sponsor, onSaved }) {
         <div className="space-y-6 max-w-3xl">
             <SectionTitle title="Mon organisation" subtitle="Les informations de votre espace sponsor." />
             <Card className="p-6 sm:p-8">
+                <ProfilePhoto user={{ name: sponsor?.name, profile: auth.user?.profile }} onChange={async () => { try { auth.setUser?.(await authService.me()); } catch { } }} />
+            </Card>
+            <Card className="p-6 sm:p-8">
                 <dl className="grid grid-cols-[minmax(0,1fr)] sm:grid-cols-2 gap-5 text-sm">
                     <div><dt className="text-xs text-[#8A837A]">Organisation</dt><dd className="text-[#1A1814] mt-1">{sponsor?.name}</dd></div>
                     <div><dt className="text-xs text-[#8A837A]">E-mail de connexion</dt><dd className="text-[#1A1814] mt-1 break-all">{sponsor?.email}</dd></div>
@@ -311,8 +324,14 @@ export function ProfileView({ sponsor, onSaved }) {
             <form onSubmit={save}>
                 <Card className="p-6 sm:p-8 grid grid-cols-[minmax(0,1fr)] sm:grid-cols-2 gap-5">
                     <h2 className="sm:col-span-2 font-serif text-lg text-[#1A1814]">Personne de contact</h2>
-                    <Field label="Nom et prénom *"><input className={input} value={v.contact_name} maxLength={255} required onChange={(e) => setV((p) => ({ ...p, contact_name: e.target.value }))} /></Field>
-                    <Field label="Téléphone *"><input className={input} value={v.phone} maxLength={40} required inputMode="tel" onChange={(e) => setV((p) => ({ ...p, phone: e.target.value }))} placeholder="+229 01 00 00 00 00" /></Field>
+                    <Field label="Nom et prénom *">
+                        <input className={input} value={v.contact_name} maxLength={100} required aria-invalid={touched && !!errors.contact_name} onChange={(e) => setV((p) => ({ ...p, contact_name: nameInput(e.target.value) }))} />
+                        {touched && errors.contact_name && <p className="mt-1.5 text-xs text-[#B42318]">{errors.contact_name}</p>}
+                    </Field>
+                    <Field label="Téléphone *">
+                        <input className={input} value={v.phone} maxLength={16} required inputMode="tel" aria-invalid={touched && !!errors.phone} onChange={(e) => setV((p) => ({ ...p, phone: phoneInput(e.target.value) }))} placeholder="+2290100000000" />
+                        {touched && errors.phone && <p className="mt-1.5 text-xs text-[#B42318]">{errors.phone}</p>}
+                    </Field>
                     <div className="sm:col-span-2 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
                         <Link href="/forgot-password" className="inline-flex items-center gap-2 text-sm text-[#6B655D] hover:text-[#1A1814]"><KeyRound size={15} /> Changer de mot de passe</Link>
                         <button type="submit" disabled={busy} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#1A1814] px-6 py-3 text-sm text-white disabled:opacity-50">
