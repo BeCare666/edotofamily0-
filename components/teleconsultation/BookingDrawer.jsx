@@ -15,21 +15,16 @@ import { api, clearDraft, dayLabel, downloadIcs, fullLabel, MODE_LABEL, readDraf
 
 // Prise de rendez-vous de téléconsultation (19/10/2026), à la manière de Calendly :
 // 1. visio ou appel  2. jour et heure (calendrier réel des médecins)  3. coordonnées  4. confirmation.
-// 20/10/2026 : le clic sur une date affiche les médecins disponibles ce jour et leurs heures ;
-// le médecin E.doto family prend les heures où aucun autre médecin n'est libre.
+// 20/10/2026 : grille de la semaine (lundi à vendredi) avec les heures libres, comme Calendly ;
+// le jeune choisit une heure puis son médecin. Le médecin E.doto family (lundi à vendredi, 8 h à 18 h)
+// prend les heures où aucun autre médecin n'est libre. Une heure réservée disparaît pour tous.
 const spring = { type: "spring", stiffness: 260, damping: 32, mass: 0.9 };
-const WEEKDAYS = ["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."];
 
-function monthDays(year, month) {
-    // Grille du mois (lundi en premier), jours au format AAAA-MM-JJ
-    const first = new Date(Date.UTC(year, month, 1));
-    const offset = (first.getUTCDay() + 6) % 7;
-    const count = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-    const cells = Array.from({ length: offset }, () => null);
-    for (let d = 1; d <= count; d++) cells.push(new Date(Date.UTC(year, month, d)).toISOString().slice(0, 10));
-    while (cells.length % 7) cells.push(null);
-    return cells;
-}
+// Jours au format AAAA-MM-JJ (calendrier, sans fuseau)
+const addDay = (d, n) => new Date(Date.parse(`${d}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
+const mondayOf = (d) => addDay(d, -((new Date(`${d}T00:00:00Z`).getUTCDay() + 6) % 7));
+const shortDay = (d, opts) => new Date(`${d}T12:00:00Z`).toLocaleDateString("fr-FR", { timeZone: "UTC", ...opts });
+const slotFor = (iso, doc) => ({ start: iso, minutes: doc.minutes, doctor_id: doc.id, doctor: { name: doc.name, title: doc.title, is_house: doc.is_house } });
 
 function Steps({ step }) {
     const items = ["Mode", "Date et heure", "Coordonnées", "Confirmation"];
@@ -96,53 +91,47 @@ function groupTimes(list) {
     return Object.entries(g).filter(([, v]) => v.length);
 }
 
-// Un médecin disponible le jour choisi, avec ses heures libres
-function DoctorDay({ doctor, times, slot, onPick, index }) {
-    const groups = groupTimes(times);
-    const mine = slot?.doctor_id === doctor.id;
+// Médecin libre à l'heure choisie : le jeune le sélectionne
+function DoctorOption({ doctor, active, onClick, index }) {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 12 }}
+        <motion.button
+            type="button"
+            onClick={onClick}
+            aria-pressed={active}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ ...spring, delay: index * 0.05 }}
-            className={`rounded-[22px] border bg-white p-4 transition-[border-color,box-shadow] sm:p-5 ${mine ? "border-[#1A1814] shadow-[0_16px_36px_-26px_rgba(26,24,20,0.5)]" : "border-[#E9E5DF]"}`}
+            transition={{ ...spring, delay: index * 0.04 }}
+            className={`flex w-full items-center gap-3.5 rounded-[18px] border p-3.5 text-left transition ${active ? "border-[#1A1814] bg-white shadow-[0_14px_32px_-24px_rgba(26,24,20,0.6)]" : "border-[#E9E5DF] bg-white hover:border-[#1A1814]"}`}
         >
-            <div className="flex items-start gap-3.5">
-                <DoctorAvatar doctor={doctor} />
-                <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <p className="truncate font-semibold text-[#1A1814]">{doctor.name}</p>
-                        {doctor.is_house && (
-                            <span className="rounded-full bg-[#FBEEF3] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A0124A]">Médecin E.doto family</span>
-                        )}
-                    </div>
-                    <p className="mt-0.5 text-[13px] text-[#6B655D]">{doctor.title || "Professionnel de santé"} · {doctor.minutes} min</p>
-                    {doctor.bio && <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-[#8A837A]">{doctor.bio}</p>}
-                </div>
-            </div>
-            <div className="mt-4 space-y-3">
-                {groups.map(([label, list]) => (
-                    <div key={label}>
-                        <p className="mb-1.5 text-[10.5px] uppercase tracking-[0.16em] text-[#8A837A]">{label}</p>
-                        <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
-                            {list.map((iso) => {
-                                const on = mine && slot?.start === iso;
-                                return (
-                                    <button
-                                        key={iso}
-                                        onClick={() => onPick({ start: iso, minutes: doctor.minutes, doctor_id: doctor.id, doctor: { name: doctor.name, title: doctor.title, is_house: doctor.is_house } })}
-                                        aria-pressed={on}
-                                        className={`rounded-xl border py-2.5 text-[13px] font-semibold tabular-nums transition ${on ? "border-[#1A1814] bg-[#1A1814] text-white" : "border-[#E9E5DF] bg-[#F9F8F6] text-[#1A1814] hover:border-[#1A1814] hover:bg-white"}`}
-                                    >
-                                        {timeLabel(iso)}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </motion.div>
+            <DoctorAvatar doctor={doctor} size={44} />
+            <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="truncate font-semibold text-[#1A1814]">{doctor.name}</span>
+                    {doctor.is_house && <span className="rounded-full bg-[#FBEEF3] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A0124A]">Médecin E.doto family</span>}
+                </span>
+                <span className="mt-0.5 block truncate text-[13px] text-[#6B655D]">{doctor.title || "Professionnel de santé"} · {doctor.minutes} min</span>
+                {doctor.bio && <span className="mt-1 line-clamp-1 block text-[12px] text-[#8A837A]">{doctor.bio}</span>}
+            </span>
+            <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border transition ${active ? "border-[#1A1814] bg-[#1A1814] text-white" : "border-[#D9D3CA] text-transparent"}`}>
+                <Check size={13} />
+            </span>
+        </motion.button>
+    );
+}
+
+// Heure libre dans la grille de la semaine
+function TimeChip({ iso, count, active, onClick }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            aria-pressed={active}
+            aria-label={`${timeLabel(iso)}, ${count} médecin${count > 1 ? "s" : ""} disponible${count > 1 ? "s" : ""}`}
+            className={`relative w-full rounded-xl border py-2.5 text-[13px] font-semibold tabular-nums transition ${active ? "border-[#1A1814] bg-[#1A1814] text-white" : "border-[#F3D3E0] bg-white text-[#A0124A] hover:border-[#C2185B] hover:bg-[#FBEEF3]"}`}
+        >
+            {timeLabel(iso)}
+            {count > 1 && <span className={`absolute right-1.5 top-1 text-[9px] font-medium ${active ? "text-white/70" : "text-[#C2185B]/70"}`}>{count}</span>}
+        </button>
     );
 }
 
@@ -155,7 +144,8 @@ export default function BookingDrawer() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [month, setMonth] = useState(null); // { y, m }
+    const [week, setWeek] = useState(null); // lundi de la semaine affichée (AAAA-MM-JJ)
+    const [pick, setPick] = useState(null); // { day, start } : heure choisie dans la grille
     const [day, setDay] = useState(null);
     const [slot, setSlot] = useState(null);
     const [phone, setPhone] = useState("");
@@ -164,7 +154,7 @@ export default function BookingDrawer() {
     const [booked, setBooked] = useState(null);
 
     const reset = useCallback(() => {
-        setStep("mode"); setMode(null); setData(null); setDay(null); setSlot(null); setError(""); setBooked(null); setReason("");
+        setStep("mode"); setMode(null); setData(null); setDay(null); setPick(null); setSlot(null); setError(""); setBooked(null); setReason("");
     }, []);
 
     const close = () => {
@@ -205,10 +195,11 @@ export default function BookingDrawer() {
         try {
             const res = await api(`teleconsultation/availability?mode=${m}`);
             setData(res);
+            // Semaine du premier créneau libre ; jour choisi sur mobile : ce premier jour
             const firstDay = res.days?.[0]?.date ?? res.window?.from;
-            const [y, mm] = firstDay.split("-").map(Number);
-            setMonth({ y, m: mm - 1 });
+            setWeek(mondayOf(firstDay));
             setDay(res.days?.[0]?.date ?? null);
+            setPick(null);
             setSlot(null);
         } catch (e) {
             setError(e.message || "Calendrier indisponible pour le moment.");
@@ -218,30 +209,51 @@ export default function BookingDrawer() {
     }, []);
 
     const chooseMode = (m) => {
-        setMode(m); setSlot(null); setStep("date"); load(m);
+        setMode(m); setPick(null); setSlot(null); setStep("date"); load(m);
     };
 
     // Jour → médecins disponibles et leurs heures ; fiches des médecins par identifiant
     const byDay = useMemo(() => new Map((data?.days ?? []).map((d) => [d.date, d.doctors])), [data]);
     const doctorsById = useMemo(() => new Map((data?.doctors ?? []).map((d) => [d.id, d])), [data]);
-    const cells = month ? monthDays(month.y, month.m) : [];
-    const monthTitle = month ? new Date(Date.UTC(month.y, month.m, 1)).toLocaleDateString("fr-FR", { month: "long", year: "numeric", timeZone: "UTC" }) : "";
+    // Jour → heure → médecins libres à cette heure (médecins d'abord, médecin E.doto family ensuite)
+    const timesByDay = useMemo(() => {
+        const out = new Map();
+        for (const [date, list] of byDay) {
+            const m = new Map();
+            for (const x of list) {
+                const doc = doctorsById.get(x.doctor_id);
+                if (!doc) continue;
+                for (const iso of x.slots) (m.get(iso) || m.set(iso, []).get(iso)).push(doc);
+            }
+            m.forEach((docs) => docs.sort((a, b) => Number(a.is_house) - Number(b.is_house) || a.name.localeCompare(b.name)));
+            out.set(date, new Map([...m.entries()].sort(([a], [b]) => a.localeCompare(b))));
+        }
+        return out;
+    }, [byDay, doctorsById]);
+
+    // Semaine affichée : lundi à vendredi, plus samedi et dimanche s'ils ont des créneaux
     const winFrom = data?.window?.from;
     const winTo = data?.window?.to;
-    const canPrev = month && winFrom && `${month.y}-${String(month.m + 1).padStart(2, "0")}` > winFrom.slice(0, 7);
-    const canNext = month && winTo && `${month.y}-${String(month.m + 1).padStart(2, "0")}` < winTo.slice(0, 7);
-    const shiftMonth = (n) => setMonth((cur) => {
-        const d = new Date(Date.UTC(cur.y, cur.m + n, 1));
-        return { y: d.getUTCFullYear(), m: d.getUTCMonth() };
-    });
-    const dayDoctors = useMemo(() => {
-        const list = (day ? byDay.get(day) ?? [] : [])
-            .map((x) => ({ doctor: doctorsById.get(x.doctor_id), times: x.slots }))
-            .filter((x) => x.doctor);
-        // Médecins d'abord, médecin E.doto family ensuite
-        return list.sort((a, b) => Number(a.doctor.is_house) - Number(b.doctor.is_house) || a.doctor.name.localeCompare(b.doctor.name));
-    }, [day, byDay, doctorsById]);
-    const minutes = slot?.minutes ?? data?.doctors?.[0]?.minutes ?? 30;
+    const weekDays = useMemo(() => {
+        if (!week) return [];
+        return [0, 1, 2, 3, 4, 5, 6].map((i) => addDay(week, i)).filter((d, i) => i < 5 || timesByDay.has(d));
+    }, [week, timesByDay]);
+    const canPrev = week && winFrom && week > mondayOf(winFrom);
+    const canNext = week && winTo && addDay(week, 7) <= winTo;
+    const shiftWeek = (n) => { setWeek((w) => addDay(w, 7 * n)); setPick(null); setSlot(null); };
+    const weekTitle = weekDays.length
+        ? `${shortDay(weekDays[0], { day: "numeric", month: "long" })} au ${shortDay(weekDays[weekDays.length - 1], { day: "numeric", month: "long", year: "numeric" })}`
+        : "";
+    // Jour choisi sur mobile : reste dans la semaine affichée
+    const mobileDay = weekDays.includes(day) ? day : weekDays.find((d) => timesByDay.has(d)) ?? weekDays[0];
+    const pickDoctors = pick ? timesByDay.get(pick.day)?.get(pick.start) ?? [] : [];
+    const choosePick = (d, iso) => {
+        const docs = timesByDay.get(d)?.get(iso) ?? [];
+        setPick({ day: d, start: iso });
+        // Un seul médecin libre : déjà choisi ; plusieurs : le jeune choisit
+        setSlot(docs.length === 1 ? slotFor(iso, docs[0]) : null);
+    };
+    const minutes = slot?.minutes ?? 30;
     const today = new Date(Date.now() + 3600000).toISOString().slice(0, 10); // jour du Bénin
 
     const goLogin = () => {
@@ -261,7 +273,7 @@ export default function BookingDrawer() {
             setBooked(res); setStep("done");
         } catch (e) {
             if (e.status === 409) {
-                setError(e.message); setSlot(null); setStep("date"); load(mode);
+                setError(e.message); setPick(null); setSlot(null); setStep("date"); load(mode);
             } else if (e.status === 401) {
                 goLogin();
             } else setError(e.message);
@@ -328,7 +340,7 @@ export default function BookingDrawer() {
                         <div className="flex items-center justify-between gap-3 border-b border-[#E9E5DF] px-4 py-3 sm:px-6">
                             <div className="flex items-center gap-3">
                                 {step !== "mode" && step !== "done" && (
-                                    <button onClick={() => setStep(step === "details" ? "date" : "mode")} aria-label="Retour" className="grid h-10 w-10 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#1A1814] transition hover:border-[#1A1814]">
+                                    <button onClick={() => { if (step === "details") { setStep("date"); if (!data && mode) load(mode); } else setStep("mode"); }} aria-label="Retour" className="grid h-10 w-10 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#1A1814] transition hover:border-[#1A1814]">
                                         <ArrowLeft size={18} />
                                     </button>
                                 )}
@@ -362,7 +374,7 @@ export default function BookingDrawer() {
                                     {step === "date" && (
                                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                                             <h3 className="font-serif text-2xl text-[#1A1814]">Choisissez une date et une heure</h3>
-                                            <p className="mt-1 text-sm text-[#57524B]">Touchez un jour : les médecins disponibles et leurs heures s’affichent.</p>
+                                            <p className="mt-1 text-sm text-[#57524B]">Touchez une heure libre : les médecins disponibles s’affichent, choisissez le vôtre.</p>
                                             {loading ? (
                                                 <div className="grid h-72 place-items-center"><Loader2 className="h-7 w-7 animate-spin text-[#C2185B]" /></div>
                                             ) : !data ? (
@@ -379,83 +391,115 @@ export default function BookingDrawer() {
                                                     {mode === "phone" && <button onClick={() => chooseMode("video")} className="mt-4 text-sm font-medium text-[#C2185B] hover:underline">Voir les créneaux en visio</button>}
                                                 </div>
                                             ) : (
-                                                <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-                                                    {/* Mois */}
-                                                    <div className="self-start rounded-[24px] border border-[#E9E5DF] bg-white p-4 sm:p-5 xl:sticky xl:top-0">
-                                                        <div className="mb-4 flex items-center justify-between">
-                                                            <p className="font-serif text-xl capitalize text-[#1A1814]">{monthTitle}</p>
-                                                            <div className="flex gap-2">
-                                                                <button disabled={!canPrev} onClick={() => shiftMonth(-1)} aria-label="Mois précédent" className="grid h-9 w-9 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#1A1814] transition hover:border-[#1A1814] disabled:opacity-30"><ChevronLeft size={16} /></button>
-                                                                <button disabled={!canNext} onClick={() => shiftMonth(1)} aria-label="Mois suivant" className="grid h-9 w-9 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#1A1814] transition hover:border-[#1A1814] disabled:opacity-30"><ChevronRight size={16} /></button>
-                                                            </div>
+                                                <div className="mt-6">
+                                                    {/* Semaine affichée et navigation */}
+                                                    <div className="mb-4 flex items-end justify-between gap-3">
+                                                        <div className="min-w-0">
+                                                            <p className="text-[11px] uppercase tracking-[0.16em] text-[#8A837A]">Semaine</p>
+                                                            <p className="truncate font-serif text-xl text-[#1A1814]">{weekTitle}</p>
                                                         </div>
-                                                        <div className="grid grid-cols-7 gap-1 text-center">
-                                                            {WEEKDAYS.map((w) => <span key={w} className="pb-2 text-[11px] uppercase tracking-wide text-[#8A837A]">{w}</span>)}
-                                                            {cells.map((d, i) => {
-                                                                if (!d) return <span key={`e${i}`} />;
-                                                                const docs = byDay.get(d) || [];
-                                                                const open = docs.length > 0;
-                                                                const on = d === day;
+                                                        <div className="flex shrink-0 items-center gap-2">
+                                                            <span className="mr-1 hidden items-center gap-1.5 text-[11.5px] text-[#8A837A] sm:flex"><Globe2 size={12} /> Heure du Bénin</span>
+                                                            <button disabled={!canPrev} onClick={() => shiftWeek(-1)} aria-label="Semaine précédente" className="grid h-10 w-10 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#1A1814] transition hover:border-[#1A1814] disabled:opacity-30"><ChevronLeft size={17} /></button>
+                                                            <button disabled={!canNext} onClick={() => shiftWeek(1)} aria-label="Semaine suivante" className="grid h-10 w-10 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#1A1814] transition hover:border-[#1A1814] disabled:opacity-30"><ChevronRight size={17} /></button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Ordinateur : une colonne par jour, ses heures libres dessous */}
+                                                    <AnimatePresence mode="wait">
+                                                        <motion.div
+                                                            key={week}
+                                                            initial={{ opacity: 0, x: 12 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            exit={{ opacity: 0, x: -12 }}
+                                                            transition={{ duration: 0.2 }}
+                                                            className="hidden gap-2 md:grid"
+                                                            style={{ gridTemplateColumns: `repeat(${weekDays.length}, minmax(0, 1fr))` }}
+                                                        >
+                                                            {weekDays.map((d) => {
+                                                                const times = timesByDay.get(d);
                                                                 return (
-                                                                    <button
-                                                                        key={d}
-                                                                        disabled={!open}
-                                                                        onClick={() => { setDay(d); setSlot(null); }}
-                                                                        aria-pressed={on}
-                                                                        aria-label={`${dayLabel(`${d}T12:00:00Z`)}${open ? `, ${docs.length} médecin${docs.length > 1 ? "s" : ""} disponible${docs.length > 1 ? "s" : ""}` : ", complet ou fermé"}`}
-                                                                        className={`relative mx-auto grid aspect-square w-full max-w-[52px] place-items-center rounded-full text-sm tabular-nums transition ${on ? "font-semibold text-white" : open ? "bg-[#FBEEF3] font-semibold text-[#A0124A] hover:bg-[#F7DCE7]" : "text-[#C9C2B8]"}`}
-                                                                    >
-                                                                        {on && <motion.span layoutId="tc-day" transition={spring} className="absolute inset-0 rounded-full bg-[#1A1814]" />}
-                                                                        <span className="relative">{Number(d.slice(8))}</span>
-                                                                        {d === today && <span className={`absolute bottom-1 h-1 w-1 rounded-full ${on ? "bg-white" : "bg-[#1A1814]"}`} />}
+                                                                    <div key={d} className="min-w-0 rounded-[20px] border border-[#E9E5DF] bg-white p-2">
+                                                                        <div className={`mb-2 rounded-[14px] px-1 py-2.5 text-center ${d === today ? "bg-[#1A1814] text-white" : "bg-[#F9F8F6] text-[#1A1814]"}`}>
+                                                                            <p className="text-[10.5px] uppercase tracking-[0.16em] opacity-70">{shortDay(d, { weekday: "short" })}</p>
+                                                                            <p className="font-serif text-[26px] leading-tight">{Number(d.slice(8))}</p>
+                                                                            <p className="text-[11px] opacity-70">{shortDay(d, { month: "short" })}</p>
+                                                                        </div>
+                                                                        {times ? (
+                                                                            <div className="space-y-1.5">
+                                                                                {[...times.entries()].map(([iso, docs]) => (
+                                                                                    <TimeChip key={iso} iso={iso} count={docs.length} active={pick?.start === iso} onClick={() => choosePick(d, iso)} />
+                                                                                ))}
+                                                                            </div>
+                                                                        ) : (
+                                                                            <p className="px-1 py-8 text-center text-[12px] leading-snug text-[#B3ABA1]">{d < today ? "Passé" : "Aucune heure libre"}</p>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </motion.div>
+                                                    </AnimatePresence>
+
+                                                    {/* Mobile : les jours en rangée, puis les heures du jour choisi */}
+                                                    <div className="md:hidden">
+                                                        <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${weekDays.length}, minmax(0, 1fr))` }}>
+                                                            {weekDays.map((d) => {
+                                                                const has = timesByDay.has(d);
+                                                                const on = d === mobileDay;
+                                                                return (
+                                                                    <button key={d} disabled={!has} onClick={() => setDay(d)} aria-pressed={on}
+                                                                        className={`rounded-2xl border py-2 text-center transition ${on ? "border-[#1A1814] bg-[#1A1814] text-white" : has ? "border-[#F3D3E0] bg-white text-[#1A1814]" : "border-transparent text-[#C9C2B8]"}`}>
+                                                                        <span className="block text-[10px] uppercase tracking-[0.12em] opacity-70">{shortDay(d, { weekday: "short" })}</span>
+                                                                        <span className="block text-lg font-semibold leading-tight">{Number(d.slice(8))}</span>
                                                                     </button>
                                                                 );
                                                             })}
                                                         </div>
-                                                        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#EFECE7] pt-4 text-[11.5px] text-[#8A837A]">
-                                                            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#FBEEF3] ring-1 ring-[#F3D3E0]" /> Médecin disponible</span>
-                                                            <span className="flex items-center gap-1.5"><span className="h-1 w-1 rounded-full bg-[#1A1814]" /> Aujourd’hui</span>
-                                                            <span className="flex items-center gap-1.5"><Globe2 size={12} /> Heure du Bénin</span>
+                                                        <div className="mt-4">
+                                                            {timesByDay.get(mobileDay) ? (
+                                                                groupTimes([...timesByDay.get(mobileDay).keys()]).map(([label, list]) => (
+                                                                    <div key={label} className="mb-3">
+                                                                        <p className="mb-1.5 text-[10.5px] uppercase tracking-[0.16em] text-[#8A837A]">{label}</p>
+                                                                        <div className="grid grid-cols-3 gap-1.5">
+                                                                            {list.map((iso) => (
+                                                                                <TimeChip key={iso} iso={iso} count={timesByDay.get(mobileDay).get(iso).length} active={pick?.start === iso} onClick={() => choosePick(mobileDay, iso)} />
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <p className="py-6 text-center text-sm text-[#8A837A]">Aucune heure libre ce jour.</p>
+                                                            )}
                                                         </div>
-                                                    </div>
-
-                                                    {/* Médecins disponibles le jour choisi, avec leurs heures */}
-                                                    <div className="min-w-0">
-                                                        {day ? (
-                                                            <>
-                                                                <div className="mb-3">
-                                                                    <p className="text-[11px] uppercase tracking-[0.16em] text-[#8A837A]">{dayDoctors.length} médecin{dayDoctors.length > 1 ? "s" : ""} disponible{dayDoctors.length > 1 ? "s" : ""}</p>
-                                                                    <p className="mt-0.5 font-serif text-xl first-letter:uppercase text-[#1A1814]">{dayLabel(`${day}T12:00:00Z`)}</p>
-                                                                </div>
-                                                                <AnimatePresence mode="wait">
-                                                                    <motion.div key={day} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
-                                                                        {dayDoctors.map(({ doctor, times }, i) => (
-                                                                            <DoctorDay key={doctor.id} doctor={doctor} times={times} slot={slot} onPick={setSlot} index={i} />
-                                                                        ))}
-                                                                    </motion.div>
-                                                                </AnimatePresence>
-                                                            </>
-                                                        ) : (
-                                                            <p className="text-sm text-[#57524B]">Choisissez un jour en surbrillance.</p>
-                                                        )}
                                                     </div>
                                                 </div>
                                             )}
-                                            {slot && (
+
+                                            {/* Heure choisie : les médecins libres à cette heure, le jeune choisit le sien */}
+                                            {pick && (
                                                 <motion.div
+                                                    key={pick.start}
                                                     initial={{ opacity: 0, y: 16 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={spring}
-                                                    className="sticky bottom-3 z-10 mt-6 flex items-center justify-between gap-3 rounded-[20px] border border-[#1A1814] bg-white p-3 pl-4 shadow-[0_18px_40px_-24px_rgba(26,24,20,0.55)]"
+                                                    className="sticky bottom-3 z-10 mt-6 rounded-[24px] border border-[#1A1814] bg-[#F9F8F6] p-4 shadow-[0_24px_50px_-28px_rgba(26,24,20,0.6)] sm:p-5"
                                                 >
-                                                    <span className="flex min-w-0 items-center gap-3">
-                                                        <DoctorAvatar doctor={slot.doctor} size={40} />
-                                                        <span className="min-w-0">
-                                                            <span className="block truncate text-sm font-semibold text-[#1A1814]">{slot.doctor?.name}</span>
-                                                            <span className="block truncate text-[12.5px] text-[#6B655D] first-letter:uppercase">{fullLabel(slot.start)}</span>
-                                                        </span>
-                                                    </span>
-                                                    <button onClick={() => setStep("details")} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#C2185B] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#A0124A]">Suivant <ArrowRight size={16} /></button>
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="min-w-0">
+                                                            <p className="text-[11px] uppercase tracking-[0.16em] text-[#8A837A]">{pickDoctors.length > 1 ? `${pickDoctors.length} médecins disponibles` : "Médecin disponible"}</p>
+                                                            <p className="mt-0.5 font-serif text-lg first-letter:uppercase text-[#1A1814]">{fullLabel(pick.start)}</p>
+                                                        </div>
+                                                        <button onClick={() => { setPick(null); setSlot(null); }} aria-label="Changer d’heure" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#57524B] transition hover:border-[#1A1814]"><X size={16} /></button>
+                                                    </div>
+                                                    <div className="mt-3 grid max-h-[38vh] gap-2 overflow-y-auto sm:grid-cols-2">
+                                                        {pickDoctors.map((doc, i) => (
+                                                            <DoctorOption key={doc.id} doctor={doc} index={i} active={slot?.doctor_id === doc.id} onClick={() => setSlot(slotFor(pick.start, doc))} />
+                                                        ))}
+                                                    </div>
+                                                    <div className="mt-4 flex items-center justify-between gap-3">
+                                                        <p className="min-w-0 truncate text-[12.5px] text-[#6B655D]">{slot ? `Avec ${slot.doctor.name}` : "Choisissez votre médecin."}</p>
+                                                        <button disabled={!slot} onClick={() => setStep("details")} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#C2185B] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#A0124A] disabled:opacity-40">Suivant <ArrowRight size={16} /></button>
+                                                    </div>
                                                 </motion.div>
                                             )}
                                         </motion.div>

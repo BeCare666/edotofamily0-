@@ -436,9 +436,16 @@ export function ScheduleView() {
     return (
         <div className="space-y-6">
             <SectionTitle title="Mes disponibilités" subtitle="Heure du Bénin. Les jeunes réservent dans ces plages, sur les 30 prochains jours." action={
-                <button onClick={save} disabled={busy} className="rounded-xl bg-[#1A1814] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Enregistrement…" : "Enregistrer"}</button>
+                !data.fixed_hours && <button onClick={save} disabled={busy} className="rounded-xl bg-[#1A1814] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Enregistrement…" : "Enregistrer"}</button>
             } />
             {msg && <p className={`rounded-xl px-4 py-3 text-sm ${msg.ok ? "bg-[#E8EFE6] text-[#3F6B45]" : "bg-[#FDF1E0] text-[#9A5B13]"}`}>{msg.text}</p>}
+            {/* Médecin E.doto family : heures fixes (20/10/2026), seules les absences se gèrent ici */}
+            {data.fixed_hours ? (
+                <Card className="border-[#F3D3E0] bg-[#FBEEF3] p-5">
+                    <p className="font-serif text-lg text-[#1A1814]">Médecin E.doto family</p>
+                    <p className="mt-1 text-sm text-[#57524B]">{data.fixed_hours}. Vous recevez les rendez-vous de toutes les heures où aucun autre médecin n’est libre.</p>
+                </Card>
+            ) : (<>
             <Card className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <label className="flex items-center gap-3 text-sm text-[#1A1814]">
                     Durée d’une consultation
@@ -466,6 +473,7 @@ export function ScheduleView() {
                     </div>
                 ))}
             </Card>
+            </>)}
 
             <Card className="p-5">
                 <p className="font-serif text-lg text-[#1A1814]">Absences</p>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, MotionProps } from "framer-motion";
 import { ArrowUpRight, Gift, LockKeyhole, MessageCircleHeart, ShoppingBag, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useChatAI } from "../context/ChatAIContext";
@@ -10,6 +10,9 @@ const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes en ms
 // Drawer d'accueil (refonte 19/10/2026) : trois accès en cartes photo, rendu premium.
 // « Poser une question à l'Assistant SSR » ouvre le choix « Assistant virtuel » ou « Prendre rendez-vous ».
 const spring = { type: "spring" as const, stiffness: 260, damping: 32, mass: 0.9 };
+// Transtypage : types de React 19 et framer-motion 10 incompatibles sans lui (même méthode que home/Reveal.tsx)
+const MotionDiv = motion.div as unknown as React.FC<React.HTMLAttributes<HTMLDivElement> & MotionProps & { key?: React.Key }>;
+const MotionButton = motion.button as unknown as React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & MotionProps>;
 
 type Access = {
   key: string;
@@ -24,8 +27,7 @@ type Access = {
 function AccessCard({ a, index }: { a: Access; index: number }) {
   const Icon = a.icon;
   return (
-    <motion.button
-      type="button"
+    <MotionButton
       onClick={a.onClick}
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
@@ -63,7 +65,7 @@ function AccessCard({ a, index }: { a: Access; index: number }) {
           <ArrowUpRight size={16} />
         </span>
       </span>
-    </motion.button>
+    </MotionButton>
   );
 }
 
@@ -136,7 +138,7 @@ const SSRAccessDrawer = () => {
       {open && (
         <>
           {/* Backdrop */}
-          <motion.div
+          <MotionDiv
             key="ssr-access-backdrop"
             className="fixed inset-0 z-40 bg-[#1A1814]/30 backdrop-blur-[3px]"
             initial={{ opacity: 0 }}
@@ -147,7 +149,7 @@ const SSRAccessDrawer = () => {
           />
 
           {/* Drawer */}
-          <motion.div
+          <MotionDiv
             key="ssr-access-drawer"
             role="dialog"
             aria-modal="true"
@@ -169,7 +171,7 @@ const SSRAccessDrawer = () => {
                 <X size={18} />
               </button>
 
-              <motion.div
+              <MotionDiv
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...spring, delay: 0.04 }}
@@ -182,7 +184,7 @@ const SSRAccessDrawer = () => {
                 <h2 className="mt-4 font-serif text-[24px] leading-[1.15] text-[#1A1814] sm:text-[32px]">
                   Accès simple, confidentiel et immédiat aux produits SSR
                 </h2>
-              </motion.div>
+              </MotionDiv>
 
               <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-3 sm:gap-4">
                 {items.map((a, i) => (
@@ -190,7 +192,7 @@ const SSRAccessDrawer = () => {
                 ))}
               </div>
             </div>
-          </motion.div>
+          </MotionDiv>
         </>
       )}
     </AnimatePresence>
