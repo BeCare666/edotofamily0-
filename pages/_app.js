@@ -13,6 +13,9 @@ import CookieConsent from '../components/CookieConsent';
 import SSRAdvisorButton from "../components/SSRAdvisorButton";
 import { ChatAIProvider } from "../context/ChatAIContext";
 const ChatAIDrawer = dynamic(() => import("../components/ai-chat/ChatAIDrawer"), { ssr: false });
+// Téléconsultation (19/10/2026) : choix assistant / rendez-vous et prise de rendez-vous
+const SSRChoice = dynamic(() => import("../components/teleconsultation/SSRChoice"), { ssr: false });
+const BookingDrawer = dynamic(() => import("../components/teleconsultation/BookingDrawer"), { ssr: false });
 const MobileBottomNav = dynamic(() => import("../components/mobile/MobileBottomNav"), { ssr: false });
 const Header = dynamic(() => import("../components/header"), {
   ssr: false,
@@ -33,6 +36,13 @@ export default function MyApp({ Component, pageProps }) {
     pathname === "/devenir-point-de-retrait" ||
     pathname === "/pickup-dashboard" || // le dashboard a sa propre barre latérale, son en-tête et son pied de page
     pathname.startsWith("/sponsor") || // espace sponsor : même principe
+    // Téléconsultation (19/10/2026) : espaces jeune, médecin, centre ; activation ; dossier ; code QR
+    pathname === "/mon-espace" ||
+    pathname === "/medecin" ||
+    pathname === "/centre" ||
+    pathname.startsWith("/espace/") ||
+    pathname.startsWith("/dossier/") ||
+    pathname.startsWith("/qr/") ||
 
     pathname.startsWith("/admin") ||
     pathname === "/forgot-password" ||
@@ -59,6 +69,8 @@ export default function MyApp({ Component, pageProps }) {
         <CookieConsent />
         {isHomePagex && <SSRAdvisorButton />}
         <ChatAIDrawer />
+        <SSRChoice />
+        <BookingDrawer />
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       </Layout>
       {!isHomePage && !hideFooter && <Footer />}

@@ -61,9 +61,15 @@ export const authService = {
 
     async logout() {
         //const router = useRouter();
-        await apiRequest("/logout", { method: "POST" });
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        // Session effacée même si l'appel échoue ; l'adresse de retour mémorisée aussi (19/10/2026),
+        // sinon le compte suivant pouvait être envoyé sur la page d'un autre compte
+        try {
+            await apiRequest("/logout", { method: "POST" });
+        } finally {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            localStorage.removeItem("redirect_after_login");
+        }
         //router.push("/");
     },
     resendVerificationEmail: (email) =>

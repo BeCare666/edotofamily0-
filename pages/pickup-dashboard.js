@@ -9,6 +9,7 @@ import KitsView from "../components/pickup-dashboard/KitsView";
 import HistoryView from "../components/pickup-dashboard/HistoryView";
 import ValidateModal from "../components/pickup-dashboard/ValidateModal";
 import { api, todayKeys, token } from "../components/pickup-dashboard/api";
+import AccessDenied from "../components/dashboard-ui/AccessDenied";
 
 const VIEWS = ["overview", "orders", "kits", "history"];
 
@@ -36,7 +37,11 @@ export default function PickupDashboardPage() {
         api("me")
             .then((u) => (u.role === "super_pickuppoint" ? setMe(u) : setDenied("Cet espace est réservé aux points de retrait.")))
             .catch((e) => {
-                if (e.status === 401) router.replace("/login");
+                if (e.status === 401) {
+                    // Session expirée : retour ici après reconnexion (19/10/2026)
+                    try { localStorage.removeItem("token"); localStorage.setItem("redirect_after_login", "/pickup-dashboard"); } catch { }
+                    router.replace("/login");
+                }
                 else setDenied(e.message);
             });
     }, [router]);
@@ -76,14 +81,7 @@ export default function PickupDashboardPage() {
     };
 
     if (denied) {
-        return (
-            <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center p-6 text-center">
-                <div>
-                    <p className="font-serif text-2xl text-[#1A1814]">Accès impossible</p>
-                    <p className="text-[#6B655D] mt-2">{denied}</p>
-                </div>
-            </div>
-        );
+        return <AccessDenied message={denied} here="/pickup-dashboard" />;
     }
     if (!me) {
         return (

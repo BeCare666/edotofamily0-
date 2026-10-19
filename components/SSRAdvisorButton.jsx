@@ -4,13 +4,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { useChatAI } from "../context/ChatAIContext";
 
-// Bouton flottant : ouvre le chat « Assistant SSR » (remplace l'ancien accès direct à Calendly).
+// Bouton flottant : ouvre le choix « Assistant virtuel » ou « Prendre rendez-vous » (19/10/2026),
+// qui mène au chat « Assistant SSR » ou à la téléconsultation.
 export default function SSRAdvisorButton() {
-    const { isOpen, openChat } = useChatAI();
+    const { isOpen, choiceOpen, bookingOpen, openChoice } = useChatAI();
 
     return (
         <AnimatePresence>
-            {!isOpen && (
+            {!isOpen && !choiceOpen && !bookingOpen && (
                 <motion.div
                     // Sur mobile, au-dessus de la barre de navigation du bas (MobileBottomNav)
                     className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] right-4 z-30 flex flex-col items-center gap-2 md:bottom-5 md:right-5"
@@ -20,7 +21,7 @@ export default function SSRAdvisorButton() {
                     transition={{ type: "spring", stiffness: 300, damping: 24 }}
                 >
                     <motion.button
-                        onClick={openChat}
+                        onClick={openChoice}
                         aria-label="Ouvrir l'Assistant SSR"
                         className="group relative h-16 w-16 rounded-full"
                         whileHover={{ scale: 1.08 }}

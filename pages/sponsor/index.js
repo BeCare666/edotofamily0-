@@ -8,6 +8,7 @@ import { ActivityView, CitiesView, LiveView, PointsView } from "../../components
 import { ProfileView, ProposalsView } from "../../components/sponsor-dashboard/proposals";
 import { resetFiltersCache } from "../../components/sponsor-dashboard/filters";
 import { api, token } from "../../components/pickup-dashboard/api";
+import AccessDenied from "../../components/dashboard-ui/AccessDenied";
 
 const VIEWS = ["home", "live", "campaigns", "activity", "points", "cities", "proposals", "exports", "profile"];
 
@@ -36,7 +37,11 @@ export default function SponsorPage() {
         api("sponsor/me")
             .then(setSponsor)
             .catch((e) => {
-                if (e.status === 401) router.replace("/login");
+                if (e.status === 401) {
+                    // Session expirée : retour ici après reconnexion (19/10/2026)
+                    try { localStorage.removeItem("token"); localStorage.setItem("redirect_after_login", "/sponsor"); } catch { }
+                    router.replace("/login");
+                }
                 else setDenied(e.status === 403 ? "Cet espace est réservé aux sponsors d’E.doto family." : e.message);
             });
     }, [router]);
@@ -73,11 +78,7 @@ export default function SponsorPage() {
     };
 
     if (denied) {
-        return (
-            <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center p-6 text-center">
-                <div><p className="font-serif text-2xl text-[#1A1814]">Accès impossible</p><p className="text-[#6B655D] mt-2">{denied}</p></div>
-            </div>
-        );
+        return <AccessDenied message={denied} here="/sponsor" />;
     }
     if (!sponsor) {
         return <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-[#C2185B]" /></div>;

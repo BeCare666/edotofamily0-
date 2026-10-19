@@ -8,6 +8,7 @@ import { authService } from "../services/authService"
 import { useAuthContext } from "../context/AuthContext" // ✅ import du contexte
 import AuthShell, { AuthAlert, AuthField, AuthLink, AuthSubmit, PasswordField } from "../components/auth/AuthShell"
 import { emailError, emailInput } from "../lib/fieldRules"
+import { pathAfterLogin, takeRedirect } from "../lib/roleHome"
 
 export default function LoginPage() {
     const router = useRouter()
@@ -55,19 +56,10 @@ export default function LoginPage() {
 
                 setAlert({ type: "success", message: "Connexion réussie !" })
 
-                // 🔁 récupérer la page d'origine
-                const redirect = localStorage.getItem("redirect_after_login");
-
-                // Redirection immédiate (l'ancien délai fixe de 500 ms ralentissait chaque connexion)
-                // Un sponsor arrive sur son espace
-                if (me?.role === "sponsor" && !redirect) {
-                    router.push("/sponsor");
-                } else if (redirect) {
-                    localStorage.removeItem("redirect_after_login");
-                    router.push(redirect);
-                } else {
-                    router.push("/");
-                }
+                // Redirection immédiate selon le rôle (19/10/2026) : sponsor → espace sponsor,
+                // point de retrait → dashboard, médecin → espace médecin, centre → espace centre ;
+                // l'adresse mémorisée n'est suivie que si elle appartient à l'espace du compte.
+                router.push(pathAfterLogin(me?.role, takeRedirect()))
             } else {
                 throw new Error("Identifiants invalides.")
             }

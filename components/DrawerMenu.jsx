@@ -231,7 +231,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
               </li>
             ))}
             {user?.role === "super_pickuppoint" ? (
-              <p onClick={router.push("/pickup-dashboard")} className="hidden cursor-pointer">Dashboard</p>
+              <p onClick={() => router.push("/pickup-dashboard")} className="hidden cursor-pointer">Dashboard</p>
             ) : (<p onClick={handleFinalize} className="hidden cursor-pointer">💼 Devenir Point de Retrait</p>)}
 
           </ul>

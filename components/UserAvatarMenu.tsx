@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { User, ShoppingBag, Star, LogOut } from "lucide-react";
+import { User, ShoppingBag, Star, LogOut, LayoutDashboard } from "lucide-react";
 
 // Avatar du compte connecté : même présentation que les dashboards admin / point de retrait
 // (photo ou initiales, sans nom à côté). Le clic ouvre les informations ; clic à l'extérieur ou Échap = fermeture.
@@ -40,7 +40,16 @@ export default function UserAvatarMenu({ user, onNavigate, onLogout, round = fal
         onNavigate(path);
     };
     const avatar = user?.profile?.avatar?.url;
-    const isPickup = user?.role === "super_pickuppoint";
+    // Entrées selon le rôle (19/10/2026) : l'ancien lien « Dashboard » menait à /pickup-dashboard-for-orders
+    // (page inexistante) et un sponsor n'avait aucun lien vers son espace.
+    const role = user?.role;
+    const space =
+        role === "sponsor" ? { path: "/sponsor", label: "Espace sponsor" }
+            : role === "super_pickuppoint" ? { path: "/pickup-dashboard", label: "Dashboard" }
+                : role === "doctor" ? { path: "/medecin", label: "Espace médecin" }
+                    : role === "health_center" ? { path: "/centre", label: "Espace centre" }
+                        : { path: "/mon-espace", label: "Mon dashboard" };
+    const canBecomePickup = !role || role === "customer";
     const item = "w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#3B342D] hover:bg-[#F6F1EA] hover:text-[#1F1B16] transition";
 
     return (
@@ -76,11 +85,10 @@ export default function UserAvatarMenu({ user, onNavigate, onLogout, round = fal
                             <span className="block text-xs text-[#9A8E80] truncate">{user?.email}</span>
                         </span>
                     </div>
+                    <button role="menuitem" onClick={() => go(space.path)} className={item}><LayoutDashboard size={16} /> {space.label}</button>
                     <button role="menuitem" onClick={() => go("/profile")} className={item}><User size={16} /> Profil</button>
                     <button role="menuitem" onClick={() => go("/orders")} className={item}><ShoppingBag size={16} /> Commandes</button>
-                    {isPickup ? (
-                        <button role="menuitem" onClick={() => go("/pickup-dashboard-for-orders")} className={item}><Star size={16} /> Dashboard</button>
-                    ) : (
+                    {canBecomePickup && (
                         <button role="menuitem" onClick={() => go("/devenir-point-de-retrait")} className={item}><Star size={16} /> Devenir Point de Retrait</button>
                     )}
                     <div className="my-1 border-t border-[#F1ECE4]" />
