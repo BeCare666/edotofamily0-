@@ -391,8 +391,9 @@ export default function CategoryPage() {
           : null;
 
   // Panneau de filtres (colonne fixe sur ordinateur, panneau sur mobile) : même contenu, mêmes états
+  // Colonne ordinateur plus compacte (20/10/2026) : tous les filtres visibles sur un écran de portable
   const renderFilters = (prefix) => (
-    <div className="space-y-7">
+    <div className={prefix === "desk" ? "space-y-6" : "space-y-7"}>
       <section aria-labelledby={`${prefix}-cat`}>
         <h2 id={`${prefix}-cat`} className="text-[11px] uppercase tracking-[0.22em] text-[#9A8E80] mb-3">Catégories</h2>
         <ul className="space-y-1">
@@ -403,7 +404,7 @@ export default function CategoryPage() {
                 <button
                   onClick={() => selectCategory(c.id)}
                   aria-current={active ? "page" : undefined}
-                  className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-sm text-left transition-all duration-200 ${active
+                  className={`w-full flex items-center justify-between gap-3 px-3.5 ${prefix === "desk" ? "py-2" : "py-2.5"} rounded-xl text-sm text-left transition-all duration-200 ${active
                     ? "bg-[#1F1B16] text-white shadow-[0_10px_24px_-12px_rgba(31,27,22,0.55)]"
                     : "text-[#3B342D] hover:bg-[#F3EEE7]"
                     }`}
@@ -424,13 +425,13 @@ export default function CategoryPage() {
 
       <section aria-labelledby={`${prefix}-sort`}>
         <h2 id={`${prefix}-sort`} className="text-[11px] uppercase tracking-[0.22em] text-[#9A8E80] mb-3">Trier par</h2>
-        <div className="grid grid-cols-2 gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           {Object.entries(SORTS).map(([key, srt]) => (
             <button
               key={key}
               onClick={() => setSortBy(key)}
               aria-pressed={sortBy === key}
-              className={`px-3 py-2 rounded-xl text-xs text-left border transition ${sortBy === key
+              className={`whitespace-nowrap px-3 py-2 rounded-xl text-xs text-left border transition ${sortBy === key
                 ? "border-[#1F1B16] bg-white text-[#1F1B16] font-medium"
                 : "border-[#EDE6DC] bg-white/60 text-[#7A6E62] hover:border-[#D8CFC3] hover:text-[#1F1B16]"
                 }`}
@@ -537,11 +538,11 @@ export default function CategoryPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 lg:pt-6 pb-24 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 lg:pt-6 pb-24 lg:grid lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-10">
           {/* Ordinateur : colonne de filtres qui reste visible pendant le défilement */}
           <aside className="hidden lg:block" aria-label="Filtres">
-            <div className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto pr-1 [scrollbar-width:thin]">
-              <div className="bg-white/80 backdrop-blur rounded-3xl border border-[#EDE6DC] p-6 shadow-[0_1px_2px_rgba(60,40,20,0.04),0_12px_32px_-18px_rgba(60,40,20,0.18)]">
+            <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-1 [scrollbar-width:thin]">
+              <div className="bg-white/80 backdrop-blur rounded-3xl border border-[#EDE6DC] p-5 shadow-[0_1px_2px_rgba(60,40,20,0.04),0_12px_32px_-18px_rgba(60,40,20,0.18)]">
                 {renderFilters("desk")}
               </div>
             </div>

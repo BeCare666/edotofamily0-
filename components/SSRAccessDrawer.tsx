@@ -1,31 +1,87 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { ShoppingBag, Gift, Sparkles, X, MessageCircleHeart } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, Gift, LockKeyhole, MessageCircleHeart, ShoppingBag, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useChatAI } from "../context/ChatAIContext";
 const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes en ms
+
+// Drawer d'accueil (refonte 19/10/2026) : trois accès en cartes photo, rendu premium.
+// « Poser une question à l'Assistant SSR » ouvre le choix « Assistant virtuel » ou « Prendre rendez-vous ».
+const spring = { type: "spring" as const, stiffness: 260, damping: 32, mass: 0.9 };
+
+type Access = {
+  key: string;
+  photo: string;
+  icon: React.ElementType;
+  title: string;
+  text: string;
+  featured?: boolean;
+  onClick: () => void;
+};
+
+function AccessCard({ a, index }: { a: Access; index: number }) {
+  const Icon = a.icon;
+  return (
+    <motion.button
+      type="button"
+      onClick={a.onClick}
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ ...spring, delay: 0.08 + index * 0.07 }}
+      className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-[22px] border bg-white p-2.5 text-left transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-24px_rgba(26,24,20,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C2185B]/40 sm:flex-col sm:items-stretch sm:gap-0 sm:p-0 ${
+        a.featured ? "border-[#C2185B]/40" : "border-[#E9E5DF] hover:border-[#1A1814]"
+      }`}
+    >
+      {/* Photo : vignette à gauche sur mobile, bandeau en haut sur ordinateur */}
+      <span className="relative block h-20 w-20 shrink-0 overflow-hidden rounded-2xl sm:h-40 sm:w-full sm:rounded-none lg:h-44">
+        <img src={a.photo} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]" />
+        <span className="absolute inset-0 hidden bg-gradient-to-t from-[#1A1814]/35 to-transparent sm:block" />
+        <span className="absolute left-3 top-3 hidden h-10 w-10 place-items-center rounded-full bg-white/95 text-[#1A1814] backdrop-blur sm:grid">
+          <Icon size={18} strokeWidth={1.7} />
+        </span>
+        {a.featured && (
+          <span className="absolute right-3 top-3 hidden rounded-full bg-[#C2185B] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white sm:block">
+            Gratuit
+          </span>
+        )}
+      </span>
+
+      <span className="flex min-w-0 flex-1 items-center justify-between gap-3 sm:p-5">
+        <span className="min-w-0">
+          <span className="block text-[15px] font-semibold leading-snug text-[#1A1814] sm:text-base">{a.title}</span>
+          <span className="mt-1 block text-[13px] leading-relaxed text-[#6B655D]">{a.text}</span>
+        </span>
+        <span
+          className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border transition-all duration-300 group-hover:rotate-45 ${
+            a.featured
+              ? "border-[#C2185B] bg-[#C2185B] text-white"
+              : "border-[#E9E5DF] text-[#57524B] group-hover:border-[#1A1814] group-hover:bg-[#1A1814] group-hover:text-white"
+          }`}
+        >
+          <ArrowUpRight size={16} />
+        </span>
+      </span>
+    </motion.button>
+  );
+}
 
 const SSRAccessDrawer = () => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  // « Parler à un conseiller SSR » ouvre le chat IA ; le drawer ne se réaffiche pas par-dessus le chat.
-  const { isOpen: chatOpen, openChat } = useChatAI();
-  const chatOpenRef = useRef(chatOpen);
-  chatOpenRef.current = chatOpen;
+  // Le drawer ne se réaffiche pas par-dessus le chat, le choix ou la prise de rendez-vous.
+  const { isOpen: chatOpen, choiceOpen, bookingOpen, openChoice } = useChatAI();
+  const busyRef = useRef(false);
+  busyRef.current = chatOpen || choiceOpen || bookingOpen;
   useEffect(() => {
-    // Fonction qui ouvre le drawer
-    const showDrawer = () => {
-      setOpen(true);
-    };
-
     // Affiche au premier chargement.
-    showDrawer();
+    setOpen(true);
 
     // Lance un intervalle toutes les 5 minutes
     timerRef.current = setInterval(() => {
-      if (!chatOpenRef.current) setOpen(true); // réaffiche
+      if (!busyRef.current) setOpen(true); // réaffiche
     }, FIVE_MINUTES);
 
     // Cleanup
@@ -34,109 +90,110 @@ const SSRAccessDrawer = () => {
     };
   }, []);
 
+  // Échap pour fermer
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  const go = (fn: () => void) => () => {
+    setOpen(false);
+    fn();
+  };
+
+  const items: Access[] = [
+    {
+      key: "products",
+      photo: "/images/woman-soft-bg.jpg",
+      icon: ShoppingBag,
+      title: "Visiter nos produits",
+      text: "Commandez en toute discrétion",
+      onClick: go(() => router.push("/category/categories_id=3")),
+    },
+    {
+      key: "kits",
+      photo: "/images/campagnes_uac.png",
+      icon: Gift,
+      title: "Bénéficier de kits gratuits",
+      text: "Campagnes disponibles près de vous",
+      featured: true,
+      onClick: go(() => router.push("/campaigns")),
+    },
+    {
+      key: "assistant",
+      photo: "/icons/conseiller.jpg",
+      icon: MessageCircleHeart,
+      title: "Poser une question à l'Assistant SSR",
+      text: "Réponses automatiques, anonymes et confidentielles",
+      onClick: go(openChoice),
+    },
+  ];
+
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${open
-          ? "opacity-100 pointer-events-auto"
-          : "opacity-0 pointer-events-none"
-          }`}
-        onClick={() => setOpen(false)}
-      />
-
-      {/* Drawer */}
-      <div
-        className={`fixed bottom-0 left-0 right-0 z-50 transition-transform duration-500 ease-out ${open ? "translate-y-0" : "translate-y-full"
-          }`}
-      >
-        <div className="relative bg-white rounded-t-3xl shadow-2xl border border-slate-100 px-6 pt-6 pb-8">
-          <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-300" />
-
-          <button
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            key="ssr-access-backdrop"
+            className="fixed inset-0 z-40 bg-[#1A1814]/30 backdrop-blur-[3px]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
             onClick={() => setOpen(false)}
-            className="absolute right-4 top-4 text-slate-500 hover:text-slate-800"
+          />
+
+          {/* Drawer */}
+          <motion.div
+            key="ssr-access-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Accès SSR sécurisé"
+            className="fixed inset-x-0 bottom-0 z-50 flex justify-center"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={spring}
           >
-            <X />
-          </button>
+            <div className="relative max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-t-[30px] border border-b-0 border-[#E9E5DF] bg-[#F9F8F6] px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-24px_60px_-30px_rgba(26,24,20,0.35)] sm:px-8 sm:pb-8">
+              <div className="mx-auto mb-5 h-1.5 w-11 rounded-full bg-[#D9D3CA]" />
 
-          <div className="flex justify-center mb-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-50 border border-pink-100 text-pink-600 text-sm font-medium whitespace-nowrap">
-              <Sparkles size={16} />
-              Accès SSR sécurisé
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Fermer"
+                className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#57524B] transition hover:border-[#1A1814] hover:text-[#1A1814] sm:right-6 sm:top-5"
+              >
+                <X size={18} />
+              </button>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...spring, delay: 0.04 }}
+                className="mx-auto max-w-2xl px-8 text-center"
+              >
+                <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-[#E9E5DF] bg-white px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-[#C2185B]">
+                  <LockKeyhole size={13} />
+                  Accès SSR sécurisé
+                </span>
+                <h2 className="mt-4 font-serif text-[24px] leading-[1.15] text-[#1A1814] sm:text-[32px]">
+                  Accès simple, confidentiel et immédiat aux produits SSR
+                </h2>
+              </motion.div>
+
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-3 sm:gap-4">
+                {items.map((a, i) => (
+                  <AccessCard key={a.key} a={a} index={i} />
+                ))}
+              </div>
             </div>
-          </div>
-
-          <h2 className="text-center text-xl sm:text-2xl font-bold text-slate-900 mb-6">
-            Accès simple, confidentiel et immédiat aux produits SSR
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <button
-              onClick={() => {
-                setOpen(false);
-                router.push("/category/categories_id=3");
-              }}
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-slate-200  hover:border-pink-300 hover:shadow-lg transition-all"
-            >
-              <div className="p-3 rounded-xl bg-pink-100 text-pink-600">
-                <ShoppingBag />
-              </div>
-
-              <div className="text-left">
-                <p className="font-semibold text-slate-800  ">
-                  Visiter nos produits
-                </p>
-                <p className="text-sm text-slate-500 ">
-                  Commandez en toute discrétion
-                </p>
-              </div>
-            </button>
-
-            <button
-              onClick={() => {
-                setOpen(false);
-                router.push("/campaigns");
-              }}
-              className="group flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-[0_6px_20px_rgba(236,72,153,0.35)] hover:scale-[1.02] transition-all"
-            >
-              <div className="p-3 rounded-xl bg-white/20">
-                <Gift />
-              </div>
-
-              <div className="text-left">
-                <p className="font-semibold">
-                  Bénéficier de kits gratuits
-                </p>
-                <p className="text-sm text-white/90">
-                  Campagnes disponibles près de vous
-                </p>
-              </div>
-            </button>
-            <button
-              onClick={() => {
-                setOpen(false);
-                openChat();
-              }}
-              className="group flex items-center gap-4 p-5 rounded-2xl border border-slate-200 hover:border-purple-300 hover:shadow-lg transition-all"
-            >
-              <div className="p-3 rounded-xl bg-purple-100 text-purple-600">
-                <MessageCircleHeart size={22} />
-              </div>
-
-              <div className="text-left">
-                <p className="font-semibold text-slate-800">
-                  Poser une question à l'Assistant SSR
-                </p>
-                <p className="text-sm text-slate-500">
-                  Réponses automatiques, anonymes et confidentielles
-                </p>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 

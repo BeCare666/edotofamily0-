@@ -487,10 +487,12 @@ export default function OrdersPage() {
                             exit={{ opacity: 0 }}
                             onClick={() => setPanel(false)}
                         />
+                        {/* Centrage par un conteneur : l'animation (transform) du panneau ne peut plus annuler le centrage, qui coupait le panneau sur ordinateur (20/10/2026) */}
+                        <div className="pointer-events-none fixed inset-0 z-[66] flex items-end justify-center sm:items-center sm:p-6">
                         <motion.div
                             role="dialog"
                             aria-label="Filtres des commandes"
-                            className="fixed inset-x-0 bottom-0 z-[66] max-h-[88vh] overflow-y-auto rounded-t-[32px] bg-[#FFFDFB] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:w-[520px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[32px]"
+                            className="pointer-events-auto max-h-[88vh] w-full overflow-y-auto rounded-t-[32px] bg-[#FFFDFB] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl sm:max-h-[calc(100vh-3rem)] sm:w-[520px] sm:rounded-[32px]"
                             initial={{ y: "100%" }}
                             animate={{ y: 0 }}
                             exit={{ y: "100%" }}
@@ -559,6 +561,7 @@ export default function OrdersPage() {
                                 </button>
                             </div>
                         </motion.div>
+                        </div>
                     </>
                 )}
             </AnimatePresence>

@@ -55,7 +55,7 @@ function AvatarMenu({ name, email, roleLabel, showProfile }) {
     );
 }
 
-export default function SpaceShell({ space, roleLabel, identity, menu, view, onView, viewKey, storageKey, search, extraActions, showProfile = true, children }) {
+export default function SpaceShell({ space, roleLabel, identity, menu, view, onView, viewKey, storageKey, search, extraActions, showProfile = true, siteNav = false, children }) {
     return (
         <DashboardFrame
             space={space}
@@ -65,6 +65,7 @@ export default function SpaceShell({ space, roleLabel, identity, menu, view, onV
             onView={onView}
             viewKey={viewKey || view}
             storageKey={storageKey}
+            siteNav={siteNav}
             footerText={`E.doto family · ${space}`}
             search={search ?? <div />}
             actions={<>{extraActions}<AvatarMenu name={identity?.name} email={identity?.detail} roleLabel={roleLabel} showProfile={showProfile} /></>}

@@ -6,7 +6,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import {
     ArrowUp, ArrowUpLeft, ArrowUpRight, CornerUpLeft, CornerUpRight, Undo2, RotateCw, Flag, Navigation,
     Car, Footprints, Box, Compass, Moon, Sun, Volume2, VolumeX, LocateFixed, Route, X, Loader2,
-    AlertTriangle, ExternalLink, RefreshCw,
+    AlertTriangle, ExternalLink, RefreshCw, Phone,
 } from "lucide-react";
 import { COLORS, MAP_STYLES, USING_DEMO_ROUTING } from "./mapConfig";
 import { bearing, circlePolygon, formatDistance, formatDuration, haversine, lineFeature, projectOnLine } from "./geo";
@@ -66,7 +66,8 @@ function createDestinationElement(name) {
  * Navigation temps réel vers un point de retrait.
  * Fond OpenFreeMap (OpenStreetMap), rendu MapLibre GL, itinéraire OSRM.
  */
-export default function NavigationMap({ destLat, destLng, destName, onClose }) {
+// destPhone : téléphone du point de retrait ; bouton flottant d'appel pour le client perdu (20/10/2026)
+export default function NavigationMap({ destLat, destLng, destName, destPhone, onClose }) {
     const dest = [Number(destLng), Number(destLat)];
     const validDest = Number.isFinite(dest[0]) && Number.isFinite(dest[1]);
 
@@ -426,6 +427,9 @@ export default function NavigationMap({ destLat, destLng, destName, onClose }) {
     };
 
     const externalUrl = `https://www.google.com/maps/dir/?api=1&destination=${dest[1]},${dest[0]}&travelmode=${mode === "foot" ? "walking" : "driving"}`;
+    // Numéro composable : chiffres et « + » de tête seulement (8 chiffres au moins)
+    const telDigits = String(destPhone || "").replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
+    const telHref = telDigits.replace(/\D/g, "").length >= 8 ? telDigits : "";
     const ManeuverIcon = info ? MANEUVER_ICONS[info.step.icon] || ArrowUp : Navigation;
     const dark = theme === "dark";
     const panel = dark ? "bg-[#1f2328] text-white" : "bg-white text-[#0F172A]";
@@ -522,6 +526,24 @@ export default function NavigationMap({ destLat, destLng, destName, onClose }) {
                 </button>
             )}
 
+            {/* ---------------- Appeler le point de retrait (client perdu) */}
+            {telHref && (
+                <a
+                    href={`tel:${telHref}`}
+                    aria-label={`Appeler ${destName || "le point de retrait"} au ${destPhone}`}
+                    className="edoto-call absolute left-3 z-20 flex items-center gap-3 rounded-full bg-white py-1.5 pl-1.5 pr-5 text-left shadow-[0_14px_34px_-12px_rgba(26,24,20,0.5)] ring-1 ring-black/5 transition duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
+                    style={{ bottom: 266 }}
+                >
+                    <span className="edoto-call-icon relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#C2185B] text-white">
+                        <Phone size={20} strokeWidth={2} />
+                    </span>
+                    <span className="min-w-0 leading-tight">
+                        <span className="block text-[13.5px] font-semibold text-[#1A1814]">Appeler le point</span>
+                        <span className="block max-w-[150px] truncate text-[12px] tabular-nums text-[#6B655D]">{destPhone}</span>
+                    </span>
+                </a>
+            )}
+
             {/* ---------------- Panneau bas */}
             <div className={`absolute bottom-0 inset-x-0 z-20 rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.15)] px-5 pt-3 ${panel}`}
                 style={{ paddingBottom: "max(16px, env(safe-area-inset-bottom))" }}>
@@ -585,7 +607,9 @@ export default function NavigationMap({ destLat, destLng, destName, onClose }) {
                 .edoto-dest-label { margin-bottom: 4px; padding: 3px 10px; border-radius: 999px; background: #fff; color: #0F172A;
                     font: 600 12px/1.4 var(--edoto-font); box-shadow: 0 2px 8px rgba(0,0,0,.2); white-space: nowrap;
                     max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
-                @media (prefers-reduced-motion: reduce) { .edoto-user-pulse { animation: none; } }
+                .edoto-call-icon { animation: edoto-ring 4s ease-in-out infinite; }
+                @keyframes edoto-ring { 0%, 86%, 100% { transform: rotate(0); } 88% { transform: rotate(-12deg); } 90% { transform: rotate(12deg); } 92% { transform: rotate(-8deg); } 94% { transform: rotate(8deg); } 96% { transform: rotate(0); } }
+                @media (prefers-reduced-motion: reduce) { .edoto-user-pulse, .edoto-call-icon { animation: none; } }
             `}</style>
         </div>
     );

@@ -14,7 +14,7 @@ const NavigationMap = dynamic(() => import("../map/NavigationMap"), {
     ),
 });
 
-export default function PickupMapModal({ open, onClose, pickupLat, pickupLng, name }) {
+export default function PickupMapModal({ open, onClose, pickupLat, pickupLng, name, phone }) {
     // Pas de défilement de la page derrière la carte ; fermeture avec Échap
     useEffect(() => {
         if (!open) return;
@@ -32,7 +32,7 @@ export default function PickupMapModal({ open, onClose, pickupLat, pickupLng, na
 
     return (
         <div className="fixed inset-0 z-[10000] bg-white" role="dialog" aria-modal="true" aria-label={`Navigation vers ${name || "le point de retrait"}`}>
-            <NavigationMap destLat={pickupLat} destLng={pickupLng} destName={name} onClose={onClose} />
+            <NavigationMap destLat={pickupLat} destLng={pickupLng} destName={name} destPhone={phone} onClose={onClose} />
         </div>
     );
 }

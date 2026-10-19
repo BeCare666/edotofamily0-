@@ -633,6 +633,7 @@ export default function OrderDetailsPage() {
         pickupLat={order?.pickup_point?.pickup_lat}
         pickupLng={order?.pickup_point?.pickup_lng}
         name={order?.pickup_point?.name}
+        phone={order?.pickup_point?.phone}
       />
     </main>
   );

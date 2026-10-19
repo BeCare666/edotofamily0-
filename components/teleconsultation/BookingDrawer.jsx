@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    ArrowLeft, CalendarPlus, Check, ChevronLeft, ChevronRight, Clock3, Globe2, Loader2, LockKeyhole, Phone, ShieldCheck, Video, X,
+    ArrowLeft, ArrowRight, CalendarPlus, Check, ChevronLeft, ChevronRight, Clock3, Globe2, Loader2, LockKeyhole, Phone, ShieldCheck, Stethoscope, Video, X,
 } from "lucide-react";
+import Image from "next/image";
+import emblem from "../../public/logo/favicon.png";
 import { useRouter } from "next/router";
 import { useChatAI } from "../../context/ChatAIContext";
 import { useAuthContext } from "../../context/AuthContext";
@@ -13,6 +15,8 @@ import { api, clearDraft, dayLabel, downloadIcs, fullLabel, MODE_LABEL, readDraf
 
 // Prise de rendez-vous de téléconsultation (19/10/2026), à la manière de Calendly :
 // 1. visio ou appel  2. jour et heure (calendrier réel des médecins)  3. coordonnées  4. confirmation.
+// 20/10/2026 : le clic sur une date affiche les médecins disponibles ce jour et leurs heures ;
+// le médecin E.doto family prend les heures où aucun autre médecin n'est libre.
 const spring = { type: "spring", stiffness: 260, damping: 32, mass: 0.9 };
 const WEEKDAYS = ["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."];
 
@@ -60,6 +64,85 @@ function ModeCard({ icon: Icon, title, text, active, onClick }) {
                 <span className="mt-1 block text-sm leading-relaxed text-[#57524B]">{text}</span>
             </span>
         </button>
+    );
+}
+
+const initialsOf = (n) => String(n || "?").replace(/^(dr|docteur|pr)\.?\s+/i, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "?";
+
+function DoctorAvatar({ doctor, size = 48 }) {
+    if (doctor?.is_house) {
+        return (
+            <span className="relative grid shrink-0 place-items-center rounded-2xl border border-[#F3D3E0] bg-[#FBEEF3]" style={{ width: size, height: size }}>
+                <span className="relative block" style={{ width: size * 0.62, height: size * 0.62 }}>
+                    <Image src={emblem} alt="" fill sizes="40px" className="object-contain" />
+                </span>
+            </span>
+        );
+    }
+    return (
+        <span className="grid shrink-0 place-items-center rounded-2xl bg-[#1A1814] font-semibold text-white" style={{ width: size, height: size, fontSize: size * 0.32 }}>
+            {initialsOf(doctor?.name)}
+        </span>
+    );
+}
+
+// Heures d'un médecin regroupées : matin, après-midi, soir
+function groupTimes(list) {
+    const g = { Matin: [], "Après-midi": [], Soir: [] };
+    list.forEach((iso) => {
+        const h = Number(new Date(iso).toLocaleTimeString("fr-FR", { timeZone: TZ, hour: "2-digit", hour12: false }).slice(0, 2));
+        (h < 12 ? g.Matin : h < 17 ? g["Après-midi"] : g.Soir).push(iso);
+    });
+    return Object.entries(g).filter(([, v]) => v.length);
+}
+
+// Un médecin disponible le jour choisi, avec ses heures libres
+function DoctorDay({ doctor, times, slot, onPick, index }) {
+    const groups = groupTimes(times);
+    const mine = slot?.doctor_id === doctor.id;
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...spring, delay: index * 0.05 }}
+            className={`rounded-[22px] border bg-white p-4 transition-[border-color,box-shadow] sm:p-5 ${mine ? "border-[#1A1814] shadow-[0_16px_36px_-26px_rgba(26,24,20,0.5)]" : "border-[#E9E5DF]"}`}
+        >
+            <div className="flex items-start gap-3.5">
+                <DoctorAvatar doctor={doctor} />
+                <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <p className="truncate font-semibold text-[#1A1814]">{doctor.name}</p>
+                        {doctor.is_house && (
+                            <span className="rounded-full bg-[#FBEEF3] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#A0124A]">Médecin E.doto family</span>
+                        )}
+                    </div>
+                    <p className="mt-0.5 text-[13px] text-[#6B655D]">{doctor.title || "Professionnel de santé"} · {doctor.minutes} min</p>
+                    {doctor.bio && <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-[#8A837A]">{doctor.bio}</p>}
+                </div>
+            </div>
+            <div className="mt-4 space-y-3">
+                {groups.map(([label, list]) => (
+                    <div key={label}>
+                        <p className="mb-1.5 text-[10.5px] uppercase tracking-[0.16em] text-[#8A837A]">{label}</p>
+                        <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
+                            {list.map((iso) => {
+                                const on = mine && slot?.start === iso;
+                                return (
+                                    <button
+                                        key={iso}
+                                        onClick={() => onPick({ start: iso, minutes: doctor.minutes, doctor_id: doctor.id, doctor: { name: doctor.name, title: doctor.title, is_house: doctor.is_house } })}
+                                        aria-pressed={on}
+                                        className={`rounded-xl border py-2.5 text-[13px] font-semibold tabular-nums transition ${on ? "border-[#1A1814] bg-[#1A1814] text-white" : "border-[#E9E5DF] bg-[#F9F8F6] text-[#1A1814] hover:border-[#1A1814] hover:bg-white"}`}
+                                    >
+                                        {timeLabel(iso)}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </motion.div>
     );
 }
 
@@ -126,6 +209,7 @@ export default function BookingDrawer() {
             const [y, mm] = firstDay.split("-").map(Number);
             setMonth({ y, m: mm - 1 });
             setDay(res.days?.[0]?.date ?? null);
+            setSlot(null);
         } catch (e) {
             setError(e.message || "Calendrier indisponible pour le moment.");
         } finally {
@@ -137,7 +221,9 @@ export default function BookingDrawer() {
         setMode(m); setSlot(null); setStep("date"); load(m);
     };
 
-    const byDay = useMemo(() => new Map((data?.days ?? []).map((d) => [d.date, d.slots])), [data]);
+    // Jour → médecins disponibles et leurs heures ; fiches des médecins par identifiant
+    const byDay = useMemo(() => new Map((data?.days ?? []).map((d) => [d.date, d.doctors])), [data]);
+    const doctorsById = useMemo(() => new Map((data?.doctors ?? []).map((d) => [d.id, d])), [data]);
     const cells = month ? monthDays(month.y, month.m) : [];
     const monthTitle = month ? new Date(Date.UTC(month.y, month.m, 1)).toLocaleDateString("fr-FR", { month: "long", year: "numeric", timeZone: "UTC" }) : "";
     const winFrom = data?.window?.from;
@@ -148,18 +234,15 @@ export default function BookingDrawer() {
         const d = new Date(Date.UTC(cur.y, cur.m + n, 1));
         return { y: d.getUTCFullYear(), m: d.getUTCMonth() };
     });
-    const slots = day ? byDay.get(day) ?? [] : [];
-    const minutes = slots[0]?.minutes ?? data?.days?.[0]?.slots?.[0]?.minutes ?? 30;
-
-    // Groupes d'heures : matin, après-midi, soir
-    const groups = useMemo(() => {
-        const g = { Matin: [], "Après-midi": [], Soir: [] };
-        slots.forEach((s) => {
-            const h = Number(new Date(s.start).toLocaleTimeString("fr-FR", { timeZone: TZ, hour: "2-digit", hour12: false }).slice(0, 2));
-            (h < 12 ? g.Matin : h < 17 ? g["Après-midi"] : g.Soir).push(s);
-        });
-        return Object.entries(g).filter(([, v]) => v.length);
-    }, [slots]);
+    const dayDoctors = useMemo(() => {
+        const list = (day ? byDay.get(day) ?? [] : [])
+            .map((x) => ({ doctor: doctorsById.get(x.doctor_id), times: x.slots }))
+            .filter((x) => x.doctor);
+        // Médecins d'abord, médecin E.doto family ensuite
+        return list.sort((a, b) => Number(a.doctor.is_house) - Number(b.doctor.is_house) || a.doctor.name.localeCompare(b.doctor.name));
+    }, [day, byDay, doctorsById]);
+    const minutes = slot?.minutes ?? data?.doctors?.[0]?.minutes ?? 30;
+    const today = new Date(Date.now() + 3600000).toISOString().slice(0, 10); // jour du Bénin
 
     const goLogin = () => {
         saveDraft({ mode, slot, day, phone, reason });
@@ -173,7 +256,7 @@ export default function BookingDrawer() {
         try {
             const res = await api("teleconsultation/me/appointments", {
                 method: "POST",
-                body: JSON.stringify({ mode, starts_at: slot.start, phone: phone.trim(), reason: reason.trim() }),
+                body: JSON.stringify({ mode, starts_at: slot.start, doctor_id: slot.doctor_id, phone: phone.trim(), reason: reason.trim() }),
             });
             setBooked(res); setStep("done");
         } catch (e) {
@@ -204,6 +287,11 @@ export default function BookingDrawer() {
                     </li>
                 )}
                 <li className="flex items-center gap-3"><Globe2 size={16} className="text-[#1A1814]" /> Heure du Bénin (UTC+1)</li>
+                {slot?.doctor && (
+                    <li className="flex items-center gap-3 text-[#1A1814]">
+                        <Stethoscope size={16} /> {slot.doctor.name}
+                    </li>
+                )}
                 {slot && (
                     <li className="flex items-start gap-3 font-medium text-[#1A1814]">
                         <CalendarPlus size={16} className="mt-0.5" /> <span className="first-letter:uppercase">{fullLabel(slot.start)}</span>
@@ -230,7 +318,7 @@ export default function BookingDrawer() {
                         role="dialog"
                         aria-modal="true"
                         aria-label="Prendre rendez-vous"
-                        className="fixed inset-y-0 right-0 z-[95] flex w-full flex-col bg-[#F9F8F6] md:w-[min(1040px,calc(100vw-48px))] md:rounded-l-[28px]"
+                        className="fixed inset-y-0 right-0 z-[95] flex w-full flex-col bg-[#F9F8F6] md:w-[min(1180px,calc(100vw-48px))] md:rounded-l-[28px]"
                         initial={{ x: "100%" }}
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
@@ -274,8 +362,15 @@ export default function BookingDrawer() {
                                     {step === "date" && (
                                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                                             <h3 className="font-serif text-2xl text-[#1A1814]">Choisissez une date et une heure</h3>
-                                            {loading || !data ? (
+                                            <p className="mt-1 text-sm text-[#57524B]">Touchez un jour : les médecins disponibles et leurs heures s’affichent.</p>
+                                            {loading ? (
                                                 <div className="grid h-72 place-items-center"><Loader2 className="h-7 w-7 animate-spin text-[#C2185B]" /></div>
+                                            ) : !data ? (
+                                                // Calendrier non chargé (réseau) : pas de roue sans fin, une reprise
+                                                <div className="mt-6 rounded-[20px] border border-[#E9E5DF] bg-white p-6 text-center">
+                                                    <p className="font-serif text-xl text-[#1A1814]">Calendrier indisponible pour le moment</p>
+                                                    <button onClick={() => load(mode)} className="mt-4 rounded-xl bg-[#1A1814] px-5 py-3 text-sm font-semibold text-white">Réessayer</button>
+                                                </div>
                                             ) : !data.days?.length ? (
                                                 <div className="mt-6 rounded-[20px] border border-[#E9E5DF] bg-white p-6 text-center">
                                                     <p className="font-serif text-xl text-[#1A1814]">Aucun créneau libre pour le moment</p>
@@ -284,11 +379,11 @@ export default function BookingDrawer() {
                                                     {mode === "phone" && <button onClick={() => chooseMode("video")} className="mt-4 text-sm font-medium text-[#C2185B] hover:underline">Voir les créneaux en visio</button>}
                                                 </div>
                                             ) : (
-                                                <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_260px]">
+                                                <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
                                                     {/* Mois */}
-                                                    <div>
+                                                    <div className="self-start rounded-[24px] border border-[#E9E5DF] bg-white p-4 sm:p-5 xl:sticky xl:top-0">
                                                         <div className="mb-4 flex items-center justify-between">
-                                                            <p className="font-medium capitalize text-[#1A1814]">{monthTitle}</p>
+                                                            <p className="font-serif text-xl capitalize text-[#1A1814]">{monthTitle}</p>
                                                             <div className="flex gap-2">
                                                                 <button disabled={!canPrev} onClick={() => shiftMonth(-1)} aria-label="Mois précédent" className="grid h-9 w-9 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#1A1814] transition hover:border-[#1A1814] disabled:opacity-30"><ChevronLeft size={16} /></button>
                                                                 <button disabled={!canNext} onClick={() => shiftMonth(1)} aria-label="Mois suivant" className="grid h-9 w-9 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#1A1814] transition hover:border-[#1A1814] disabled:opacity-30"><ChevronRight size={16} /></button>
@@ -298,7 +393,8 @@ export default function BookingDrawer() {
                                                             {WEEKDAYS.map((w) => <span key={w} className="pb-2 text-[11px] uppercase tracking-wide text-[#8A837A]">{w}</span>)}
                                                             {cells.map((d, i) => {
                                                                 if (!d) return <span key={`e${i}`} />;
-                                                                const open = byDay.has(d);
+                                                                const docs = byDay.get(d) || [];
+                                                                const open = docs.length > 0;
                                                                 const on = d === day;
                                                                 return (
                                                                     <button
@@ -306,49 +402,38 @@ export default function BookingDrawer() {
                                                                         disabled={!open}
                                                                         onClick={() => { setDay(d); setSlot(null); }}
                                                                         aria-pressed={on}
-                                                                        aria-label={`${dayLabel(`${d}T12:00:00Z`)}${open ? `, ${byDay.get(d).length} créneaux` : ", complet ou fermé"}`}
-                                                                        className={`relative mx-auto grid aspect-square w-full max-w-[52px] place-items-center rounded-full text-sm transition ${on ? "bg-[#1A1814] font-semibold text-white" : open ? "bg-white font-semibold text-[#1A1814] ring-1 ring-[#E9E5DF] hover:ring-[#1A1814]" : "text-[#C9C2B8]"}`}
+                                                                        aria-label={`${dayLabel(`${d}T12:00:00Z`)}${open ? `, ${docs.length} médecin${docs.length > 1 ? "s" : ""} disponible${docs.length > 1 ? "s" : ""}` : ", complet ou fermé"}`}
+                                                                        className={`relative mx-auto grid aspect-square w-full max-w-[52px] place-items-center rounded-full text-sm tabular-nums transition ${on ? "font-semibold text-white" : open ? "bg-[#FBEEF3] font-semibold text-[#A0124A] hover:bg-[#F7DCE7]" : "text-[#C9C2B8]"}`}
                                                                     >
-                                                                        {Number(d.slice(8))}
-                                                                        {open && !on && <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-[#C2185B]" />}
+                                                                        {on && <motion.span layoutId="tc-day" transition={spring} className="absolute inset-0 rounded-full bg-[#1A1814]" />}
+                                                                        <span className="relative">{Number(d.slice(8))}</span>
+                                                                        {d === today && <span className={`absolute bottom-1 h-1 w-1 rounded-full ${on ? "bg-white" : "bg-[#1A1814]"}`} />}
                                                                     </button>
                                                                 );
                                                             })}
                                                         </div>
+                                                        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#EFECE7] pt-4 text-[11.5px] text-[#8A837A]">
+                                                            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#FBEEF3] ring-1 ring-[#F3D3E0]" /> Médecin disponible</span>
+                                                            <span className="flex items-center gap-1.5"><span className="h-1 w-1 rounded-full bg-[#1A1814]" /> Aujourd’hui</span>
+                                                            <span className="flex items-center gap-1.5"><Globe2 size={12} /> Heure du Bénin</span>
+                                                        </div>
                                                     </div>
 
-                                                    {/* Heures du jour choisi */}
+                                                    {/* Médecins disponibles le jour choisi, avec leurs heures */}
                                                     <div className="min-w-0">
                                                         {day ? (
                                                             <>
-                                                                <p className="mb-3 font-medium first-letter:uppercase text-[#1A1814]">{dayLabel(`${day}T12:00:00Z`)}</p>
-                                                                <div className="max-h-[420px] space-y-4 overflow-y-auto pe-1">
-                                                                    {groups.map(([label, list]) => (
-                                                                        <div key={label}>
-                                                                            <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-[#8A837A]">{label}</p>
-                                                                            <div className="grid grid-cols-2 gap-2 xl:grid-cols-1">
-                                                                                {list.map((s) => {
-                                                                                    const on = slot?.start === s.start;
-                                                                                    return (
-                                                                                        <div key={s.start} className="flex gap-2">
-                                                                                            <button
-                                                                                                onClick={() => setSlot(s)}
-                                                                                                className={`flex-1 rounded-xl border py-3 text-sm font-semibold transition ${on ? "border-[#1A1814] bg-[#1A1814] text-white" : "border-[#E9E5DF] bg-white text-[#1A1814] hover:border-[#1A1814]"}`}
-                                                                                            >
-                                                                                                {timeLabel(s.start)}
-                                                                                            </button>
-                                                                                            {on && (
-                                                                                                <motion.button initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: "auto" }} onClick={() => setStep("details")} className="hidden rounded-xl bg-[#C2185B] px-4 text-sm font-semibold text-white xl:block">
-                                                                                                    Suivant
-                                                                                                </motion.button>
-                                                                                            )}
-                                                                                        </div>
-                                                                                    );
-                                                                                })}
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
+                                                                <div className="mb-3">
+                                                                    <p className="text-[11px] uppercase tracking-[0.16em] text-[#8A837A]">{dayDoctors.length} médecin{dayDoctors.length > 1 ? "s" : ""} disponible{dayDoctors.length > 1 ? "s" : ""}</p>
+                                                                    <p className="mt-0.5 font-serif text-xl first-letter:uppercase text-[#1A1814]">{dayLabel(`${day}T12:00:00Z`)}</p>
                                                                 </div>
+                                                                <AnimatePresence mode="wait">
+                                                                    <motion.div key={day} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+                                                                        {dayDoctors.map(({ doctor, times }, i) => (
+                                                                            <DoctorDay key={doctor.id} doctor={doctor} times={times} slot={slot} onPick={setSlot} index={i} />
+                                                                        ))}
+                                                                    </motion.div>
+                                                                </AnimatePresence>
                                                             </>
                                                         ) : (
                                                             <p className="text-sm text-[#57524B]">Choisissez un jour en surbrillance.</p>
@@ -357,10 +442,21 @@ export default function BookingDrawer() {
                                                 </div>
                                             )}
                                             {slot && (
-                                                <div className="sticky bottom-0 mt-6 flex items-center justify-between gap-3 rounded-2xl border border-[#E9E5DF] bg-white p-3 xl:hidden">
-                                                    <span className="text-sm text-[#1A1814] first-letter:uppercase">{fullLabel(slot.start)}</span>
-                                                    <button onClick={() => setStep("details")} className="rounded-xl bg-[#C2185B] px-5 py-3 text-sm font-semibold text-white">Suivant</button>
-                                                </div>
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 16 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={spring}
+                                                    className="sticky bottom-3 z-10 mt-6 flex items-center justify-between gap-3 rounded-[20px] border border-[#1A1814] bg-white p-3 pl-4 shadow-[0_18px_40px_-24px_rgba(26,24,20,0.55)]"
+                                                >
+                                                    <span className="flex min-w-0 items-center gap-3">
+                                                        <DoctorAvatar doctor={slot.doctor} size={40} />
+                                                        <span className="min-w-0">
+                                                            <span className="block truncate text-sm font-semibold text-[#1A1814]">{slot.doctor?.name}</span>
+                                                            <span className="block truncate text-[12.5px] text-[#6B655D] first-letter:uppercase">{fullLabel(slot.start)}</span>
+                                                        </span>
+                                                    </span>
+                                                    <button onClick={() => setStep("details")} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#C2185B] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#A0124A]">Suivant <ArrowRight size={16} /></button>
+                                                </motion.div>
                                             )}
                                         </motion.div>
                                     )}

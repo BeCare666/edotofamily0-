@@ -193,6 +193,7 @@ export default function MonEspacePage() {
                 view={view}
                 onView={changeView}
                 storageKey="edoto:youth-sidebar"
+                siteNav
                 extraActions={
                     <button onClick={openBooking} className="hidden items-center gap-2 rounded-2xl bg-[#1A1814] px-4 py-3 text-sm font-semibold text-white transition hover:bg-black sm:inline-flex">
                         <CalendarPlus size={16} /> Prendre rendez-vous

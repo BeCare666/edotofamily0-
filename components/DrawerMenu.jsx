@@ -83,7 +83,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
         animate={{ opacity: isOpen ? 1 : 0 }}
         transition={{ duration: 0.3 }}
         onClick={onClose}
-        className={`fixed inset-0 z-30 bg-black/40 backdrop-blur-[3px] transition-all ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+        className={`fixed inset-0 z-[75] bg-black/40 backdrop-blur-[3px] transition-all ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}
       />
 
       {/* DRAWER */}
@@ -91,7 +91,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
         initial={{ x: "100%" }}
         animate={{ x: isOpen ? 0 : "100%" }}
         transition={{ type: "spring", stiffness: 280, damping: 28 }}
-        className="fixed right-0 top-0 h-full w-[350px] max-w-[90vw] z-40 bg-white backdrop-blur-2xl border-l border-white/40 shadow-[0_8px_40px_rgba(255,110,169,0.15)] flex flex-col p-6 lg:rounded-l-[2rem]"
+        className="fixed right-0 top-0 h-full w-[350px] max-w-[90vw] z-[76] bg-white backdrop-blur-2xl border-l border-white/40 shadow-[0_8px_40px_rgba(255,110,169,0.15)] flex flex-col p-6 lg:rounded-l-[2rem]"
       >
         {/* HEADER */}
         <div className="flex items-center justify-between mb-10">

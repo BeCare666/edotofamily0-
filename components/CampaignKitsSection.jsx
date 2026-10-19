@@ -138,6 +138,7 @@ export default function CampaignKitsSection() {
                 pickupLat={mapTarget?.pickup_lat}
                 pickupLng={mapTarget?.pickup_lng}
                 name={mapTarget?.pickup_center_name}
+                phone={mapTarget?.pickup_phone}
             />
         </section>
     );

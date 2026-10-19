@@ -75,7 +75,8 @@ export default function MyApp({ Component, pageProps }) {
       </Layout>
       {!isHomePage && !hideFooter && <Footer />}
       {/* Navigation mobile du bas (mêmes pages que l'en-tête) */}
-      {!isHomePage && <MobileBottomNav />}
+      {/* Le dashboard jeune garde aussi la barre mobile du site (19/10/2026) */}
+      {(!isHomePage || pathname === "/mon-espace") && <MobileBottomNav />}
       </ChatAIProvider>
     </AuthProvider>
   )
