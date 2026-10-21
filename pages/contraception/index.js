@@ -30,7 +30,7 @@ const shortEfficacy = (e) => String(e || "").split(" (")[0].split(",")[0];
 
 function MethodCard({ m, index }) {
     return (
-        <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ ...spring, delay: (index % 3) * 0.05 }}>
+        <motion.div className="min-w-0" initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ ...spring, delay: (index % 3) * 0.05 }}>
             <Link
                 href={`/contraception/${m.slug}`}
                 className="group flex h-full flex-col overflow-hidden rounded-[26px] border border-[#E9E5DF] bg-white transition duration-300 hover:-translate-y-1 hover:border-[#1A1814] hover:shadow-[0_24px_50px_-30px_rgba(26,24,20,0.45)]"
@@ -179,7 +179,8 @@ export default function ContraceptionPage() {
                                         </div>
                                         <p className="max-w-xl text-sm leading-relaxed text-[#6B655D]">{GROUPS[g].text}</p>
                                     </div>
-                                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                                    {/* grid-cols-1 : colonne à la largeur de l’écran (une ligne longue ne doit pas élargir la page sur mobile) */}
+                                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                                         {list.map((m, i) => <MethodCard key={m.id} m={m} index={i} />)}
                                     </div>
                                 </div>

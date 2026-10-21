@@ -300,7 +300,7 @@ export default function MonEspacePage() {
                             })}
                         </div>
 
-                        <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+                        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr_0.9fr]">
                             <div className="space-y-6">
                                 {!appts ? (
                                     <Skeleton className="h-40" />
@@ -341,7 +341,7 @@ export default function MonEspacePage() {
                             </div>
 
                             <div className="space-y-4">
-                                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1">
                                     {[
                                         { icon: HeartHandshake, title: "Découvrir les contraceptifs", text: "Avantages, critères, inconvénients.", href: "/contraception" },
                                         { icon: CalendarPlus, title: "Prendre rendez-vous", text: "Visio ou appel avec un médecin.", onClick: () => openBooking() },

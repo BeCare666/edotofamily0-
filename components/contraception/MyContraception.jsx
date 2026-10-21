@@ -34,7 +34,7 @@ function QrBlock({ r }) {
     const img = `${API}${f.qr_image}`;
     const c = f.center || {};
     return (
-        <div className="grid gap-0 overflow-hidden rounded-[22px] border border-[#E9E5DF] md:grid-cols-[200px_1fr]">
+        <div className="grid grid-cols-1 gap-0 overflow-hidden rounded-[22px] border border-[#E9E5DF] md:grid-cols-[200px_1fr]">
             <div className="flex flex-col items-center justify-center border-b border-[#E9E5DF] bg-[#F9F8F6] p-5 md:border-b-0 md:border-r">
                 <img src={img} alt="Code QR pour le centre" className="h-36 w-36 rounded-xl border border-[#E9E5DF] bg-white p-2" />
                 <p className="mt-3 text-[11px] uppercase tracking-[0.16em] text-[#8A837A]">Code de secours</p>
@@ -98,7 +98,7 @@ function RequestCard({ r, open, onToggle, onBook, onChanged }) {
             <AnimatePresence initial={false}>
                 {open && (
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                        <div className="grid gap-6 border-t border-[#EFECE7] p-4 sm:p-6 lg:grid-cols-[0.9fr_1.1fr]">
+                        <div className="grid grid-cols-1 gap-6 border-t border-[#EFECE7] p-4 sm:p-6 lg:grid-cols-[0.9fr_1.1fr]">
                             <AdoptionSteps steps={r.steps} />
                             <div className="space-y-4">
                                 <div className="rounded-2xl bg-[#F9F8F6] p-4">

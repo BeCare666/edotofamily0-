@@ -178,7 +178,7 @@ export default function MethodPage() {
                 </nav>
 
                 <div className="mx-auto grid max-w-7xl gap-5 px-4 pt-8 sm:px-6 lg:px-8">
-                    <div className="grid gap-5 lg:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                         <Section id="fonctionnement" eyebrow="Comprendre" title="Comment ça marche">
                             <p className="whitespace-pre-line text-[15px] leading-relaxed text-[#3D3934]">{m.description || "Information à venir."}</p>
                         </Section>
@@ -190,7 +190,7 @@ export default function MethodPage() {
                     {m.drawbacks?.length > 0 && <Section id="inconvenients" eyebrow="À savoir" title="Inconvénients"><Bullets items={m.drawbacks} tone="minus" /></Section>}
                     {m.criteria?.length > 0 && <Section id="criteres" eyebrow="Pour qui" title="Critères"><Bullets items={m.criteria} tone="dot" /></Section>}
                     <Section id="parcours" eyebrow="Votre accompagnement" title="L’adoption en 7 étapes">
-                        <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr]">
+                        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_0.8fr]">
                             <AdoptionSteps requiresDoctor={m.requires_doctor} />
                             <div className="self-start rounded-[24px] bg-[#F9F8F6] p-6">
                                 <p className="font-serif text-xl text-[#1A1814]">Prêt(e) à commencer ?</p>
