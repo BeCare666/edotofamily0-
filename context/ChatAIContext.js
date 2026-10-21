@@ -14,6 +14,7 @@ const ChatAIContext = createContext({
     openChoice: () => {},
     closeChoice: () => {},
     bookingOpen: false,
+    bookingContext: null,
     openBooking: () => {},
     closeBooking: () => {},
 });
@@ -22,15 +23,20 @@ export function ChatAIProvider({ children }) {
     const [isOpen, setIsOpen] = useState(false);
     const [choiceOpen, setChoiceOpen] = useState(false);
     const [bookingOpen, setBookingOpen] = useState(false);
+    // Rendez-vous lié à une adoption de contraceptif (étape 3) : { contraceptionRequestId, methodName } (21/10/2026)
+    const [bookingContext, setBookingContext] = useState(null);
     const openChat = useCallback(() => { setChoiceOpen(false); setIsOpen(true); }, []);
     const closeChat = useCallback(() => setIsOpen(false), []);
     const openChoice = useCallback(() => setChoiceOpen(true), []);
     const closeChoice = useCallback(() => setChoiceOpen(false), []);
-    const openBooking = useCallback(() => { setChoiceOpen(false); setIsOpen(false); setBookingOpen(true); }, []);
+    const openBooking = useCallback((ctx) => {
+        setBookingContext(ctx && ctx.contraceptionRequestId ? ctx : null);
+        setChoiceOpen(false); setIsOpen(false); setBookingOpen(true);
+    }, []);
     const closeBooking = useCallback(() => setBookingOpen(false), []);
     const value = useMemo(
-        () => ({ isOpen, openChat, closeChat, choiceOpen, openChoice, closeChoice, bookingOpen, openBooking, closeBooking }),
-        [isOpen, openChat, closeChat, choiceOpen, openChoice, closeChoice, bookingOpen, openBooking, closeBooking],
+        () => ({ isOpen, openChat, closeChat, choiceOpen, openChoice, closeChoice, bookingOpen, bookingContext, openBooking, closeBooking }),
+        [isOpen, openChat, closeChat, choiceOpen, openChoice, closeChoice, bookingOpen, bookingContext, openBooking, closeBooking],
     );
     return <ChatAIContext.Provider value={value}>{children}</ChatAIContext.Provider>;
 }

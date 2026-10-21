@@ -196,6 +196,8 @@ export function AppointmentsView({ onOpen, search }) {
 const EMPTY_REPORT = {
     request_type: "", request_detail: "", chief_complaint: "", history: "", gyneco_history: "", allergies: "", current_treatments: "",
     findings: "", assessment: "", plan: "", urgency: "routine", center_id: "", center_instructions: "", patient_summary: "",
+    // Adoption d'un contraceptif (21/10/2026) : conclusion de l'étape 4, envoyée à la finalisation
+    adoption_conclusion: "",
 };
 
 export function AppointmentDetail({ id, onBack }) {
@@ -332,6 +334,23 @@ export function AppointmentDetail({ id, onBack }) {
                                 <Field label="Conclusion"><textarea rows={3} value={form.assessment} onChange={set("assessment")} className={input} /></Field>
                                 <Field label="Conduite à tenir"><textarea rows={3} value={form.plan} onChange={set("plan")} className={input} /></Field>
                             </div>
+
+                            {data.contraception && (
+                                <div className="rounded-2xl border border-[#F3D3E0] bg-[#FBEEF3] p-4 sm:p-5">
+                                    <p className="text-[11px] uppercase tracking-[0.16em] text-[#A0124A]">Adoption d’un contraceptif · étape 3 sur 7</p>
+                                    <p className="mt-1 font-serif text-xl text-[#1A1814]">{data.contraception.method_name}</p>
+                                    {data.contraception.youth_note && <p className="mt-1 whitespace-pre-line text-sm text-[#57524B]">Message du jeune : {data.contraception.youth_note}</p>}
+                                    <div className="mt-4">
+                                        <Field label="Conclusion de l’adoption" hint="(obligatoire pour finaliser)">
+                                            <select value={form.adoption_conclusion} onChange={set("adoption_conclusion")} className={input}>
+                                                <option value="">Choisir…</option>
+                                                {Object.entries(data.conclusions || {}).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                            </select>
+                                        </Field>
+                                    </div>
+                                    <p className="mt-2 text-xs text-[#8A837A]">Adoption de la méthode : choisissez ci-dessous le centre où le jeune ira (code QR envoyé à la finalisation).</p>
+                                </div>
+                            )}
 
                             <div className="rounded-2xl border border-[#E9E5DF] p-4 sm:p-5">
                                 <p className="font-medium text-[#1A1814]">Orientation vers un centre</p>

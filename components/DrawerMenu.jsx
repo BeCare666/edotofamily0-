@@ -10,7 +10,8 @@ import GoogleFormDrawer from "./GoogleFormDrawer";
 import toast from "react-hot-toast"
 import {
   Home, Info, Phone, Target, Flag, FileText, Shield,
-  User, LogOut, ShoppingBag, Star, Briefcase, Gift
+  User, LogOut, ShoppingBag, Star, Briefcase, Gift,
+  HeartHandshake,
 } from "lucide-react"
 import { SiX } from "react-icons/si"; // icône officielle X
 import { FaFacebookF, FaLinkedinIn, FaTwitter, FaTiktok, FaInstagram } from "react-icons/fa"
@@ -213,6 +214,18 @@ export default function DrawerMenu({ isOpen, onClose }) {
                 <div className="flex items-center gap-3">
                   <Gift size={18} color="#FF6EA9" />
                   Campagnes
+                </div>
+              </button>
+            </li>
+            {/* Contraception (21/10/2026) */}
+            <li className="w-full">
+              <button
+                onClick={() => { router.push("/contraception"); onClose?.(); }}
+                className="flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-800 bg-white/40 hover:bg-[#FF6EA9]/10"
+              >
+                <div className="flex items-center gap-3">
+                  <HeartHandshake size={18} color="#FF6EA9" />
+                  Contraception
                 </div>
               </button>
             </li>

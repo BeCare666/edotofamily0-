@@ -137,7 +137,7 @@ function TimeChip({ iso, count, active, onClick }) {
 
 export default function BookingDrawer() {
     const router = useRouter();
-    const { bookingOpen, closeBooking, openBooking } = useChatAI();
+    const { bookingOpen, bookingContext, closeBooking, openBooking } = useChatAI();
     const { user } = useAuthContext() || {};
     const [step, setStep] = useState("mode");
     const [mode, setMode] = useState(null);
@@ -268,7 +268,7 @@ export default function BookingDrawer() {
         try {
             const res = await api("teleconsultation/me/appointments", {
                 method: "POST",
-                body: JSON.stringify({ mode, starts_at: slot.start, doctor_id: slot.doctor_id, phone: phone.trim(), reason: reason.trim() }),
+                body: JSON.stringify({ mode, starts_at: slot.start, doctor_id: slot.doctor_id, phone: phone.trim(), reason: reason.trim(), contraception_request_id: bookingContext?.contraceptionRequestId }),
             });
             setBooked(res); setStep("done");
         } catch (e) {
@@ -290,6 +290,11 @@ export default function BookingDrawer() {
         <div className="border-b border-[#E9E5DF] p-5 lg:border-b-0 lg:border-r lg:p-7">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#8A837A]">E.doto family</p>
             <h2 className="mt-1 font-serif text-[26px] leading-tight text-[#1A1814]">Téléconsultation santé sexuelle</h2>
+            {bookingContext?.methodName && (
+                <p className="mt-3 rounded-2xl border border-[#F3D3E0] bg-[#FBEEF3] px-4 py-3 text-[13px] leading-relaxed text-[#A0124A]">
+                    Rencontre de l’étape 3 pour votre adoption : <strong>{bookingContext.methodName}</strong>
+                </p>
+            )}
             <ul className="mt-5 space-y-3 text-sm text-[#57524B]">
                 <li className="flex items-center gap-3"><Clock3 size={16} className="text-[#1A1814]" /> {minutes} minutes</li>
                 {mode && (

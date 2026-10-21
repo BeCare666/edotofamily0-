@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-import { ShoppingBag, Menu, X, Home, MapPin, Info, CheckCircle, User, Gift, Phone, Target, Flag, FileText, Shield, LogOut, Star, Briefcase } from 'lucide-react';
+import { ShoppingBag, Menu, X, Home, MapPin, Info, CheckCircle, User, Gift, Phone, Target, Flag, FileText, Shield, LogOut, Star, Briefcase, HeartHandshake } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { ViewState } from '../types';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from "../context/AuthContext";
@@ -31,6 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
     const [openForm, setOpenForm] = React.useState(false);
     const [openCalendly, setOpenCalendly] = React.useState(false);
     const router = useRouter();
+    const pathname = usePathname() || '';
     const { user, logout } = useAuthContext();
     const HandleGotoShop = (id: number) => {
         router.push(`/category/categories_id=${id}`);
@@ -158,6 +160,19 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                             >
                                 <Gift size={16} />
                                 Campagnes
+                            </button>
+
+                            {/* CONTRACEPTION (21/10/2026) */}
+                            <button
+                                onClick={() => router.push("/contraception")}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200
+      ${pathname.startsWith("/contraception")
+                                        ? "bg-pink-50 text-pink-600 ring-1 ring-pink-200"
+                                        : "text-slate-600 hover:text-pink-500 hover:bg-pink-50/50"
+                                    }`}
+                            >
+                                <HeartHandshake size={16} />
+                                Contraception
                             </button>
 
                             {/* A PROPOS + DROPDOWN */}

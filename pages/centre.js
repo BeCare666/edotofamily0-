@@ -85,10 +85,11 @@ function Dossier({ keyInfo, onBack }) {
     }, [keyInfo]);
     useEffect(() => { load(); }, [load]);
 
-    const complete = async () => {
+    // outcome : adoption d'un contraceptif faite (done) ou non (not_done), étape 6 (21/10/2026)
+    const complete = async (outcome) => {
         setBusy(true); setMsg(null);
         try {
-            const res = await api(`teleconsultation/center/referrals/${data.referral.id}/complete`, { method: "POST", body: JSON.stringify({ note }) });
+            const res = await api(`teleconsultation/center/referrals/${data.referral.id}/complete`, { method: "POST", body: JSON.stringify({ note, outcome }) });
             setMsg(res.message); await load();
         } catch (e) { setMsg(e.message); } finally { setBusy(false); }
     };
@@ -100,7 +101,7 @@ function Dossier({ keyInfo, onBack }) {
         </div>
     );
     if (!data) return <Skeleton className="h-96" />;
-    const { patient: p, report: r, consultation: c, referral: f } = data;
+    const { patient: p, report: r, consultation: c, referral: f, contraception: k } = data;
     const done = f.status === "completed";
     return (
         <div className="space-y-6">
@@ -116,15 +117,21 @@ function Dossier({ keyInfo, onBack }) {
                         <p className="mt-1 text-sm text-[#57524B]">{[p.age != null ? `${p.age} ans` : null, SEX[p.sex]].filter(Boolean).join(" · ") || "Âge et sexe non renseignés"}{p.phone ? ` · ${p.phone}` : ""}</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        <Badge tone={urgTone[r.urgency] || "ink"}>{r.urgency_label}</Badge>
+                        {r && <Badge tone={urgTone[r.urgency] || "ink"}>{r.urgency_label}</Badge>}
                         <Badge tone={done ? "ok" : "rose"}>{f.status_label}</Badge>
                     </div>
                 </div>
                 <div className="mt-6 rounded-2xl border border-[#1A1814] p-5">
                     <p className="text-[11px] uppercase tracking-[0.16em] text-[#C2185B]">Ce que le jeune souhaite</p>
-                    <p className="mt-1 font-serif text-2xl text-[#1A1814]">{r.request_label}</p>
-                    {r.request_detail && <p className="mt-1 text-[#1A1814]">{r.request_detail}</p>}
-                    {r.center_instructions && (
+                    <p className="mt-1 font-serif text-2xl text-[#1A1814]">{k ? `Contraception : ${k.method}` : r?.request_label}</p>
+                    {r?.request_detail && <p className="mt-1 text-[#1A1814]">{r.request_detail}</p>}
+                    {k && (
+                        <p className="mt-1 text-sm text-[#57524B]">
+                            {k.requires_doctor ? `Adoption conclue par le médecin${k.conclusion_label ? ` : ${k.conclusion_label.toLowerCase()}` : ""}.` : "Méthode sans médecin : orientation directe par E.doto family."}
+                            {k.youth_note ? ` Message du jeune : ${k.youth_note}` : ""}
+                        </p>
+                    )}
+                    {r?.center_instructions && (
                         <>
                             <p className="mt-4 text-[11px] uppercase tracking-[0.16em] text-[#C2185B]">Consignes du médecin pour votre centre</p>
                             <p className="mt-1 whitespace-pre-line text-[15px] text-[#1A1814]">{r.center_instructions}</p>
@@ -134,36 +141,53 @@ function Dossier({ keyInfo, onBack }) {
             </Card>
 
             <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-                <Card className="p-5 sm:p-7">
-                    <p className="mb-4 font-serif text-xl text-[#1A1814]">Compte rendu de téléconsultation</p>
-                    <Section title="Motif de consultation">{r.chief_complaint}</Section>
-                    <Section title="Antécédents médicaux">{r.history}</Section>
-                    <Section title="Antécédents gynécologiques">{r.gyneco_history}</Section>
-                    <Section title="Allergies">{r.allergies}</Section>
-                    <Section title="Traitements en cours">{r.current_treatments}</Section>
-                    <Section title="Observations">{r.findings}</Section>
-                    <Section title="Conclusion">{r.assessment}</Section>
-                    <Section title="Conduite à tenir">{r.plan}</Section>
-                </Card>
-                <div className="space-y-4">
-                    <Card className="p-5 text-sm">
-                        <p className="text-[11px] uppercase tracking-[0.16em] text-[#8A837A]">Téléconsultation</p>
-                        <p className="mt-1 text-[#1A1814] first-letter:uppercase">{fullLabel(c.date)}</p>
-                        <p className="text-[#57524B]">{c.mode_label} · {c.reference}</p>
-                        <p className="mt-2 text-[#1A1814]">{c.doctor}{c.doctor_title ? `, ${c.doctor_title}` : ""}</p>
+                {r ? (
+                    <Card className="p-5 sm:p-7">
+                        <p className="mb-4 font-serif text-xl text-[#1A1814]">Compte rendu de téléconsultation</p>
+                        <Section title="Motif de consultation">{r.chief_complaint}</Section>
+                        <Section title="Antécédents médicaux">{r.history}</Section>
+                        <Section title="Antécédents gynécologiques">{r.gyneco_history}</Section>
+                        <Section title="Allergies">{r.allergies}</Section>
+                        <Section title="Traitements en cours">{r.current_treatments}</Section>
+                        <Section title="Observations">{r.findings}</Section>
+                        <Section title="Conclusion">{r.assessment}</Section>
+                        <Section title="Conduite à tenir">{r.plan}</Section>
                     </Card>
+                ) : (
+                    <Card className="p-5 sm:p-7">
+                        <p className="font-serif text-xl text-[#1A1814]">Sans téléconsultation</p>
+                        <p className="mt-2 text-sm leading-relaxed text-[#57524B]">Cette méthode ne nécessite pas de rencontre avec un médecin : la demande du jeune a été acceptée par l’équipe E.doto family, qui vous l’oriente directement.</p>
+                    </Card>
+                )}
+                <div className="space-y-4">
+                    {c && (
+                        <Card className="p-5 text-sm">
+                            <p className="text-[11px] uppercase tracking-[0.16em] text-[#8A837A]">Téléconsultation</p>
+                            <p className="mt-1 text-[#1A1814] first-letter:uppercase">{fullLabel(c.date)}</p>
+                            <p className="text-[#57524B]">{c.mode_label} · {c.reference}</p>
+                            <p className="mt-2 text-[#1A1814]">{c.doctor}{c.doctor_title ? `, ${c.doctor_title}` : ""}</p>
+                        </Card>
+                    )}
                     <Card className="p-5 text-sm print:hidden">
                         <p className="text-[11px] uppercase tracking-[0.16em] text-[#8A837A]">Prise en charge</p>
                         {done ? (
                             <div className="mt-2">
                                 <p className="flex items-center gap-2 text-[#3F6B45]"><CheckCircle2 size={16} /> Faite le {dayLabel(f.completed_at, { year: "numeric" })}</p>
+                                {f.outcome && <p className="mt-1 font-medium text-[#1A1814]">{f.outcome === "done" ? "Méthode adoptée" : "Méthode non adoptée"}</p>}
                                 {f.completed_note && <p className="mt-2 whitespace-pre-line text-[#1A1814]">{f.completed_note}</p>}
                             </div>
                         ) : (
                             <div className="mt-2 space-y-3">
                                 <textarea rows={3} value={note} onChange={(e) => setNote(e.target.value.slice(0, 600))} placeholder="Note (facultatif) : ce qui a été fait"
                                     className="w-full resize-none rounded-xl border border-[#E9E5DF] px-3.5 py-2.5 text-sm outline-none focus:border-[#1A1814]" />
-                                <button onClick={complete} disabled={busy} className="w-full rounded-xl bg-[#1A1814] py-3 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Enregistrement…" : "Prise en charge effectuée"}</button>
+                                {k ? (
+                                    <div className="grid gap-2">
+                                        <button onClick={() => complete("done")} disabled={busy} className="w-full rounded-xl bg-[#1A1814] py-3 text-sm font-semibold text-white disabled:opacity-50">Méthode adoptée</button>
+                                        <button onClick={() => complete("not_done")} disabled={busy} className="w-full rounded-xl border border-[#E9E5DF] py-3 text-sm font-medium text-[#9B2C2C] disabled:opacity-50">Pas d’adoption</button>
+                                    </div>
+                                ) : (
+                                    <button onClick={() => complete()} disabled={busy} className="w-full rounded-xl bg-[#1A1814] py-3 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Enregistrement…" : "Prise en charge effectuée"}</button>
+                                )}
                             </div>
                         )}
                         {msg && <p className="mt-2 text-xs text-[#57524B]">{msg}</p>}
