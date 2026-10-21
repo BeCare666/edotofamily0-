@@ -429,7 +429,7 @@ export default function BookingDrawer() {
                                                                         <div className={`mb-2 rounded-[14px] px-1 py-2.5 text-center ${d === today ? "bg-[#1A1814] text-white" : "bg-[#F9F8F6] text-[#1A1814]"}`}>
                                                                             <p className="text-[10.5px] uppercase tracking-[0.16em] opacity-70">{shortDay(d, { weekday: "short" })}</p>
                                                                             <p className="font-serif text-[26px] leading-tight">{Number(d.slice(8))}</p>
-                                                                            <p className="text-[11px] opacity-70">{shortDay(d, { month: "short" })}</p>
+                                                                            <p className="text-[11px] opacity-70">{d === today ? "Aujourd’hui" : d === addDay(today, 1) ? "Demain" : shortDay(d, { month: "short" })}</p>
                                                                         </div>
                                                                         {times ? (
                                                                             <div className="space-y-1.5">
@@ -461,7 +461,14 @@ export default function BookingDrawer() {
                                                                 );
                                                             })}
                                                         </div>
-                                                        <div className="mt-4">
+                                                        {/* Jour choisi écrit en toutes lettres : on sait à quel jour appartiennent les heures */}
+                                                        {mobileDay && (
+                                                            <p className="mt-4 font-serif text-lg first-letter:uppercase text-[#1A1814]">
+                                                                {mobileDay === today ? "Aujourd’hui, " : mobileDay === addDay(today, 1) ? "Demain, " : ""}
+                                                                {shortDay(mobileDay, { weekday: "long", day: "numeric", month: "long" })}
+                                                            </p>
+                                                        )}
+                                                        <div className="mt-3">
                                                             {timesByDay.get(mobileDay) ? (
                                                                 groupTimes([...timesByDay.get(mobileDay).keys()]).map(([label, list]) => (
                                                                     <div key={label} className="mb-3">
