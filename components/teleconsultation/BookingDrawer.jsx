@@ -287,7 +287,7 @@ export default function BookingDrawer() {
 
     // Panneau d'information (colonne gauche sur ordinateur)
     const Info = (
-        <div className="border-b border-[#E9E5DF] p-5 lg:border-b-0 lg:border-r lg:p-7">
+        <div className="min-w-0 border-b border-[#E9E5DF] p-5 lg:border-b-0 lg:border-r lg:p-7">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#8A837A]">E.doto family</p>
             <h2 className="mt-1 font-serif text-[26px] leading-tight text-[#1A1814]">Téléconsultation santé sexuelle</h2>
             {bookingContext?.methodName && (
@@ -357,10 +357,11 @@ export default function BookingDrawer() {
                         </div>
 
                         <div className="flex-1 overflow-y-auto">
-                            <div className="grid min-h-full lg:grid-cols-[320px_1fr]">
+                            {/* grid-cols-1 : sur mobile, une ligne longue (nom, e-mail) ne doit pas élargir le tiroir au-delà de l’écran */}
+                            <div className="grid min-h-full grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)]">
                                 {Info}
 
-                                <div className="p-5 sm:p-7">
+                                <div className="min-w-0 p-5 sm:p-7">
                                     {error && <p role="alert" className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
 
                                     {/* 1. Mode */}
@@ -496,7 +497,7 @@ export default function BookingDrawer() {
                                                         </div>
                                                         <button onClick={() => { setPick(null); setSlot(null); }} aria-label="Changer d’heure" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#E9E5DF] bg-white text-[#57524B] transition hover:border-[#1A1814]"><X size={16} /></button>
                                                     </div>
-                                                    <div className="mt-3 grid max-h-[38vh] gap-2 overflow-y-auto sm:grid-cols-2">
+                                                    <div className="mt-3 grid max-h-[38vh] grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2">
                                                         {pickDoctors.map((doc, i) => (
                                                             <DoctorOption key={doc.id} doctor={doc} index={i} active={slot?.doctor_id === doc.id} onClick={() => setSlot(slotFor(pick.start, doc))} />
                                                         ))}
@@ -528,7 +529,7 @@ export default function BookingDrawer() {
                                                 <p className="mt-6 rounded-2xl border border-[#E9E5DF] bg-white p-5 text-sm text-[#57524B]">Les rendez-vous se prennent avec un compte jeune (client) E.doto family.</p>
                                             ) : (
                                                 <div className="mt-6 space-y-4">
-                                                    <div className="grid gap-4 sm:grid-cols-2">
+                                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                                         <div className="rounded-2xl border border-[#E9E5DF] bg-white px-4 py-3">
                                                             <p className="text-[11px] uppercase tracking-[0.14em] text-[#8A837A]">Nom</p>
                                                             <p className="mt-0.5 truncate text-[#1A1814]">{user.name}</p>
