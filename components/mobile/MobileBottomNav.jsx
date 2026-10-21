@@ -5,9 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import DrawerMenu from "../DrawerMenu";
-import { CampaignNavIcon, HomeNavIcon, MenuNavIcon, ProductsNavIcon } from "./navIcons";
+import { CampaignNavIcon, ContraceptionNavIcon, HomeNavIcon, MenuNavIcon, ProductsNavIcon } from "./navIcons";
 
-// Barre de navigation mobile (sous md) : Accueil, Produits, Campagnes, Menu.
+// Barre de navigation mobile (sous md) : Accueil, Produits, Campagnes, Contraception (21/10/2026), Menu.
 // Le point « en direct » sur Campagnes vient de l'API (GET /campaigns/active/count) : il n'apparaît
 // que si au moins une campagne est réellement en cours (statut calculé par dates, heure du Bénin).
 const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
@@ -53,6 +53,13 @@ export default function MobileBottomNav() {
       active: pathname.toLowerCase().startsWith("/campaigns"),
       live: liveCount > 0,
     },
+    {
+      key: "contraception",
+      label: "Contraception",
+      href: "/contraception",
+      icon: ContraceptionNavIcon,
+      active: pathname.startsWith("/contraception"),
+    },
   ];
 
   return (
@@ -66,7 +73,7 @@ export default function MobileBottomNav() {
       >
         {/* Pleine largeur, collée en bas, sans coins arrondis (16/10/2026) */}
         <div className="relative w-full">
-          <div className="relative grid grid-cols-4 items-stretch px-1.5 py-1.5">
+          <div className="relative grid grid-cols-5 items-stretch px-1.5 py-1.5">
             {items.map((it) => (
               <Link
                 key={it.key}
@@ -93,7 +100,7 @@ export default function MobileBottomNav() {
                     </span>
                   )}
                 </span>
-                <span className={`relative text-[10.5px] font-semibold tracking-wide ${it.active ? "text-[#C2185B]" : "text-slate-500"}`}>
+                <span className={`relative whitespace-nowrap text-[10px] font-semibold ${it.active ? "text-[#C2185B]" : "text-slate-500"}`}>
                   {it.label}
                 </span>
                 {it.live && (
@@ -113,7 +120,7 @@ export default function MobileBottomNav() {
             >
               {menuOpen && <span className="absolute inset-0 rounded-[20px] bg-[#FBEEF3]" />}
               <MenuNavIcon filled={menuOpen} className={`relative h-[23px] w-[23px] ${menuOpen ? "text-[#E0457F]" : "text-slate-500"}`} />
-              <span className={`relative text-[10.5px] font-semibold tracking-wide ${menuOpen ? "text-[#C2185B]" : "text-slate-500"}`}>Menu</span>
+              <span className={`relative whitespace-nowrap text-[10px] font-semibold ${menuOpen ? "text-[#C2185B]" : "text-slate-500"}`}>Menu</span>
             </button>
           </div>
         </div>

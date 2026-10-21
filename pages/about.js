@@ -62,7 +62,7 @@ export default function AProposPage() {
           className="flex flex-col items-center text-center"
         >
           <div className="w-52 h-52 relative mb-6">
-            <Image src="/images/sante1800.jpg" alt="santé" fill className="object-cover rounded-full shadow-2xl" />
+            <Image src="/images/site/apropos-sante.jpg" alt="santé" fill className="object-cover rounded-full shadow-2xl" />
           </div>
           <HeartPulse size={28} className="text-[#FF6EA9] mb-3" />
           <h2 className="text-2xl font-semibold mb-3">Santé sexuelle & reproductive</h2>
@@ -96,7 +96,7 @@ export default function AProposPage() {
           className="flex flex-col items-center text-center"
         >
           <div className="w-52 h-52 relative mb-6">
-            <Image src="/images/twopersons.avif" alt="soins" fill className="object-cover rounded-full shadow-2xl" />
+            <Image src="/images/site/apropos-soins.jpg" alt="soins" fill className="object-cover rounded-full shadow-2xl" />
           </div>
           <Droplet size={28} className="text-[#FF6EA9] mb-3" />
           <h2 className="text-2xl font-semibold mb-3">Soins & bien-être</h2>

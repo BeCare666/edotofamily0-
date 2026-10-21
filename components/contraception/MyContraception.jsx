@@ -185,7 +185,7 @@ export default function MyContraception({ requests, onBook, onChanged }) {
                             <p className="mt-2 max-w-md text-sm leading-relaxed text-[#57524B]">Découvrez les contraceptifs modernes, leurs avantages et leurs critères, puis demandez à adopter celui qui vous convient. Chaque étape apparaîtra ici.</p>
                             <Link href="/contraception" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#C2185B] px-5 py-3 text-sm font-semibold text-white">Voir les contraceptifs <ArrowRight size={16} /></Link>
                         </div>
-                        <img src="/images/pil-.png" alt="" className="hidden h-full w-full object-cover md:block" />
+                        <img src="/images/site/contraception-dashboard.jpg" alt="" className="hidden h-full w-full object-cover md:block" />
                     </div>
                 </Card>
             ) : (

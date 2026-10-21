@@ -122,10 +122,10 @@ export default function ContraceptionPage() {
                     </motion.div>
                     <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...spring, delay: 0.08 }} className="relative">
                         <div className="overflow-hidden rounded-[32px]">
-                            <img src="/images/twopersons.avif" alt="" className="aspect-[5/4] w-full object-cover" />
+                            <img src="/images/site/contraception-hero.jpg" alt="" className="aspect-[5/4] w-full object-cover" />
                         </div>
                         <div className="absolute -bottom-6 left-4 hidden w-56 overflow-hidden rounded-[22px] border-4 border-[#F9F8F6] sm:block lg:-left-8">
-                            <img src="/images/pil-.png" alt="" className="aspect-[4/3] w-full object-cover" />
+                            <img src="/images/site/contraception-detail.jpg" alt="" className="aspect-[4/3] w-full object-cover" />
                         </div>
                         <div className="absolute -top-4 right-4 rounded-2xl border border-[#E9E5DF] bg-white px-4 py-3 shadow-[0_18px_40px_-28px_rgba(26,24,20,0.5)]">
                             <p className="font-serif text-3xl leading-none text-[#1A1814]">{methods ? counts.all : "…"}</p>

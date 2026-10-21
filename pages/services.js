@@ -130,7 +130,7 @@ export default function ServicesPage() {
             {/* IMAGE SIGNATURE */}
             <section className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden">
                 <Image
-                    src="/images/service-bg.jpg"
+                    src="/images/site/services.jpg"
                     alt="E.doto family Service"
                     fill
                     className="object-cover opacity-40"

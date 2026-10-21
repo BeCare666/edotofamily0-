@@ -38,6 +38,16 @@ export function CampaignNavIcon({ filled, className }) {
   );
 }
 
+// Contraception (21/10/2026) : cœur et main, même style que les autres icônes
+export function ContraceptionNavIcon({ filled, className }) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M19 14c1.5-1.4 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.1 3 5.5l7 7z" fill={filled ? "currentColor" : "none"} fillOpacity={filled ? 0.14 : 0} />
+      <path d="M12 5 9 8a2.2 2.2 0 0 0 0 3.1c.8.8 2.1.8 3 .1l2.1-1.9a2.8 2.8 0 0 1 3.8 0l3 2.7" />
+    </svg>
+  );
+}
+
 export function MenuNavIcon({ filled, className }) {
   return (
     <svg {...base} className={className}>

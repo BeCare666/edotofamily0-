@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion, MotionProps } from "framer-motion";
-import { ArrowUpRight, Gift, LockKeyhole, MessageCircleHeart, ShoppingBag, X } from "lucide-react";
+import { ArrowUpRight, Gift, HeartHandshake, LockKeyhole, MessageCircleHeart, ShoppingBag, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useChatAI } from "../context/ChatAIContext";
 const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes en ms
@@ -116,7 +116,7 @@ const SSRAccessDrawer = () => {
     },
     {
       key: "kits",
-      photo: "/images/campagnes_uac.png",
+      photo: "/images/site/drawer-kits.jpg",
       icon: Gift,
       title: "Bénéficier de kits gratuits",
       text: "Campagnes disponibles près de vous",
@@ -124,8 +124,17 @@ const SSRAccessDrawer = () => {
       onClick: go(() => router.push("/campaigns")),
     },
     {
+      // Contraception (21/10/2026) : catalogue des méthodes et adoption en 7 étapes
+      key: "contraception",
+      photo: "/images/site/drawer-contraception.jpg",
+      icon: HeartHandshake,
+      title: "Choisir ma contraception",
+      text: "Méthodes modernes, accompagnement en 7 étapes",
+      onClick: go(() => router.push("/contraception")),
+    },
+    {
       key: "assistant",
-      photo: "/icons/conseiller.jpg",
+      photo: "/images/site/drawer-assistant.jpg",
       icon: MessageCircleHeart,
       title: "Poser une question à l'Assistant SSR",
       text: "Réponses automatiques, anonymes et confidentielles",
@@ -186,7 +195,7 @@ const SSRAccessDrawer = () => {
                 </h2>
               </MotionDiv>
 
-              <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-3 sm:gap-4">
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
                 {items.map((a, i) => (
                   <AccessCard key={a.key} a={a} index={i} />
                 ))}

@@ -114,7 +114,7 @@ export default function ObjectifsPage() {
       {/* ✨ SECTION SIGNATURE (IMMERSIVE) */}
       <section className="relative w-full h-[70vh] flex items-center justify-center overflow-hidden bg-[#fff7fa]">
         <Image
-          src="/images/woman-soft-bg.jpg"
+          src="/images/site/objectifs.jpg"
           alt="Vision féminine"
           fill
           className="object-cover opacity-40"

@@ -88,7 +88,7 @@ const Hero: React.FC = () => {
                             <div className="text-center p-4">
                                 <span className="block text-4xl mb-2 animate-bounce">🌸</span>
                                 <h3 className="text-pink-900 font-bold text-lg lg:text-xl leading-tight">
-                                    Univers<br />Femme
+                                    Univers<br />Jeune
                                 </h3>
                             </div>
                         </div>
