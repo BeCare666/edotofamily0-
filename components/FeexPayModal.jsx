@@ -5,11 +5,21 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 
+const FEEXPAY_TOKEN = process.env.NEXT_PUBLIC_FEEXPAY_PUBLIC_KEY;
+const FEEXPAY_STORE_ID = process.env.NEXT_PUBLIC_FEEXPAY_STORE_ID;
+
 export default function FeexPayModal({ payment, onClose }) {
     const router = useRouter()
     const pathname = usePathname()
     useEffect(() => {
         if (!payment) return;
+
+        // Jeton et boutique FeexPay lus dans les variables Vercel, plus jamais écrits dans le code (audit du 21/10/2026, C2)
+        if (!FEEXPAY_TOKEN || !FEEXPAY_STORE_ID) {
+            toast.error("Le paiement est momentanément indisponible. Réessayez plus tard.");
+            onClose?.();
+            return;
+        }
 
         console.log("📌 FeexPayModal payment data :", payment.orderId);
 
@@ -17,8 +27,6 @@ export default function FeexPayModal({ payment, onClose }) {
         const script = document.createElement("script");
         script.src = "https://api.feexpay.me/feexpay-javascript-sdk/index.js";
         script.async = true;
-        console.log("STORE ID =", process.env.NEXT_PUBLIC_FEEXPAY_STORE_ID);
-        console.log("PUBLIC KEY =", process.env.NEXT_PUBLIC_FEEXPAY_PUBLIC_KEY);
         script.onload = () => {
             console.log("🚀 FEEXPAY SDK LOADED :", window.FeexPayButton);
 
@@ -33,8 +41,8 @@ export default function FeexPayModal({ payment, onClose }) {
             document.body.appendChild(container);
             const API_BASE_URL = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
             window.FeexPayButton.init("render", {
-                token: "fp_NpBZ5JP0ncTGKszqKbYIXs8IYv5vzkhXbx5eZciUCmmc0YMvRGCyVyuUHiV9aMEl",
-                id: "672b15e3c8365bbb9b3ed029",
+                token: FEEXPAY_TOKEN,
+                id: FEEXPAY_STORE_ID,
                 amount: payment.amount,
                 custom_id: payment.reference,
                 description: "Paiement commande " + payment.reference,

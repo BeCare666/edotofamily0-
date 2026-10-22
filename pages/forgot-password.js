@@ -51,11 +51,13 @@ export default function ForgotPassword() {
         setLoading(true)
         try {
             const res = await authService.verifyForgetPasswordToken(email.trim(), token)
+            // L'API répond 200 avec success: false quand le code est faux ou expiré
+            if (res?.success === false) throw new Error(res.message)
             toast.success(res?.message || "Code vérifié ✅")
             setStep(3)
         } catch (err) {
             console.error("Erreur:", err)
-            toast.error(err?.response?.data?.message || "Code invalide ❌")
+            toast.error(err?.message || "Code invalide ❌")
         } finally {
             setLoading(false)
         }
@@ -69,6 +71,7 @@ export default function ForgotPassword() {
         setLoading(true)
         try {
             const res = await authService.resetPassword(email.trim(), token, newPassword)
+            if (res?.success === false) throw new Error(res.message)
             toast.success(res?.message || "Mot de passe réinitialisé avec succès ✅")
 
             setTimeout(() => {

@@ -12,8 +12,7 @@ export default function Layout({ children }) {
     pathname === "/pickup-dashboard-for-orders" ||
     pathname.startsWith("/category") ||
     pathname.startsWith("/product") ||
-    pathname.startsWith("/orders") ||
-    pathname === "/admin/add-pickup-point";
+    pathname.startsWith("/orders");
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
