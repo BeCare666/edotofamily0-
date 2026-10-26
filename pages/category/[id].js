@@ -20,6 +20,7 @@ import {
 import dynamic from "next/dynamic";
 import OrderProgressBar from "../../components/OrderProgressBar";
 import DeliveryChoiceStep from "../../components/DeliveryChoiceStep";
+import { safeHtml } from "../../lib/safeHtml";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 /**
  * Category page — JavaScript (no TypeScript)
@@ -658,7 +659,7 @@ export default function CategoryPage() {
                         <h3 className="font-serif text-lg leading-snug text-[#1F1B16] mb-1.5 line-clamp-2 group-hover:text-[#C2185B] transition-colors">
                           {p.name}
                         </h3>
-                        <p className="text-sm text-[#7A6E62] mb-4 line-clamp-2" dangerouslySetInnerHTML={{ __html: p.desc }}></p>
+                        <p className="text-sm text-[#7A6E62] mb-4 line-clamp-2" dangerouslySetInnerHTML={{ __html: safeHtml(p.desc) }}></p>
 
                         <div className="flex items-baseline gap-2 mb-4 mt-auto">
                           <span className="text-lg font-semibold text-[#1F1B16] tabular-nums">{formatPrice(sale ?? price)} FCFA</span>

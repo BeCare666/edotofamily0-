@@ -8,6 +8,7 @@ import { Star, Truck, CheckCircle, Shield, ArrowLeft } from "lucide-react";
 import dynamic from "next/dynamic";
 import OrderProgressBar from "../../components/OrderProgressBar";
 import DeliveryChoiceStep from "../../components/DeliveryChoiceStep";
+import { safeHtml } from "../../lib/safeHtml";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 // pour feexpay
 //import("@feexpay/react-sdk").then(console.log);
@@ -244,7 +245,7 @@ export default function ProductDetails() {
                                 className="text-gray-600 text-sm leading-relaxed"
                                 dangerouslySetInnerHTML={{
                                     __html:
-                                        product.description || "Aucune description disponible.",
+                                        safeHtml(product.description) || "Aucune description disponible.",
                                 }}
                             ></p>
                         </div>

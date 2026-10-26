@@ -21,7 +21,8 @@
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.6.0",
     "react-icons": "^4.10.1",
-    "react-leaflet": "4.2.1"
+    "react-leaflet": "4.2.1",
+    "sanitize-html": "2.13.1"
   },
   "devDependencies": {
     "@types/node": "24.10.0",
