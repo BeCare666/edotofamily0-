@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import maplibregl from "maplibre-gl";
+import maplibregl from "./maplibre"; // maplibre-gl 6 + worker émis par webpack (audit 2.1)
 import "maplibre-gl/dist/maplibre-gl.css";
 import { COLORS, MAP_STYLES } from "./mapConfig";
 import { circlePolygon, formatWithdrawals } from "./geo";

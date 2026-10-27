@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import maplibregl from "maplibre-gl";
+import maplibregl from "../map/maplibre"; // maplibre-gl 6 + worker émis par webpack (audit 2.1)
 import "maplibre-gl/dist/maplibre-gl.css";
 import { circlePolygon } from "../map/geo";
 import { cityCoords, normCity } from "../../lib/beninCities";

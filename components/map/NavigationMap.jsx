@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import maplibregl from "maplibre-gl";
+import maplibregl from "./maplibre"; // maplibre-gl 6 + worker émis par webpack (audit 2.1)
 import "maplibre-gl/dist/maplibre-gl.css";
 import {
     ArrowUp, ArrowUpLeft, ArrowUpRight, CornerUpLeft, CornerUpRight, Undo2, RotateCw, Flag, Navigation,
