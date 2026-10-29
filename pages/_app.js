@@ -22,6 +22,7 @@ const Header = dynamic(() => import("../components/header"), {
 });
 import { useEffect } from "react";
 import { syncSiteFont } from "../lib/siteFont";
+import { startSessionKeeper } from "../lib/sessionKeeper";
 
 
 export default function MyApp({ Component, pageProps }) {
@@ -29,6 +30,8 @@ export default function MyApp({ Component, pageProps }) {
   useEffect(() => {
     syncSiteFont(process.env.NEXT_PUBLIC_REST_API_ENDPOINT);
   }, []);
+  // Session fermée après 5 min d'inactivité (29/10/2026) : renouvelée tant que la personne agit
+  useEffect(() => startSessionKeeper(), []);
   let pathname = usePathname() || ""
   const isHomePage =
     pathname === "/login" ||
