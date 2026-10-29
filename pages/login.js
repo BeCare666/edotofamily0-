@@ -94,7 +94,8 @@ export default function LoginPage() {
             }
         >
             <AuthAlert type={alert.type} message={alert.message}>
-                {alert.type === "error" && alert.message.includes("en attente de validation") && (
+                {/* Point de retrait en attente, ou rôle sensible dont l'e-mail n'est pas confirmé (audit 3.8, 29/10/2026) */}
+                {alert.type === "error" && (alert.message.includes("en attente de validation") || alert.message.includes("Confirmez d'abord votre adresse e-mail")) && (
                     <div className="mt-2 text-[#57524B]">
                         Adresse e-mail pas encore confirmée ?{" "}
                         <button type="button" onClick={handleResendVerification} disabled={resendState.loading}
