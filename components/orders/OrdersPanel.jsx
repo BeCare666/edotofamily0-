@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import {
     Package,
     Truck,
@@ -131,6 +132,9 @@ export default function OrdersPanel({ embedded = false }) {
     const [values, setValues] = useState(EMPTY);
     const [sort, setSort] = useState("created_at:desc");
     const [panel, setPanel] = useState(false);
+    // Panneau rendu dans document.body (29/10/2026) : aucun conteneur du dashboard ne peut plus le masquer ni le couper
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
 
     // Connexion requise
     useEffect(() => {
@@ -479,7 +483,7 @@ export default function OrdersPanel({ embedded = false }) {
             </div>
 
             {/* Panneau des filtres avancés (feuille en bas sur mobile, fenêtre centrée sur ordinateur) */}
-            <AnimatePresence>
+            {mounted && createPortal(<AnimatePresence>
                 {panel && (
                     <>
                         <motion.div
@@ -566,7 +570,7 @@ export default function OrdersPanel({ embedded = false }) {
                         </div>
                     </>
                 )}
-            </AnimatePresence>
+            </AnimatePresence>, document.body)}
         </div>
     );
 }
