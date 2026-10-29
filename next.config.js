@@ -23,12 +23,12 @@ module.exports = nextConfig;**/
 const API = "https://edotofamily.onrender.com";
 const CSP = [
     "default-src 'self'",
-    "script-src 'self' https://api.feexpay.me",
+    "script-src 'self' https://api-v2.feexpay.me",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' data: https://fonts.gstatic.com",
     "img-src 'self' data: blob: https://res.cloudinary.com https://img.icons8.com https://tiles.openfreemap.org https://*.tile.openstreetmap.org",
-    `connect-src 'self' ${API} https://api.feexpay.me https://api.ipify.org https://tiles.openfreemap.org https://nominatim.openstreetmap.org https://routing.openstreetmap.de`,
-    "frame-src https://api.feexpay.me https://feexpay.me https://www.google.com https://calendly.com https://docs.google.com",
+    `connect-src 'self' ${API} https://api-v2.feexpay.me https://api.ipify.org https://tiles.openfreemap.org https://nominatim.openstreetmap.org https://routing.openstreetmap.de`,
+    "frame-src https://api-v2.feexpay.me https://checkout.feexpay.me https://feexpay.me https://www.google.com https://calendly.com https://docs.google.com",
     "worker-src 'self' blob:",
     "frame-ancestors 'self'",
 ].join("; ");

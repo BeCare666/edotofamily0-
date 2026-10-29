@@ -23,9 +23,10 @@ export default function FeexPayModal({ payment, onClose }) {
 
         console.log("📌 FeexPayModal payment data :", payment.orderId);
 
-        // Injecte le bon SDK FEEXPAY
+        // SDK FeexPay v2 (29/10/2026) : l'API v1 (api.feexpay.me) ne répond plus (502) ;
+        // docs.feexpay.me : « les versions antérieures ne fonctionnent plus »
         const script = document.createElement("script");
-        script.src = "https://api.feexpay.me/feexpay-javascript-sdk/index.js";
+        script.src = "https://api-v2.feexpay.me/feexpay-javascript-sdk/index.js";
         script.async = true;
         script.onload = () => {
             console.log("🚀 FEEXPAY SDK LOADED :", window.FeexPayButton);
