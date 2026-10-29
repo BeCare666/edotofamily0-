@@ -10,6 +10,7 @@ import AuthShell, { AuthAlert, AuthField, AuthLink, AuthSubmit, PasswordField } 
 import { emailError, emailInput } from "../lib/fieldRules"
 import { pathAfterLogin, takeRedirect } from "../lib/roleHome"
 import TotpStep from "../components/auth/TotpStep"
+import DeviceCodeStep from "../components/auth/DeviceCodeStep"
 
 export default function LoginPage() {
     const router = useRouter()
@@ -22,6 +23,8 @@ export default function LoginPage() {
     const [resendState, setResendState] = useState({ loading: false, message: "" })
     // Double authentification (audit 3.1) : défi renvoyé par /token à la place de la session
     const [totp, setTotp] = useState(null)
+    // Nouvel appareil (29/10/2026) : code reçu par e-mail
+    const [deviceCheck, setDeviceCheck] = useState(null)
 
     // Session reçue (directement ou après le code) : profil, puis espace du compte
     const finishLogin = async () => {
@@ -60,6 +63,8 @@ export default function LoginPage() {
 
             if (res.totp_required && res.challenge) {
                 setTotp({ challenge: res.challenge, setup_required: !!res.setup_required })
+            } else if (res.device_check_required && res.challenge) {
+                setDeviceCheck({ challenge: res.challenge, email_hint: res.email_hint })
             } else if (res.token) {
                 // Redirection immédiate selon le rôle (19/10/2026) : sponsor → espace sponsor,
                 // point de retrait → dashboard, médecin → espace médecin, centre → espace centre ;
@@ -107,7 +112,12 @@ export default function LoginPage() {
                 )}
             </AuthAlert>
 
-            {totp ? (
+            {deviceCheck ? (
+                <DeviceCodeStep email={email.trim()} check={deviceCheck} onCancel={() => setDeviceCheck(null)}
+                    onSession={async () => {
+                        try { await finishLogin() } catch (err) { setDeviceCheck(null); setAlert({ type: "error", message: err.message }) }
+                    }} />
+            ) : totp ? (
                 <TotpStep challenge={totp} onCancel={() => setTotp(null)}
                     onSession={async () => {
                         try { await finishLogin() } catch (err) { setTotp(null); setAlert({ type: "error", message: err.message }) }

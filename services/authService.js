@@ -37,9 +37,12 @@ export const authService = {
         }
     },
     async login(email, password) {
+        // Appareil reconnu (code reçu par e-mail une première fois, 29/10/2026) : jeton gardé par adresse
+        let device
+        try { device = localStorage.getItem(`edoto-device:${String(email).toLowerCase()}`) || undefined } catch { }
         const res = await apiRequest("/token", {
             method: "POST",
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email, password, ...(device ? { device } : {}) }),
         })
 
         // Sauvegarde du token... dans le localStorage (ou cookie selon ton choix)
@@ -53,7 +56,8 @@ export const authService = {
     // Double authentification (audit sécurité 3.1, 29/10/2026) : étape 2 de la connexion.
     // Appel direct : les messages de l'API (« Code incorrect »…) sont gardés, même en 401.
     async totp(step, body) {
-        const path = step === "setup" ? "/token/totp/setup" : step === "activate" ? "/token/totp/activate" : "/token/totp"
+        const paths = { setup: "/token/totp/setup", activate: "/token/totp/activate", device: "/token/device", "device-resend": "/token/device/resend" }
+        const path = paths[step] || "/token/totp"
         const res = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}${path}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -64,6 +68,11 @@ export const authService = {
         if (!res.ok) throw new Error(data.message || "Une erreur est survenue.")
         if (typeof window !== "undefined" && data.token) localStorage.setItem("token", data.token)
         return data
+    },
+
+    // Appareil reconnu 30 jours après le code reçu par e-mail
+    rememberDevice(email, deviceToken) {
+        try { if (deviceToken) localStorage.setItem(`edoto-device:${String(email).toLowerCase()}`, deviceToken) } catch { }
     },
 
     async me() {
