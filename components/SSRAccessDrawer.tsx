@@ -169,7 +169,7 @@ const SSRAccessDrawer = () => {
             exit={{ y: "100%" }}
             transition={spring}
           >
-            <div className="relative max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-t-[30px] border border-b-0 border-[#E9E5DF] bg-[#F9F8F6] px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-24px_60px_-30px_rgba(26,24,20,0.35)] sm:px-8 sm:pb-8">
+            <div className="relative max-h-[92vh] w-full max-w-6xl overflow-y-auto border border-b-0 border-[#E9E5DF] bg-[#F9F8F6] px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-24px_60px_-30px_rgba(26,24,20,0.35)] sm:px-8 sm:pb-8">
               <div className="mx-auto mb-5 h-1.5 w-11 rounded-full bg-[#D9D3CA]" />
 
               <button

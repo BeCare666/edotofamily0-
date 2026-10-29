@@ -84,9 +84,9 @@ function Avatar({ sponsor, onProfile }) {
         <div ref={ref} className="relative">
             <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-3 pl-1 pr-1 md:pr-3 py-1 rounded-2xl hover:bg-[#F3F1EE]" aria-haspopup="menu" aria-expanded={open}>
                 {avatarOf(auth?.user) ? (
-                    <img src={avatarOf(auth.user)} alt="" className="w-10 h-10 rounded-xl object-cover" />
+                    <img src={avatarOf(auth.user)} alt="" className="w-10 h-10 rounded-full object-cover" />
                 ) : (
-                    <span className="w-10 h-10 rounded-xl bg-[#1A1814] text-white text-sm font-semibold flex items-center justify-center">{initials(sponsor?.name)}</span>
+                    <span className="w-10 h-10 rounded-full bg-[#1A1814] text-white text-sm font-semibold flex items-center justify-center">{initials(sponsor?.name)}</span>
                 )}
                 <span className="hidden md:block text-left">
                     <span className="block text-sm text-[#1A1814] max-w-[160px] truncate">{sponsor?.name}</span>

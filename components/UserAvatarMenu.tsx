@@ -56,15 +56,15 @@ export default function UserAvatarMenu({ user, onNavigate, onLogout, round = fal
         <div ref={ref} className="relative">
             <button
                 onClick={() => setOpen((v) => !v)}
-                className={`block ${round ? "rounded-full ring-2 ring-white shadow-[0_4px_14px_-4px_rgba(194,24,91,0.45)]" : "rounded-xl"} transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6EA9]/50 focus-visible:ring-offset-2`}
+                className={`block ${round ? "rounded-full ring-2 ring-white shadow-[0_4px_14px_-4px_rgba(194,24,91,0.45)]" : "rounded-full"} transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6EA9]/50 focus-visible:ring-offset-2`}
                 aria-haspopup="menu"
                 aria-expanded={open}
                 aria-label="Mon compte"
             >
                 {avatar ? (
-                    <img src={avatar} alt="" className={`w-10 h-10 ${round ? "rounded-full" : "rounded-xl"} object-cover`} />
+                    <img src={avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
                 ) : (
-                    <span className={`w-10 h-10 ${round ? "rounded-full" : "rounded-xl"} bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white text-sm font-semibold flex items-center justify-center`}>
+                    <span className={`w-10 h-10 rounded-full bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white text-sm font-semibold flex items-center justify-center`}>
                         {initials(user?.name)}
                     </span>
                 )}
@@ -74,9 +74,9 @@ export default function UserAvatarMenu({ user, onNavigate, onLogout, round = fal
                 <div role="menu" className="dash-pop-in absolute right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-[#FFFDF9] rounded-2xl border border-[#EDE6DC] shadow-2xl overflow-hidden z-[80] p-1.5">
                     <div className="flex items-center gap-3 px-3 py-3 mb-1 rounded-xl bg-[#F6F1EA]">
                         {avatar ? (
-                            <img src={avatar} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
+                            <img src={avatar} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
                         ) : (
-                            <span className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white text-sm font-semibold flex items-center justify-center">
+                            <span className="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white text-sm font-semibold flex items-center justify-center">
                                 {initials(user?.name)}
                             </span>
                         )}
