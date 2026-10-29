@@ -9,6 +9,7 @@ import { useAuthContext } from "../context/AuthContext" // ✅ import du context
 import AuthShell, { AuthAlert, AuthField, AuthLink, AuthSubmit, PasswordField } from "../components/auth/AuthShell"
 import { emailError, emailInput } from "../lib/fieldRules"
 import { pathAfterLogin, takeRedirect } from "../lib/roleHome"
+import TotpStep from "../components/auth/TotpStep"
 
 export default function LoginPage() {
     const router = useRouter()
@@ -19,6 +20,16 @@ export default function LoginPage() {
     const [touched, setTouched] = useState(false)
     const { setUser } = useAuthContext() // ✅ accès au setter global
     const [resendState, setResendState] = useState({ loading: false, message: "" })
+    // Double authentification (audit 3.1) : défi renvoyé par /token à la place de la session
+    const [totp, setTotp] = useState(null)
+
+    // Session reçue (directement ou après le code) : profil, puis espace du compte
+    const finishLogin = async () => {
+        const me = await authService.me()
+        setUser(me)
+        setAlert({ type: "success", message: "Connexion réussie !" })
+        router.push(pathAfterLogin(me?.role, takeRedirect()))
+    }
 
     // Contrôle des champs (16/10/2026) : e-mail valide, mot de passe saisi.
     // Les règles de création du mot de passe ne s'appliquent pas ici (anciens comptes).
@@ -47,19 +58,13 @@ export default function LoginPage() {
         try {
             const res = await authService.login(email.trim(), password)
 
-            if (res.token) {
-                // ✅ On récupère le profil immédiatement
-                const me = await authService.me()
-
-                // ✅ On met à jour le contexte global (pas besoin de recharger)
-                setUser(me)
-
-                setAlert({ type: "success", message: "Connexion réussie !" })
-
+            if (res.totp_required && res.challenge) {
+                setTotp({ challenge: res.challenge, setup_required: !!res.setup_required })
+            } else if (res.token) {
                 // Redirection immédiate selon le rôle (19/10/2026) : sponsor → espace sponsor,
                 // point de retrait → dashboard, médecin → espace médecin, centre → espace centre ;
                 // l'adresse mémorisée n'est suivie que si elle appartient à l'espace du compte.
-                router.push(pathAfterLogin(me?.role, takeRedirect()))
+                await finishLogin()
             } else {
                 throw new Error("Identifiants invalides.")
             }
@@ -101,6 +106,12 @@ export default function LoginPage() {
                 )}
             </AuthAlert>
 
+            {totp ? (
+                <TotpStep challenge={totp} onCancel={() => setTotp(null)}
+                    onSession={async () => {
+                        try { await finishLogin() } catch (err) { setTotp(null); setAlert({ type: "error", message: err.message }) }
+                    }} />
+            ) : (
             <form onSubmit={handleLogin} noValidate className="space-y-5">
                 <AuthField id="email" label="Adresse e-mail" icon={Mail} type="email" inputMode="email" autoComplete="email"
                     placeholder="exemple@email.com" value={email} onChange={(e) => setEmail(emailInput(e.target.value))}
@@ -118,6 +129,7 @@ export default function LoginPage() {
 
                 <AuthSubmit loading={loading} loadingText="Connexion en cours...">Se connecter</AuthSubmit>
             </form>
+            )}
         </AuthShell>
     )
 }

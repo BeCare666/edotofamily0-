@@ -50,6 +50,22 @@ export const authService = {
         return res
     },
 
+    // Double authentification (audit sécurité 3.1, 29/10/2026) : étape 2 de la connexion.
+    // Appel direct : les messages de l'API (« Code incorrect »…) sont gardés, même en 401.
+    async totp(step, body) {
+        const path = step === "setup" ? "/token/totp/setup" : step === "activate" ? "/token/totp/activate" : "/token/totp"
+        const res = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}${path}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        })
+        let data = {}
+        try { data = await res.json() } catch { }
+        if (!res.ok) throw new Error(data.message || "Une erreur est survenue.")
+        if (typeof window !== "undefined" && data.token) localStorage.setItem("token", data.token)
+        return data
+    },
+
     async me() {
         // ⚠️ Ton endpoint doit correspondre à ce que ton API expose, ex: /users/me ou /me
         const res = await apiRequest("/me", {
