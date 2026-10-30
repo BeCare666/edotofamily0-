@@ -57,6 +57,7 @@ Les pièces que la loi oblige à garder plus longtemps (factures, paiements) son
       title: "Destinataires et sous-traitants",
       text: `Les données ne sont jamais vendues. Seules les personnes habilitées y accèdent : l'équipe E.doto family, et pour un dossier de santé, le médecin et le centre concernés (chaque ouverture d'un dossier est enregistrée).
 Prestataires techniques, agissant comme sous-traitants :
+- LWS : nom de domaine edotofamily.com ;
 - Vercel : hébergement du site et de l'administration ;
 - Render : hébergement du serveur (API) ;
 - TiDB Cloud : base de données (Europe, Allemagne) ;
