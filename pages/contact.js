@@ -4,8 +4,10 @@ import { motion } from "framer-motion"
 import { Mail, MapPin, Phone, Send, HeartHandshake } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { DEFAULT_MAP_URL, telHref, useSiteInfo } from "../lib/siteInfo"
 export default function ContactPage() {
   const [sent, setSent] = useState(false)
+  const info = useSiteInfo()
   const router = useRouter()
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#fff9fb] via-white to-[#fff5fa] text-[#0F172A] overflow-hidden relative">
@@ -129,24 +131,21 @@ export default function ContactPage() {
               <div className="p-3 rounded-full bg-[#FF6EA9]/10 text-[#FF6EA9]">
                 <Phone size={22} />
               </div>
-              <p className="text-gray-800 font-medium">+229 67 69 81 91</p>
+              <a href={telHref(info.phone)} className="text-gray-800 font-medium hover:text-[#FF6EA9]">{info.phone}</a>
             </div>
 
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-[#FF6EA9]/10 text-[#FF6EA9]">
                 <Mail size={22} />
               </div>
-              <div className="text-gray-800 font-medium">
-                <p>info@edotofamily.com</p>
-                <p>contact@edotofamily.com</p>
-              </div>
+              <a href={`mailto:${info.email}`} className="text-gray-800 font-medium hover:text-[#FF6EA9]">{info.email}</a>
             </div>
 
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-[#FF6EA9]/10 text-[#FF6EA9]">
                 <MapPin size={22} />
               </div>
-              <p className="text-gray-800 font-medium">Bénin, Cotonou</p>
+              <p className="text-gray-800 font-medium">{info.address}</p>
             </div>
           </div>
         </motion.div>
@@ -155,7 +154,7 @@ export default function ContactPage() {
       <div className="relative overflow-hidden mb-5 m-5 border border-[#ffd6e8]/70 bg-white/60 backdrop-blur-md">
         <iframe
           title="E.doto family Location"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3971.201178289907!2d2.451!3d6.372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x102357e9d9e56f5b%3A0x80a8db33cfb9f8d!2sAkpakpa%20Kpond%C3%A9hou%2C%20Cotonou%2C%20B%C3%A9nin!5e0!3m2!1sfr!2sbj!4v1707483200000!5m2!1sfr!2sbj"
+          src={info.map_url || DEFAULT_MAP_URL}
           width="100%"
           height="500"
           loading="lazy"

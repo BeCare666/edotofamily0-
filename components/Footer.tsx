@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { FaFacebookF, FaLinkedinIn, FaTiktok, FaInstagram } from "react-icons/fa";
+import { FaFacebookF, FaLinkedinIn, FaTiktok, FaInstagram, FaYoutube } from "react-icons/fa";
 import { SiX } from "react-icons/si";
 import { useRouter } from "next/navigation";
 import CalendlyDrawer from "./CalendlyDrawer";
@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import logo from "../public/logo/favicon.png";
 import Image from "next/image"
 import BrandMark from "./BrandMark";
+import { socialItems, telHref, useSiteInfo } from "../lib/siteInfo";
 
 /* ✅ FIX TS DEFINITIF */
 const MotionDiv = motion.div as React.FC<any>;
@@ -24,37 +25,21 @@ interface FooterProps {
     changeView: (view: any) => void;
 }
 
-const socialLinks: SocialLink[] = [
-    {
-        icon: <FaInstagram />,
-        color: "#E4405F",
-        url: "https://www.instagram.com/toncompte",
-    },
-    {
-        icon: <FaFacebookF />,
-        color: "#1877F2",
-        url: "https://www.facebook.com/toncompte",
-    },
-    {
-        icon: <FaLinkedinIn />,
-        color: "#0077B5",
-        url: "https://www.linkedin.com/in/toncompte",
-    },
-    {
-        icon: <SiX />,
-        color: "#000000",
-        url: "https://x.com/toncompte",
-    },
-    {
-        icon: <FaTiktok />,
-        color: "#000000",
-        url: "https://www.tiktok.com/@toncompte",
-    },
-];
+// Réseaux sociaux réglés par le super admin (B5, 30/10/2026) ; avant : liens d'exemple « toncompte »
+const SOCIAL_STYLE: Record<string, { icon: React.ReactNode; color: string }> = {
+    instagram: { icon: <FaInstagram />, color: "#E4405F" },
+    facebook: { icon: <FaFacebookF />, color: "#1877F2" },
+    linkedin: { icon: <FaLinkedinIn />, color: "#0077B5" },
+    x_url: { icon: <SiX />, color: "#000000" },
+    tiktok: { icon: <FaTiktok />, color: "#000000" },
+    youtube: { icon: <FaYoutube />, color: "#FF0000" },
+};
 
 export const Footer: React.FC<FooterProps> = ({ changeView }) => {
     const [openCalendly, setOpenCalendly] = React.useState(false);
     const router = useRouter();
+    const info = useSiteInfo();
+    const socialLinks: SocialLink[] = socialItems(info).map((s) => ({ ...SOCIAL_STYLE[s.key], url: s.url }));
 
     return (
         <>
@@ -157,15 +142,15 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                             <ul className="space-y-4 text-sm text-slate-600">
                                 <li className="flex items-start gap-3">
                                     <MapPin size={18} className="text-pink-500 mt-0.5" />
-                                    <span>St Rita, Cotonou, Bénin</span>
+                                    <span>{info.address}</span>
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <Phone size={18} className="text-pink-500" />
-                                    <span>+229 01 67 69 81 91</span>
+                                    <a href={telHref(info.phone)} className="hover:text-pink-500 transition">{info.phone}</a>
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <Mail size={18} className="text-pink-500" />
-                                    <span>contact@edotofamily.com</span>
+                                    <a href={`mailto:${info.email}`} className="hover:text-pink-500 transition">{info.email}</a>
                                 </li>
                             </ul>
                         </div>
@@ -175,7 +160,7 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                     {/* Bottom */}
                     <div className="border-t border-slate-100 pt-8 text-center">
                         <p className="text-slate-400 text-sm">
-                            © 2025 E.doto family. Tous droits réservés.
+                            © {new Date().getFullYear()} E.doto family. Tous droits réservés.
                         </p>
                     </div>
                 </div>

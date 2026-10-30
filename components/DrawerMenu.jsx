@@ -14,7 +14,8 @@ import {
   HeartHandshake,
 } from "lucide-react"
 import { SiX } from "react-icons/si"; // icône officielle X
-import { FaFacebookF, FaLinkedinIn, FaTwitter, FaTiktok, FaInstagram } from "react-icons/fa"
+import { FaFacebookF, FaLinkedinIn, FaTwitter, FaTiktok, FaInstagram, FaYoutube } from "react-icons/fa"
+import { socialItems, useSiteInfo } from "../lib/siteInfo"
 import { useRouter } from "next/navigation"
 
 const links = [
@@ -66,13 +67,17 @@ export default function DrawerMenu({ isOpen, onClose }) {
       toast.error("Une erreur est survenue lors de la déconnexion")
     }
   }
-  const socialLinks = [
-    { icon: <FaInstagram />, color: "#E4405F", url: "https://www.instagram.com/toncompte" },
-    { icon: <FaFacebookF />, color: "#1877F2", url: "https://www.facebook.com/toncompte" },
-    { icon: <FaLinkedinIn />, color: "#0077B5", url: "https://www.linkedin.com/in/toncompte" },
-    { icon: <SiX />, color: "#000000", url: "https://x.com/toncompte" }, // Remplacement Twitter -> X
-    { icon: <FaTiktok />, color: "#000000", url: "https://www.tiktok.com/@toncompte" },
-  ];
+  // Réseaux sociaux réglés par le super admin (B5, 30/10/2026) ; avant : liens d'exemple « toncompte »
+  const siteInfo = useSiteInfo()
+  const SOCIAL_STYLE = {
+    instagram: { icon: <FaInstagram />, color: "#E4405F" },
+    facebook: { icon: <FaFacebookF />, color: "#1877F2" },
+    linkedin: { icon: <FaLinkedinIn />, color: "#0077B5" },
+    x_url: { icon: <SiX />, color: "#000000" },
+    tiktok: { icon: <FaTiktok />, color: "#000000" },
+    youtube: { icon: <FaYoutube />, color: "#FF0000" },
+  }
+  const socialLinks = socialItems(siteInfo).map((s) => ({ ...SOCIAL_STYLE[s.key], url: s.url }))
   const handleFinalize = () => {
     router.push("/devenir-point-de-retrait");
   };
@@ -254,11 +259,13 @@ export default function DrawerMenu({ isOpen, onClose }) {
           onClose={() => setOpenForm(false)}
           formUrl="https://docs.google.com/forms/d/e/1FAIpQLScY-R5SkFwByPEDyzW7AxVmEoEc2NSTI4RYYtvlp0w0jhEIjg/viewform?usp=publish-editor"
         />
-        {/* FOOTER / RESEAUX SOCIAUX */}
+        {/* FOOTER / RESEAUX SOCIAUX (« Suivez-nous » masqué tant qu'aucun réseau n'est renseigné) */}
         <div className="mt-10 border-t border-[#ffd6e8]/50 pt-5 text-center">
+          {socialLinks.length > 0 && (
           <p className="text-xs text-gray-500 mb-3 uppercase tracking-widest">
             Suivez-nous
           </p>
+          )}
           <div className="flex justify-center gap-4 text-gray-600">
             {socialLinks.map((social, i) => (
               <motion.a
