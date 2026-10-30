@@ -7,62 +7,82 @@ import { useRouter } from "next/navigation"
 export default function PrivacyPage() {
   const router = useRouter()
 
+  // Politique mise à jour le 30/10/2026 selon l'autorisation APDP n° 2026-327/AT/APDP/DST/SC du 25 juin 2026
+  // (points a à f) ; chaque point décrit ce que fait réellement la plateforme.
   const legalSections = [
     {
       title: "Responsable du traitement",
       text: `Le responsable du traitement des données collectées sur la plateforme edotofamily.com est :
-SODINYESSI Sènou Gérard PDG de BeCare, la startup E.doto family
-Email : becare.fr.ge@fmail.com
+SODINYESSI Sènou Gérard, PDG de BeCare, la startup E.doto family
+Email : becare.fr.ge@gmail.com
 Téléphone : +229 01 67698191
-Ville : Cotonou, République du Bénin.`,
+Ville : Cotonou, République du Bénin.
+
+Traitement autorisé par l'Autorité de Protection des Données à caractère Personnel (APDP) :
+autorisation n° 2026-327/AT/APDP/DST/SC du 25 juin 2026.`,
     },
     {
       title: "Données collectées",
-      text: `Lors de l’utilisation du site, les données suivantes peuvent être collectées :
-Nom et prénoms, adresse email, numéro de téléphone, identifiant utilisateur,
-adresse IP, données de connexion, images téléchargées par les utilisateurs
-et données liées aux commandes ou à l’utilisation du service.`,
+      text: `Selon les services utilisés :
+- compte : nom et prénoms, adresse e-mail, numéro de téléphone, date de naissance, sexe, ville, photo de profil ;
+- commandes et paiements : produits, montants, point de retrait choisi, référence du paiement FeexPay (aucun numéro de carte ni code mobile money n'est conservé par E.doto family) ;
+- kits gratuits des campagnes : demande, point de retrait, empreintes techniques de l'appareil servant à limiter une demande par personne ;
+- santé (téléconsultation, adoption d'un contraceptif, suivi) : comptes rendus, notes et rapports, chiffrés dans la base de données ;
+- assistant SSR : questions et réponses, sans nom ni adresse IP, chiffrées et supprimées après 90 jours ;
+- traces de connexion : voir la section « Cookies et traces de connexion ».`,
     },
     {
       title: "Finalités du traitement",
-      text: `Les données collectées servent à :
-- créer et gérer les comptes utilisateurs
-- permettre l’accès aux services de la plateforme
-- gérer les commandes et interactions
-- envoyer des emails liés au fonctionnement du service
-- améliorer l’expérience utilisateur
-- assurer la sécurité de la plateforme`,
+      text: `Les données servent à :
+- créer et gérer les comptes ;
+- traiter les commandes, les paiements, les retraits et les commissions des points de retrait ;
+- organiser les campagnes de kits gratuits ;
+- permettre les téléconsultations, les orientations vers un centre et le suivi d'une contraception ;
+- répondre aux questions sur la santé sexuelle et reproductive (assistant SSR) ;
+- envoyer les e-mails et SMS liés à ces services ;
+- assurer la sécurité de la plateforme et des comptes.`,
     },
     {
-      title: "Base légale du traitement",
-      text: `Le traitement des données repose sur :
-- le consentement de l’utilisateur
-- l’exécution d’un contrat entre l’utilisateur et la plateforme
-- l’intérêt légitime lié au fonctionnement et à la sécurité du service.`,
+      title: "Base légale et consentement",
+      text: `Le traitement repose sur votre consentement, recueilli lors de l'inscription, et sur l'exécution des services que vous demandez.
+Vous consentez librement à la collecte et au transfert des données décrits ici ; vous pouvez retirer ce consentement à tout moment (voir « Vos droits »), ce qui entraîne la fermeture du compte.`,
     },
     {
-      title: "Conservation des données",
-      text: `Les données personnelles sont conservées pendant la durée nécessaire
-à la fourniture des services et au maximum cinq (05) ans après la dernière
-activité du compte utilisateur, sauf obligation légale contraire.`,
+      title: "Durée de conservation",
+      text: `Vos données sont conservées tant que votre compte est actif, puis au plus six (06) mois à compter du moment où il est constaté que vous n'êtes plus actif sur la plateforme ; elles sont ensuite supprimées ou rendues anonymes.
+Les échanges avec l'assistant SSR sont supprimés après 90 jours.
+Les pièces que la loi oblige à garder plus longtemps (factures, paiements) sont conservées pour la seule durée légale.`,
     },
     {
-      title: "Destinataires des données",
-      text: `Certaines données peuvent être traitées par des prestataires
-techniques nécessaires au fonctionnement du service :
-
-LWS : hébergement du site web
-TiDB Cloud : gestion de la base de données
-Cloudinary : stockage et gestion des images
-Brevo : envoi d’emails transactionnels
-
-Ces prestataires agissent en qualité de sous-traitants.`,
+      title: "Destinataires et sous-traitants",
+      text: `Les données ne sont jamais vendues. Seules les personnes habilitées y accèdent : l'équipe E.doto family, et pour un dossier de santé, le médecin et le centre concernés (chaque ouverture d'un dossier est enregistrée).
+Prestataires techniques, agissant comme sous-traitants :
+- Vercel : hébergement du site et de l'administration ;
+- Render : hébergement du serveur (API) ;
+- TiDB Cloud : base de données (Europe, Allemagne) ;
+- Cloudinary : stockage des images et des factures ;
+- Brevo : envoi des e-mails et des SMS ;
+- FeexPay : paiements mobile money et carte ;
+- Groq : réponses de l'assistant SSR (questions transmises sans identité) ;
+- Jitsi (meet.jit.si) : visioconférence des téléconsultations ;
+- OpenStreetMap : carte et calcul d'itinéraire vers les points de retrait.`,
     },
     {
-      title: "Transfert des données",
-      text: `Certains services utilisés peuvent impliquer un transfert de données
-vers des serveurs situés hors du Bénin, notamment en France,
-dans l’Union Européenne ou aux États-Unis.`,
+      title: "Transfert des données hors du Bénin",
+      text: `Plusieurs prestataires ci-dessus hébergent les données hors du Bénin, notamment dans l'Union européenne et aux États-Unis.
+Ces transferts sont nécessaires au fonctionnement des services ; vous y consentez librement en créant votre compte, et pouvez retirer ce consentement en demandant la fermeture du compte.`,
+    },
+    {
+      id: "cookies",
+      title: "Cookies et traces de connexion",
+      text: `E.doto family n'utilise aucun outil de mesure d'audience ni de publicité. Seuls des traceurs nécessaires au fonctionnement sont utilisés, pour soixante (60) jours au plus :
+- cookie « edoto_device_id » (60 jours) : limiter les demandes de kits gratuits à une par personne et par campagne ;
+- stockage du navigateur : votre session (fermée après 5 minutes d'inactivité), la reconnaissance de votre appareil après le code reçu par e-mail (30 jours), vos préférences d'affichage.
+Traces côté serveur, pour la sécurité : chaque requête (méthode, adresse masquée, résultat, durée, sans adresse IP) ; l'ouverture d'un dossier de santé et les actions faites dans l'administration (compte, date, adresse IP).`,
+    },
+    {
+      title: "Sécurité",
+      text: `Connexions chiffrées (HTTPS, TLS vers la base), données de santé chiffrées (AES-256), mots de passe stockés sous forme illisible, session fermée après 5 minutes d'inactivité, code reçu par e-mail lors d'une connexion depuis un nouvel appareil.`,
     },
   ]
 
@@ -152,7 +172,8 @@ dans l’Union Européenne ou aux États-Unis.`,
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: i * 0.15 }}
-            className="bg-white/70 backdrop-blur-lg border border-[#ffd6e8]/60 rounded-3xl p-8 shadow-md"
+            id={section.id}
+            className="scroll-mt-24 bg-white/70 backdrop-blur-lg border border-[#ffd6e8]/60 rounded-3xl p-8 shadow-md"
           >
             <h3 className="text-xl font-semibold mb-4 text-[#0F172A]">
               {section.title}
@@ -175,10 +196,14 @@ dans l’Union Européenne ou aux États-Unis.`,
           Vos droits, notre responsabilité.
         </motion.h3>
 
-        <p className="text-gray-600 mb-6 leading-relaxed">
-          Conformément à la législation en vigueur, vous disposez des droits
-          d’accès, de rectification, d’opposition, de suppression et de
-          portabilité de vos données personnelles.
+        <p className="text-gray-600 mb-4 leading-relaxed">
+          Conformément aux articles 437, 438, 440, 441 et 443 du Code du numérique, vous disposez des droits
+          d’accès, de portabilité, d’opposition, de rectification et de suppression de vos données,
+          ainsi que du droit à l’effacement et à l’oubli.
+        </p>
+        <p className="text-gray-600 mb-6 leading-relaxed text-left sm:text-center">
+          Pour les exercer : écrivez-nous à l’adresse ci-dessous en précisant le droit concerné et l’adresse e-mail de votre compte ;
+          vous pouvez aussi corriger vous-même vos informations dans « Mon profil ». Vous pouvez également saisir l’APDP (www.apdp.bj).
         </p>
 
         <p className="text-gray-600 mb-6">

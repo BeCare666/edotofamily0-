@@ -62,7 +62,12 @@ export default function TermsPage() {
       id: "privacy",
       title: "7. Protection des données",
       icon: ShieldCheck,
-      content: `La confidentialité de vos données est primordiale. Consultez notre Politique de confidentialité pour connaître vos droits, la durée de conservation et les usages de vos données.`,
+      // Mis à jour le 30/10/2026 selon l'autorisation APDP n° 2026-327/AT/APDP/DST/SC du 25 juin 2026
+      content: `Le traitement de vos données personnelles est autorisé par l'APDP (autorisation n° 2026-327/AT/APDP/DST/SC du 25 juin 2026).
+        En créant un compte, vous consentez librement à la collecte de vos données et à leur transfert vers nos prestataires techniques, dont certains sont situés hors du Bénin.
+        Vos données sont conservées au plus six (06) mois après la fin de votre activité sur la plateforme. Les cookies et traceurs utilisés sont limités à soixante (60) jours.
+        Vous disposez des droits d'accès, de portabilité, d'opposition, de rectification, de suppression, d'effacement et d'oubli (articles 437, 438, 440, 441 et 443 du Code du numérique) :
+        écrivez à contact@edotofamily.com ou corrigez vos informations dans « Mon profil ». Le détail figure dans notre Politique de confidentialité.`,
     },
     {
       id: "ip",
