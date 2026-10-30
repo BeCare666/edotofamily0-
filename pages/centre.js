@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { AlertTriangle, ArrowLeft, Camera, CheckCircle2, ClipboardCheck, Eye, Hourglass, Inbox, KeyRound, LayoutDashboard, Loader2, Printer, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Camera, CheckCircle2, ClipboardCheck, Eye, Hourglass, Inbox, KeyRound, LayoutDashboard, Loader2, Printer, User, X } from "lucide-react";
+import dynamic from "next/dynamic";
+
+// Profil affiché dans le dashboard (30/10/2026)
+const ProfilePage = dynamic(() => import("./profile"), { ssr: false });
 import SpaceShell from "../components/teleconsultation/SpaceShell";
 import useSpaceAccess from "../components/teleconsultation/useSpaceAccess";
 import AccessDenied from "../components/dashboard-ui/AccessDenied";
@@ -13,6 +17,7 @@ import { api, dayLabel, fullLabel, qs } from "../components/teleconsultation/tcS
 const MENU = [
     { key: "home", label: "Accueil", icon: LayoutDashboard },
     { key: "referrals", label: "Jeunes orientés", icon: Inbox },
+    { key: "profile", label: "Mon profil", icon: User },
 ];
 const refTone = { issued: "rose", viewed: "wait", completed: "ok", expired: "off" };
 const urgTone = { urgent: "off", soon: "wait", routine: "ink" };
@@ -203,6 +208,10 @@ export default function CentrePage() {
     const router = useRouter();
     const { me, denied } = useSpaceAccess("health_center", "/centre", "Cet espace est réservé aux centres partenaires de E.doto family.");
     const [view, setView] = useState("home");
+    // Vue demandée dans l'adresse (/centre#profile depuis le menu du compte)
+    useEffect(() => {
+        if (window.location.hash === "#profile") setView("profile");
+    }, []);
     const [dossier, setDossier] = useState(null);
     const [overview, setOverview] = useState(null);
     const [list, setList] = useState(null);
@@ -311,6 +320,7 @@ export default function CentrePage() {
                         )}
                     </div>
                 )}
+                {view === "profile" && <ProfilePage embedded />}
                 {view === "dossier" && dossier && <Dossier keyInfo={dossier} onBack={() => { changeView("home"); load(); }} />}
             </SpaceShell>
             {scan && <CameraScanner onToken={openToken} onClose={() => setScan(false)} />}

@@ -3,6 +3,10 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { Loader2 } from "lucide-react";
 import Shell from "../components/pickup-dashboard/Shell";
+import dynamic from "next/dynamic";
+
+// Profil affiché dans le dashboard (30/10/2026)
+const ProfilePage = dynamic(() => import("./profile"), { ssr: false });
 import OverviewView from "../components/pickup-dashboard/OverviewView";
 import OrdersView from "../components/pickup-dashboard/OrdersView";
 import KitsView from "../components/pickup-dashboard/KitsView";
@@ -11,7 +15,7 @@ import ValidateModal from "../components/pickup-dashboard/ValidateModal";
 import { api, todayKeys, token } from "../components/pickup-dashboard/api";
 import AccessDenied from "../components/dashboard-ui/AccessDenied";
 
-const VIEWS = ["overview", "orders", "kits", "history"];
+const VIEWS = ["overview", "orders", "kits", "history", "profile"];
 
 // Dashboard du point de retrait : vue d'ensemble, commandes, kits, compte & historique
 export default function PickupDashboardPage() {
@@ -113,6 +117,7 @@ export default function PickupDashboardPage() {
                 {view === "history" && (
                     <HistoryView period={period} date={date} onPeriodChange={onPeriodChange} search={search} refreshKey={refreshKey} />
                 )}
+                {view === "profile" && <ProfilePage embedded />}
             </Shell>
             {selected && (
                 <ValidateModal

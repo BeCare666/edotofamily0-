@@ -41,6 +41,8 @@ export default function MyApp({ Component, pageProps }) {
     pathname.startsWith("/sponsor") || // espace sponsor : même principe
     // Téléconsultation (19/10/2026) : espaces jeune, médecin, centre ; activation ; dossier ; code QR
     pathname === "/mon-espace" ||
+    // Détail d'une commande : dans le dashboard jeune, sans en-tête ni pied de page du site (30/10/2026)
+    pathname.startsWith("/orders/") ||
     pathname === "/medecin" ||
     pathname === "/centre" ||
     pathname.startsWith("/espace/") ||
@@ -79,7 +81,7 @@ export default function MyApp({ Component, pageProps }) {
       {!isHomePage && !hideFooter && <Footer />}
       {/* Navigation mobile du bas (mêmes pages que l'en-tête) */}
       {/* Le dashboard jeune garde aussi la barre mobile du site (19/10/2026) */}
-      {(!isHomePage || pathname === "/mon-espace") && <MobileBottomNav />}
+      {(!isHomePage || pathname === "/mon-espace" || pathname.startsWith("/orders/")) && <MobileBottomNav />}
       </ChatAIProvider>
     </AuthProvider>
   )

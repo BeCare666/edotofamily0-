@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
-import { CalendarClock, CalendarDays, LayoutDashboard, Loader2, Search } from "lucide-react";
+import { CalendarClock, CalendarDays, LayoutDashboard, Loader2, Search, User } from "lucide-react";
+import dynamic from "next/dynamic";
+
+// Profil affiché dans le dashboard (30/10/2026)
+const ProfilePage = dynamic(() => import("./profile"), { ssr: false });
 import SpaceShell from "../components/teleconsultation/SpaceShell";
 import useSpaceAccess from "../components/teleconsultation/useSpaceAccess";
 import AccessDenied from "../components/dashboard-ui/AccessDenied";
@@ -11,6 +15,7 @@ const MENU = [
     { key: "today", label: "Aujourd’hui", icon: LayoutDashboard },
     { key: "appointments", label: "Rendez-vous", icon: CalendarClock },
     { key: "schedule", label: "Disponibilités", icon: CalendarDays },
+    { key: "profile", label: "Mon profil", icon: User },
 ];
 
 export default function MedecinPage() {
@@ -76,6 +81,7 @@ export default function MedecinPage() {
                 {view === "appointments" && <AppointmentsView onOpen={open} search={search} />}
                 {view === "appointment" && openId && <AppointmentDetail id={openId} onBack={() => changeView("appointments")} />}
                 {view === "schedule" && <ScheduleView />}
+                {view === "profile" && <ProfilePage embedded />}
             </SpaceShell>
         </>
     );

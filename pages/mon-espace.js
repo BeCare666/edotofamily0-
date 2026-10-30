@@ -5,6 +5,7 @@ import { ArrowRight, CalendarCheck2, CalendarPlus, Download, Expand, Gift, Heart
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import SpaceShell from "../components/teleconsultation/SpaceShell";
+import { YOUTH_MENU } from "../components/dashboard-ui/youthMenu";
 import useSpaceAccess from "../components/teleconsultation/useSpaceAccess";
 import AccessDenied from "../components/dashboard-ui/AccessDenied";
 import { Badge, Card, Empty, ErrorBox, SectionTitle, Skeleton, Tabs } from "../components/pickup-dashboard/ui";
@@ -14,18 +15,14 @@ import MyContraception, { nextActionOf } from "../components/contraception/MyCon
 import { AdoptionSteps, MethodVisual } from "../components/contraception/ContraShared";
 // « Mes commandes » et les kits gratuits, intégrés au dashboard (21/10/2026)
 const OrdersPanel = dynamic(() => import("../components/orders/OrdersPanel"), { ssr: false });
+// Profil affiché dans le dashboard (30/10/2026), plus sur une page à part
+const ProfilePage = dynamic(() => import("./profile"), { ssr: false });
 
 // Dashboard du jeune (19/10/2026), ouvert depuis l'avatar (« Mon dashboard ») :
 // rendez-vous de téléconsultation, orientations avec code QR, accès rapides.
 // 21/10/2026 : contraception (7 étapes), commandes et kits intégrés, profil ; accueil construit sur les données réelles du compte.
-const MENU = [
-    { key: "home", label: "Accueil", icon: Home },
-    { key: "contraception", label: "Ma contraception", icon: HeartHandshake },
-    { key: "appointments", label: "Mes rendez-vous", icon: CalendarCheck2 },
-    { key: "referrals", label: "Mes orientations", icon: QrCode },
-    { key: "orders", label: "Mes commandes et kits", icon: ShoppingBag },
-    { key: "profile", label: "Mon profil", icon: User },
-];
+// Menu partagé avec le détail d'une commande (components/dashboard-ui/youthMenu.js)
+const MENU = YOUTH_MENU;
 
 const statusTone = { booked: "rose", completed: "ok", cancelled: "off", no_show: "wait" };
 const refTone = { issued: "rose", viewed: "wait", completed: "ok", expired: "off" };
@@ -181,7 +178,7 @@ export default function MonEspacePage() {
         if (!me) return;
         load();
         const h = window.location.hash.replace("#", "");
-        if (MENU.some((m) => m.key === h) && h !== "profile") setView(h);
+        if (MENU.some((m) => m.key === h)) setView(h);
     }, [me, load]);
 
     // Après la prise de rendez-vous (tiroir fermé) : étapes et rendez-vous à jour
@@ -191,7 +188,6 @@ export default function MonEspacePage() {
     }, [bookingOpen]);
 
     const changeView = (v) => {
-        if (v === "profile") { router.push("/profile"); return; }
         setView(v);
         window.history.replaceState(null, "", `#${v}`);
         window.scrollTo({ top: 0 });
@@ -421,6 +417,8 @@ export default function MonEspacePage() {
                         <OrdersPanel embedded />
                     </div>
                 )}
+
+                {view === "profile" && <ProfilePage embedded />}
             </SpaceShell>
 
             {cancelling && (

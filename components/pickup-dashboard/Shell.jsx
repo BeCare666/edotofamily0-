@@ -13,6 +13,7 @@ export const MENU = [
     { key: "orders", label: "Commandes", icon: Package },
     { key: "kits", label: "Kits de campagne", icon: Gift },
     { key: "history", label: "Compte & historique", icon: Wallet },
+    { key: "profile", label: "Mon profil", icon: User },
 ];
 
 function initials(name) {

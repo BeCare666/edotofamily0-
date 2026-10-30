@@ -69,7 +69,17 @@ function Row({ icon: Icon, label, value }) {
     )
 }
 
-export default function ProfilePage() {
+// Profil dans le dashboard de chaque compte (30/10/2026) : la page /profile renvoie vers la vue « Mon profil »
+// du dashboard ; embedded = affichage dans le dashboard (sans fond ni marges de page, pas de pied de page).
+const PROFILE_IN_DASHBOARD = {
+    customer: "/mon-espace#profile",
+    super_pickuppoint: "/pickup-dashboard#profile",
+    doctor: "/medecin#profile",
+    health_center: "/centre#profile",
+    sponsor: "/sponsor?vue=profile",
+}
+
+export default function ProfilePage({ embedded = false }) {
     const { user, setUser, logout, loading } = useAuthContext() || {}
     const router = useRouter()
     const [editing, setEditing] = useState(false)
@@ -84,7 +94,8 @@ export default function ProfilePage() {
 
     useEffect(() => {
         if (!loading && !user) router.push("/login")
-    }, [loading, user, router])
+        else if (!embedded && user && PROFILE_IN_DASHBOARD[user.role]) router.replace(PROFILE_IN_DASHBOARD[user.role])
+    }, [loading, user, router, embedded])
 
     const startEdit = () => {
         setForm({ name: user.name || "", phone: user.profile?.contact || "", birth_date: user.birth_date || "", sex: user.sex || "" })
@@ -194,8 +205,8 @@ export default function ProfilePage() {
     const age = user.birth_date ? ageOn(user.birth_date) : null
 
     return (
-        <main className="min-h-screen bg-[#F9F8F6] px-4 pb-16 pt-8 sm:pt-12">
-            <div className="mx-auto max-w-4xl space-y-6">
+        <main className={embedded ? "" : "min-h-screen bg-[#F9F8F6] px-4 pb-16 pt-8 sm:pt-12"}>
+            <div className={embedded ? "max-w-4xl space-y-6" : "mx-auto max-w-4xl space-y-6"}>
                 {/* --- En-tête : photo, nom, rôle --- */}
                 <section className="rounded-2xl border border-[#E9E5DF] bg-white px-5 py-6 sm:px-8 sm:py-8">
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">

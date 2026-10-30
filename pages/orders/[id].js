@@ -26,6 +26,9 @@ import OrderProgressBar from "../../components/OrderProgressBar";
 import PickupPointPicker from "../../components/PickupPointPicker";
 import OrderStepsBar, { orderSteps } from "../../components/OrderStepsBar";
 import dynamic from "next/dynamic";
+import SpaceShell from "../../components/teleconsultation/SpaceShell";
+import { YOUTH_MENU } from "../../components/dashboard-ui/youthMenu";
+import { useAuthContext } from "../../context/AuthContext";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 //import PickupMapModal from "../pickupmap/PickupMapModal";
 const PickupMapModal = dynamic(
@@ -67,6 +70,28 @@ const fcfa = (n) => `${Math.round(Number(n) || 0).toLocaleString("fr-FR")} FCFA`
 const fmtLong = (d) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 const fmtShortTime = (d) => new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
 const formatDateTime = (d) => d.toLocaleString("fr-FR", { day: "2-digit", month: "long", hour: "2-digit", minute: "2-digit" });
+
+// Détail d'une commande dans le dashboard jeune (30/10/2026) : même cadre et même menu que /mon-espace,
+// sans l'en-tête ni le pied de page du site.
+function InDashboard({ children }) {
+  const { user } = useAuthContext() || {};
+  const router = useRouter();
+  if (!user) return children;
+  return (
+    <SpaceShell
+      space="Mon dashboard"
+      roleLabel="Mon espace"
+      identity={{ name: user.name, detail: user.email }}
+      menu={YOUTH_MENU}
+      view="orders"
+      onView={(v) => router.push(`/mon-espace#${v}`)}
+      storageKey="edoto:youth-sidebar"
+      siteNav
+    >
+      {children}
+    </SpaceShell>
+  );
+}
 
 export default function OrderDetailsPage() {
   const router = useRouter();
@@ -243,6 +268,7 @@ export default function OrderDetailsPage() {
 
   if (loading)
     return (
+      <InDashboard>
       <main className="min-h-screen bg-[#FAF8F5] px-4 pt-10">
         <div className="mx-auto max-w-5xl space-y-4">
           <div className="h-4 w-32 animate-pulse rounded bg-[#EDE8E2]" />
@@ -256,16 +282,19 @@ export default function OrderDetailsPage() {
           </p>
         </div>
       </main>
+      </InDashboard>
     );
 
   if (!order)
     return (
+      <InDashboard>
       <main className="flex min-h-[70vh] flex-col items-center justify-center bg-[#FAF8F5] px-6 text-center">
         <p className="font-brand text-[28px] font-semibold text-[#161412]">Commande introuvable</p>
-        <button onClick={() => router.push("/orders")} className="mt-5 rounded-full bg-[#161412] px-6 py-2.5 text-sm font-medium text-white">
+        <button onClick={() => router.push("/mon-espace#orders")} className="mt-5 rounded-full bg-[#161412] px-6 py-2.5 text-sm font-medium text-white">
           Mes commandes
         </button>
       </main>
+      </InDashboard>
     );
 
   const st = ORDER_STATUS[order.order_status] || { label: order.order_status || "Inconnu", tone: "slate", icon: Package };
@@ -287,10 +316,11 @@ export default function OrderDetailsPage() {
   const card = "rounded-2xl border border-[#E7E2DC] bg-white";
 
   return (
-    <main className="min-h-screen bg-[#FAF8F5] px-4 pb-52 pt-6 sm:px-6 sm:pb-40 sm:pt-10">
+    <InDashboard>
+    <main className="min-w-0 pb-52 sm:pb-40">
       <div className="mx-auto min-w-0 max-w-5xl">
         <button
-          onClick={() => router.push("/orders")}
+          onClick={() => router.push("/mon-espace#orders")}
           className="inline-flex items-center gap-2 text-[13px] text-[#5E5953] underline-offset-4 transition hover:text-[#161412] hover:underline"
         >
           <ArrowLeft size={15} strokeWidth={1.8} /> Mes commandes
@@ -636,5 +666,6 @@ export default function OrderDetailsPage() {
         phone={order?.pickup_point?.phone}
       />
     </main>
+    </InDashboard>
   );
 }
