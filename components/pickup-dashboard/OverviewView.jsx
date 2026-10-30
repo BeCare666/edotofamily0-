@@ -5,6 +5,7 @@ import { Package, Gift, Wallet, Hourglass } from "lucide-react";
 import { api, dateTime, fcfa, qs } from "./api";
 import { Badge, Card, Empty, ErrorBox, SectionTitle, Skeleton, StatCard } from "./ui";
 import PeriodFilter from "./PeriodFilter";
+import PayoutsCard from "./PayoutsCard";
 import { PALETTE, StackedBars } from "../dashboard-ui/charts";
 
 // Activité : commandes + kits remis, barres empilées animées avec info-bulle
@@ -62,6 +63,8 @@ export default function OverviewView({ period, date, onPeriodChange, refreshKey,
                             <StatCard label="En attente de retrait" value={data.pending.orders + data.pending.kits} hint={`${data.pending.orders} commande(s) · ${data.pending.kits} kit(s)`} icon={Hourglass} tone="sand" />
                         </button>
                     </div>
+
+                    <PayoutsCard refreshKey={refreshKey} />
 
                     <div className="dash-stagger grid grid-cols-1 xl:grid-cols-3 gap-6">
                         <Card className="p-6 xl:col-span-2">
