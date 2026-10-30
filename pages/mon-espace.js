@@ -13,6 +13,7 @@ import { API, api, downloadIcs, fullLabel, timeLabel, dayLabel } from "../compon
 import { useChatAI } from "../context/ChatAIContext";
 import MyContraception, { nextActionOf } from "../components/contraception/MyContraception";
 import { AdoptionSteps, MethodVisual } from "../components/contraception/ContraShared";
+import { keepSessionDuringVisio } from "../lib/sessionKeeper";
 // « Mes commandes » et les kits gratuits, intégrés au dashboard (21/10/2026)
 const OrdersPanel = dynamic(() => import("../components/orders/OrdersPanel"), { ssr: false });
 // Profil affiché dans le dashboard (30/10/2026), plus sur une page à part
@@ -72,7 +73,7 @@ function AppointmentCard({ a, onCancel, big = false }) {
             {a.status === "booked" && (
                 <div className="mt-4 flex flex-wrap gap-2">
                     {a.room_url && (
-                        <a href={a.room_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl bg-[#C2185B] px-4 py-2.5 text-sm font-semibold text-white">
+                        <a href={a.room_url} target="_blank" rel="noopener noreferrer" onClick={() => keepSessionDuringVisio(a.ends_at)} className="inline-flex items-center gap-2 rounded-xl bg-[#C2185B] px-4 py-2.5 text-sm font-semibold text-white">
                             <Video size={16} /> Rejoindre la visio
                         </a>
                     )}

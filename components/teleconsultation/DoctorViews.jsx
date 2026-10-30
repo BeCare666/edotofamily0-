@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ArrowLeft, CalendarClock, CalendarX2, CheckCircle2, ClipboardList, FileText, Loader2, Phone, PhoneCall, Plus, Trash2, UserX, Video } from "lucide-react";
 import { Badge, Card, Empty, ErrorBox, SectionTitle, Skeleton, StatCard, Tabs } from "../pickup-dashboard/ui";
 import { api, dayLabel, fullLabel, qs, timeLabel } from "./tcShared";
+import { keepSessionDuringVisio } from "../../lib/sessionKeeper";
 
 // Espace médecin (19/10/2026) : vues de l'agenda, du rendez-vous (compte rendu) et des disponibilités.
 const statusTone = { booked: "rose", completed: "ok", cancelled: "off", no_show: "wait" };
@@ -30,7 +31,10 @@ export function StartButton({ a, onDone, compact = false }) {
         setBusy(true);
         try {
             const res = await api(`teleconsultation/doctor/appointments/${a.id}/start`, { method: "POST" });
-            if (a.mode === "video" && res.room_url) window.open(res.room_url, "_blank", "noopener,noreferrer");
+            if (a.mode === "video" && res.room_url) {
+                keepSessionDuringVisio(a.ends_at);
+                window.open(res.room_url, "_blank", "noopener,noreferrer");
+            }
             if (a.mode === "phone" && res.phone) window.location.href = `tel:${res.phone}`;
             onDone?.();
         } catch (e) {
