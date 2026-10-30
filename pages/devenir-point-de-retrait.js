@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { Mail, Lock, User, CheckCircle2, MapPin, LocateFixed, Loader2 } from "lucide-react"
-import Link from "next/link"
 import { authService } from "../services/authService"
 import AuthShell, { AuthAlert, AuthField, AuthLink, AuthSubmit, PasswordField, PasswordRules, inputClass } from "../components/auth/AuthShell"
+import ConsentField from "../components/auth/ConsentField"
 import { emailError, emailInput, orgError, orgInput, passwordError, passwordInput } from "../lib/fieldRules"
 
 // Coordonnée GPS : chiffres, un point décimal et un signe moins au début seulement
@@ -119,6 +119,7 @@ export default function PickupPointRegisterPage() {
                 pickup_lat: Number(lat),
                 pickup_lng: Number(lng),
                 pickup_address: address.trim() || null,
+                consent: acceptedTerms,
             })
             setDone(true)
             setResendIn(60)
@@ -231,14 +232,7 @@ export default function PickupPointRegisterPage() {
                     )}
                 </fieldset>
 
-                <label htmlFor="pp-terms" className="flex cursor-pointer items-start gap-2.5 text-sm text-[#57524B]">
-                    <input type="checkbox" id="pp-terms" checked={acceptedTerms}
-                        onChange={() => setAcceptedTerms(!acceptedTerms)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#C2185B]" />
-                    <span>
-                        J'accepte les{" "}
-                        <Link href="/terms" className="text-[#C2185B] hover:underline underline-offset-4">termes et conditions d'utilisation</Link>
-                    </span>
-                </label>
+                <ConsentField id="pp-terms" checked={acceptedTerms} onChange={setAcceptedTerms} />
 
                 <AuthSubmit loading={loading} disabled={!acceptedTerms} loadingText="Envoi en cours…">Envoyer ma demande</AuthSubmit>
             </form>

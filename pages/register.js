@@ -3,9 +3,9 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, User, CalendarDays } from "lucide-react"
-import Link from "next/link"
 import { authService } from "../services/authService"
 import AuthShell, { AuthAlert, AuthField, AuthLink, AuthSubmit, ChoiceField, PasswordField } from "../components/auth/AuthShell"
+import ConsentField from "../components/auth/ConsentField"
 import {
     birthDateError, birthDateLimits, emailError, emailInput, nameError, nameInput,
     passwordError, passwordInput, SEX_OPTIONS, sexError,
@@ -55,7 +55,7 @@ export default function RegisterPage() {
         setLoading(true)
 
         try {
-            const res = await authService.register(name.trim().replace(/\s+/g, " "), email.trim(), password, birthDate, sex)
+            const res = await authService.register(name.trim().replace(/\s+/g, " "), email.trim(), password, birthDate, sex, acceptedTerms)
 
             // Stockage temporaire (session uniquement)
             sessionStorage.setItem("register_email", email.trim());
@@ -117,16 +117,7 @@ export default function RegisterPage() {
                 <PasswordField icon={Lock} value={password} onChange={(e) => setPassword(passwordInput(e.target.value))}
                     autoComplete="new-password" placeholder="••••••••" showRules error={touched ? errors.password : ""} />
 
-                <label htmlFor="terms" className="flex cursor-pointer items-start gap-2.5 text-sm text-[#57524B]">
-                    <input type="checkbox" id="terms" checked={acceptedTerms} onChange={() => setAcceptedTerms(!acceptedTerms)}
-                        className="mt-0.5 h-4 w-4 shrink-0 accent-[#C2185B]" />
-                    <span>
-                        J’accepte les{" "}
-                        <Link href="/terms" className="text-[#C2185B] hover:underline underline-offset-4">
-                            termes et conditions d’utilisation
-                        </Link>
-                    </span>
-                </label>
+                <ConsentField id="terms" checked={acceptedTerms} onChange={setAcceptedTerms} />
 
                 <AuthSubmit loading={loading} disabled={!acceptedTerms} loadingText="Création en cours...">Créer mon compte</AuthSubmit>
             </form>

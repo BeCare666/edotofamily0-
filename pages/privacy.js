@@ -45,6 +45,7 @@ autorisation n° 2026-327/AT/APDP/DST/SC du 25 juin 2026.`,
     {
       title: "Base légale et consentement",
       text: `Le traitement repose sur votre consentement, recueilli lors de l'inscription, et sur l'exécution des services que vous demandez.
+À l'inscription, le document de consentement à la collecte et au transfert de vos données vous est présenté ; sans votre accord, le compte n'est pas créé. La date, la version du document et l'adresse IP de votre acceptation sont enregistrées comme preuve (l'adresse IP est effacée si le compte est rendu anonyme).
 Vous consentez librement à la collecte et au transfert des données décrits ici ; vous pouvez retirer ce consentement à tout moment (voir « Vos droits »), ce qui entraîne la fermeture du compte.`,
     },
     {

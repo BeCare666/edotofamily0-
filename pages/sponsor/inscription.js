@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { Building, User, Phone, Mail, Lock, CheckCircle2, Send, Radio, BarChart3 } from "lucide-react";
 import BrandMark from "../../components/BrandMark";
 import { AuthAlert, AuthField, AuthSubmit, PasswordField } from "../../components/auth/AuthShell";
+import ConsentField from "../../components/auth/ConsentField";
 import { emailError, emailInput, nameError, nameInput, orgError, orgInput, passwordError, passwordInput, phoneError, phoneInput } from "../../lib/fieldRules";
 import { api } from "../../components/pickup-dashboard/api";
 import { useAuthContext } from "../../context/AuthContext";
@@ -51,7 +52,7 @@ export default function SponsorSignup() {
         try {
             const res = await api("sponsor-signup", {
                 method: "POST",
-                body: JSON.stringify({ organization: v.organization.trim(), contact_name: v.contact_name.trim(), phone: v.phone, email: v.email.trim(), password: v.password }),
+                body: JSON.stringify({ organization: v.organization.trim(), contact_name: v.contact_name.trim(), phone: v.phone, email: v.email.trim(), password: v.password, consent: accepted }),
             });
             setDone(res);
             // Connexion directe avec le compte créé, puis ouverture des demandes de campagne
@@ -119,10 +120,7 @@ export default function SponsorSignup() {
                             <AuthField id="email" label="E-mail professionnel" icon={Mail} type="email" value={v.email} onChange={set("email")} inputMode="email" autoComplete="email" error={err("email")} />
                             <PasswordField id="password" label="Mot de passe" icon={Lock} value={v.password} onChange={set("password")} autoComplete="new-password" placeholder="••••••••" showRules error={err("password")} />
                             <PasswordField id="confirm" label="Confirmer le mot de passe" icon={Lock} value={v.confirm} onChange={set("confirm")} autoComplete="new-password" placeholder="••••••••" error={(touched || v.confirm) ? errors.confirm : ""} />
-                            <label className="flex items-start gap-3 text-sm text-[#6B645D]">
-                                <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-1 h-4 w-4 accent-[#C2185B]" />
-                                <span>J’accepte les <Link href="/terms" className="text-[#C2185B] hover:underline">conditions d’utilisation</Link> et la <Link href="/privacy" className="text-[#C2185B] hover:underline">politique de confidentialité</Link>.</span>
-                            </label>
+                            <ConsentField id="sponsor-consent" checked={accepted} onChange={setAccepted} />
                             <AuthAlert type="error" message={error} />
                             <AuthSubmit loading={busy} disabled={!accepted}>Créer mon espace sponsor</AuthSubmit>
                             <p className="text-xs text-[#8A837A]">Votre organisation a déjà été enregistrée par l’équipe E.doto family ? Utilisez le lien d’invitation reçu par e-mail.</p>

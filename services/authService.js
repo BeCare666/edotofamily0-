@@ -3,15 +3,16 @@ import { useRouter } from "next/navigation"
 export const authService = {
 
     // Date de naissance (AAAA-MM-JJ) et sexe (female | male) obligatoires depuis le 16/10/2026
-    async register(name, email, password, birth_date, sex) {
+    // consent : document de consentement accepté (APDP, point b, 30/10/2026), exigé par l'API
+    async register(name, email, password, birth_date, sex, consent) {
         const res = await apiRequest("/register", {
             method: "POST",
-            body: JSON.stringify({ name, email, password, birth_date, sex }),
+            body: JSON.stringify({ name, email, password, birth_date, sex, consent: consent === true }),
         })
 
         return res
     },
-    async registerPickUpPoint({ name, email, password, pickup_lat, pickup_lng, pickup_address }) {
+    async registerPickUpPoint({ name, email, password, pickup_lat, pickup_lng, pickup_address, consent }) {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/register-pick-up-point`, {
                 method: "POST",
@@ -25,6 +26,7 @@ export const authService = {
                     pickup_lat,
                     pickup_lng,
                     pickup_address,
+                    consent: consent === true,
                 }),
             });
 
