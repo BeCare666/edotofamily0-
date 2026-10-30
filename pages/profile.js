@@ -17,6 +17,7 @@ import {
     ChevronRight,
     CheckCircle2,
     Loader2,
+    Download,
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -40,6 +41,9 @@ const ROLE_LABEL = {
     staff: "Équipe boutique",
 }
 const SEX_LABEL = { female: "Féminin", male: "Masculin" }
+// Droits des personnes (autorisation APDP, point f, 30/10/2026) : mêmes règles que l'API (src/users/my-data.ts)
+const SELF_DELETE_ROLES = ["customer"]
+const RIGHTS_CONTACT = "contact@edotofamily.com"
 const longDate = (d) => new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })
 
 function Section({ title, subtitle, children, action }) {
@@ -88,6 +92,9 @@ export default function ProfilePage({ embedded = false }) {
     const [saving, setSaving] = useState(false)
     const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [loadingDelete, setLoadingDelete] = useState(false)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [deletePassword, setDeletePassword] = useState("")
+    const [loadingExport, setLoadingExport] = useState(false)
     const [passwords, setPasswords] = useState({ old_password: "", new_password: "", confirm_password: "" })
     const [pwdTouched, setPwdTouched] = useState(false)
     const [loadingPwd, setLoadingPwd] = useState(false)
@@ -184,21 +191,43 @@ export default function ProfilePage({ embedded = false }) {
         }
     }
 
-    // --- Suppression du compte
-    const handleDeleteAccount = async () => {
-        const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.")
-        if (!confirmDelete) return
+    // --- Télécharger mes données (fichier JSON de tout le compte)
+    const handleExport = async () => {
+        try {
+            setLoadingExport(true)
+            const data = await apiRequest("/me/data-export")
+            const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }))
+            const a = document.createElement("a")
+            a.href = url
+            a.download = `mes-donnees-edoto-family-${new Date().toISOString().slice(0, 10)}.json`
+            document.body.appendChild(a)
+            a.click()
+            a.remove()
+            URL.revokeObjectURL(url)
+            toast.success("Vos données sont téléchargées.")
+        } catch (err) {
+            toast.error(err.message || "Le fichier n'a pas pu être préparé.")
+        } finally {
+            setLoadingExport(false)
+        }
+    }
 
+    // --- Suppression du compte : mot de passe redemandé ; identité effacée, commandes et paiements gardés sans identité
+    const handleDeleteAccount = async (e) => {
+        e.preventDefault()
+        if (!deletePassword) return toast.error("Indiquez votre mot de passe.")
         try {
             setLoadingDelete(true)
-            await apiRequest(`/users/${user.id}`, { method: "DELETE" })
-            toast.success("Compte supprimé avec succès 🗑️")
+            const res = await apiRequest("/me/delete-account", { method: "POST", body: JSON.stringify({ password: deletePassword }) })
+            toast.success(res?.message || "Votre compte est supprimé.")
+            setShowDeleteModal(false)
             await logout()
-            router.push("/login")
+            router.push("/")
         } catch (err) {
-            toast.error("Erreur lors de la suppression du compte")
+            toast.error(err.message || "Le compte n'a pas pu être supprimé.")
         } finally {
             setLoadingDelete(false)
+            setDeletePassword("")
         }
     }
 
@@ -342,18 +371,63 @@ export default function ProfilePage({ embedded = false }) {
                                 </span>
                                 <ChevronRight size={16} className="text-[#A8A29A]" />
                             </button>
-                            <button type="button" onClick={handleDeleteAccount} disabled={loadingDelete} className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-[#FDF1EF]">
-                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FDF1EF] text-[#9B2C2C]"><Trash2 size={17} strokeWidth={1.8} /></span>
+                            <button type="button" onClick={handleExport} disabled={loadingExport} className="flex w-full items-center gap-4 border-b border-[#F1EFEB] px-5 py-4 text-left transition hover:bg-[#FBFAF8] disabled:opacity-60">
+                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#57524B]">{loadingExport ? <Loader2 size={17} className="animate-spin" /> : <Download size={17} strokeWidth={1.8} />}</span>
                                 <span className="min-w-0 flex-1">
-                                    <span className="block text-sm font-medium text-[#9B2C2C]">{loadingDelete ? "Suppression..." : "Supprimer mon compte"}</span>
-                                    <span className="block text-[12.5px] text-[#8A837A]">Action irréversible : soyez prudent</span>
+                                    <span className="block text-sm font-medium text-[#1A1814]">{loadingExport ? "Préparation..." : "Télécharger mes données"}</span>
+                                    <span className="block text-[12.5px] text-[#8A837A]">Un fichier avec tout ce que nous gardons sur votre compte</span>
                                 </span>
-                                <ChevronRight size={16} className="text-[#D6B4B0]" />
+                                <ChevronRight size={16} className="text-[#A8A29A]" />
                             </button>
+                            {SELF_DELETE_ROLES.includes(user.role) ? (
+                                <button type="button" onClick={() => setShowDeleteModal(true)} disabled={loadingDelete} className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-[#FDF1EF]">
+                                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FDF1EF] text-[#9B2C2C]"><Trash2 size={17} strokeWidth={1.8} /></span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block text-sm font-medium text-[#9B2C2C]">Supprimer mon compte</span>
+                                        <span className="block text-[12.5px] text-[#8A837A]">Action irréversible : soyez prudent</span>
+                                    </span>
+                                    <ChevronRight size={16} className="text-[#D6B4B0]" />
+                                </button>
+                            ) : (
+                                <a href={`mailto:${RIGHTS_CONTACT}?subject=Suppression de mon compte`} className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-[#FDF1EF]">
+                                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FDF1EF] text-[#9B2C2C]"><Trash2 size={17} strokeWidth={1.8} /></span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block text-sm font-medium text-[#9B2C2C]">Supprimer mon compte</span>
+                                        <span className="block text-[12.5px] text-[#8A837A]">Écrivez à {RIGHTS_CONTACT} : nous réglons d&apos;abord ce qui est en cours</span>
+                                    </span>
+                                    <ChevronRight size={16} className="text-[#D6B4B0]" />
+                                </a>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* --- Fenêtre : suppression du compte --- */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#1A1814]/40 p-0 sm:items-center sm:p-4" onClick={() => setShowDeleteModal(false)}>
+                    <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-t-2xl border border-[#E9E5DF] bg-white p-6 sm:rounded-2xl sm:p-7">
+                        <h2 className="mb-2 text-lg font-semibold text-[#1A1814]">Supprimer mon compte</h2>
+                        <p className="mb-5 text-[13.5px] leading-relaxed text-[#57524B]">
+                            Votre nom, vos coordonnées et votre profil seront effacés et vous ne pourrez plus vous connecter.
+                            Les commandes et paiements restent gardés pour la durée imposée par la loi, sans votre identité.
+                            Pensez à télécharger vos données avant.
+                        </p>
+                        <form onSubmit={handleDeleteAccount} noValidate className="space-y-4">
+                            <PasswordField id="delete_password" label="Votre mot de passe" icon={Lock} value={deletePassword} autoComplete="current-password"
+                                onChange={(e) => setDeletePassword(e.target.value)} />
+                            <div className="flex justify-end gap-2 pt-2">
+                                <button type="button" onClick={() => setShowDeleteModal(false)} className="h-11 rounded-xl px-5 text-sm font-medium text-[#57524B] hover:bg-[#F3F1EE]">
+                                    Annuler
+                                </button>
+                                <button type="submit" disabled={loadingDelete} className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#9B2C2C] px-6 text-sm font-medium text-white hover:bg-[#7F2323] disabled:opacity-60">
+                                    {loadingDelete && <Loader2 size={16} className="animate-spin" />} {loadingDelete ? "Suppression..." : "Supprimer définitivement"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {/* --- Fenêtre : changement de mot de passe --- */}
             {showPasswordModal && (
