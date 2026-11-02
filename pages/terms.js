@@ -13,9 +13,12 @@ import {
   Mail,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { usePlatformSettings } from "../lib/platformSettings"
 export default function TermsPage() {
   const router = useRouter()
-  const updatedAt = "7 novembre 2025"
+  const updatedAt = "2 novembre 2026"
+  // Âge minimum d'inscription réglé par le super admin (signup.min_age)
+  const minAge = usePlatformSettings()["signup.min_age"]
 
   const SECTIONS = [
     {
@@ -27,9 +30,10 @@ export default function TermsPage() {
     },
     {
       id: "eligibility",
-      title: "2. Eligibilité et responsabilité utilisateur",
+      title: "2. Éligibilité et responsabilité utilisateur",
       icon: ShieldCheck,
-      content: `Vous déclarez être majeur selon la législation applicable dans votre pays et capable légalement de conclure des contrats.
+      // 02/11/2026 : l'inscription est ouverte dès l'âge minimum réglé (et non aux seuls majeurs)
+      content: `L'inscription est ouverte à partir de ${minAge} ans. Si vous avez moins de dix-huit (18) ans, vous utilisez la plateforme avec l'accord de vos parents ou de votre représentant légal, notamment pour toute commande ou tout paiement.
         Vous acceptez d'utiliser le site conformément aux lois et de ne pas soumettre de contenu illégal.`,
     },
     {

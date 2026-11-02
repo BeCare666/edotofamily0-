@@ -25,6 +25,13 @@ Traitement autorisé par l'Autorité de Protection des Données à caractère Pe
 autorisation n° 2026-327/AT/APDP/DST/SC du 25 juin 2026.`,
     },
     {
+      // 02/11/2026 : coordonnées du Délégué à la protection des données (engagement signé pour BeCare)
+      title: "Délégué à la protection des données",
+      text: `M. Isaac T. Habib GBENOU, Délégué à la Protection des Données à caractère Personnel de BeCare.
+Téléphone : +229 01 61 61 47 47
+Vous pouvez le contacter pour toute question sur le traitement de vos données ou pour exercer vos droits.`,
+    },
+    {
       title: "Données collectées",
       text: `Selon les services utilisés :
 - compte : nom et prénoms, adresse e-mail, numéro de téléphone, date de naissance, sexe, ville, photo de profil ;

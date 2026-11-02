@@ -79,6 +79,10 @@ export default function MentionsLegales() {
                                 (<a href="mailto:becare.fr.ge@gmail.com" className="text-[#C2185B] hover:underline">becare.fr.ge@gmail.com</a>).
                             </p>
                             <p>
+                                Délégué à la protection des données : M. Isaac T. Habib GBENOU, téléphone{" "}
+                                <a href="tel:+2290161614747" className="text-[#C2185B] hover:underline">+229 01 61 61 47 47</a>.
+                            </p>
+                            <p>
                                 Traitement autorisé par l'Autorité de Protection des Données à caractère Personnel (APDP) :
                                 autorisation n° 2026-327/AT/APDP/DST/SC du 25 juin 2026.
                             </p>
