@@ -1,40 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import DrawerMenu from "../DrawerMenu";
+import MenuSheet from "../nav/MenuSheet";
+import { useLiveCampaigns } from "../../lib/siteNav";
 import { CampaignNavIcon, ContraceptionNavIcon, HomeNavIcon, MenuNavIcon, ProductsNavIcon } from "./navIcons";
 
 // Barre de navigation mobile (sous md) : Accueil, Produits, Campagnes, Contraception (21/10/2026), Menu.
-// Le point « en direct » sur Campagnes vient de l'API (GET /campaigns/active/count) : il n'apparaît
+// Le point « en direct » sur Campagnes vient de l'API (GET /campaigns/active/count, lib/siteNav.js) : il n'apparaît
 // que si au moins une campagne est réellement en cours (statut calculé par dates, heure du Bénin).
-const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
-const REFRESH_MS = 5 * 60 * 1000;
-
+// Menu (02/11/2026, maquette validée) : panneau qui monte du bas (components/nav/MenuSheet.jsx).
 export default function MobileBottomNav() {
   const pathname = usePathname() || "";
   const [menuOpen, setMenuOpen] = useState(false);
-  const [liveCount, setLiveCount] = useState(0);
-
-  useEffect(() => {
-    let alive = true;
-    const load = () =>
-      fetch(`${API}/campaigns/active/count`)
-        .then((r) => (r.ok ? r.json() : null))
-        .then((d) => alive && setLiveCount(Number(d?.total ?? 0)))
-        .catch(() => alive && setLiveCount(0));
-    load();
-    const id = setInterval(load, REFRESH_MS);
-    return () => {
-      alive = false;
-      clearInterval(id);
-    };
-  }, []);
-
-  // Fermer le menu quand la page change
-  useEffect(() => setMenuOpen(false), [pathname]);
+  const liveCount = useLiveCampaigns();
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   const items = [
     { key: "home", label: "Accueil", href: "/", icon: HomeNavIcon, active: pathname === "/" },
@@ -82,11 +64,18 @@ export default function MobileBottomNav() {
                 className="relative flex flex-col items-center justify-center gap-1 rounded-[20px] py-2 outline-none focus-visible:ring-2 focus-visible:ring-[#FF6EA9]/40"
               >
                 {it.active && (
-                  <motion.span
-                    layoutId="mobile-nav-active"
-                    className="absolute inset-0 rounded-[20px] bg-[#FBEEF3]"
-                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                  />
+                  <>
+                    <motion.span
+                      layoutId="mobile-nav-active"
+                      className="absolute inset-0 rounded-[20px] bg-[#FBEEF3]"
+                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                    />
+                    <motion.span
+                      layoutId="mobile-nav-line"
+                      className="absolute -top-1.5 left-[calc(50%-14px)] h-[2px] w-7 rounded-full bg-[#C2185B]"
+                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                    />
+                  </>
                 )}
                 <span className="relative">
                   <it.icon
@@ -126,7 +115,7 @@ export default function MobileBottomNav() {
         </div>
       </nav>
 
-      <DrawerMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MenuSheet isOpen={menuOpen} onClose={closeMenu} />
     </>
   );
 }

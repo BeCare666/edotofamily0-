@@ -199,7 +199,7 @@ export default function SiteNotificationBell() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.18 }}
-            className="fixed inset-x-3 top-[84px] z-[70] overflow-hidden rounded-[26px] border border-[#F3E3EA] bg-[#FFFDFB] shadow-[0_30px_60px_-20px_rgba(15,23,42,0.35)]"
+            className="fixed inset-x-3 top-[84px] z-[70] overflow-hidden rounded-[26px] md:left-auto md:right-6 md:w-[400px] border border-[#F3E3EA] bg-[#FFFDFB] shadow-[0_30px_60px_-20px_rgba(15,23,42,0.35)]"
           >
             <div className="flex items-center justify-between border-b border-[#F6E9EF] bg-gradient-to-b from-[#FFF4F8] to-[#FFFDFB] px-5 py-4">
               <div>
