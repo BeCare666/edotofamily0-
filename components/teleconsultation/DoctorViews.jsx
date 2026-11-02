@@ -5,6 +5,7 @@ import { AlertTriangle, ArrowLeft, CalendarClock, CalendarX2, CheckCircle2, Clip
 import { Badge, Card, Empty, ErrorBox, SectionTitle, Skeleton, StatCard, Tabs } from "../pickup-dashboard/ui";
 import { api, dayLabel, fullLabel, qs, timeLabel } from "./tcShared";
 import { keepSessionDuringVisio } from "../../lib/sessionKeeper";
+import { usePlatformSettings } from "../../lib/platformSettings";
 
 // Espace médecin (19/10/2026) : vues de l'agenda, du rendez-vous (compte rendu) et des disponibilités.
 const statusTone = { booked: "rose", completed: "ok", cancelled: "off", no_show: "wait" };
@@ -406,6 +407,7 @@ export function AppointmentDetail({ id, onBack }) {
 }
 
 export function ScheduleView() {
+    const windowDays = usePlatformSettings()["tc.booking_window_days"]; // réglé par le super admin
     const [data, setData] = useState(null);
     const [rules, setRules] = useState([]);
     const [slot, setSlot] = useState(30);
@@ -458,7 +460,7 @@ export function ScheduleView() {
     if (!data) return <Skeleton className="h-96" />;
     return (
         <div className="space-y-6">
-            <SectionTitle title="Mes disponibilités" subtitle="Heure du Bénin. Les jeunes réservent dans ces plages, sur les 30 prochains jours." action={
+            <SectionTitle title="Mes disponibilités" subtitle={`Heure du Bénin. Les jeunes réservent dans ces plages, sur les ${windowDays} prochains jours.`} action={
                 !data.fixed_hours && <button onClick={save} disabled={busy} className="rounded-xl bg-[#1A1814] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Enregistrement…" : "Enregistrer"}</button>
             } />
             {msg && <p className={`rounded-xl px-4 py-3 text-sm ${msg.ok ? "bg-[#E8EFE6] text-[#3F6B45]" : "bg-[#FDF1E0] text-[#9A5B13]"}`}>{msg.text}</p>}

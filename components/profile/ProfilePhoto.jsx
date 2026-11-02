@@ -3,9 +3,9 @@
 import { useRef, useState } from "react";
 import { Camera, Loader2, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { usePlatformSettings } from "../../lib/platformSettings";
 
 const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
-const MAX = 3 * 1024 * 1024;
 const TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 const initials = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "?";
@@ -20,7 +20,7 @@ export function avatarUrl(user) {
 
 /**
  * Photo de profil (16/10/2026), commune aux utilisateurs, sponsors et points de retrait :
- * aperçu, envoi (JPEG, PNG ou WebP, 3 Mo au plus, vérifiés ici puis par l'API), remplacement, retrait.
+ * aperçu, envoi (JPEG, PNG ou WebP, taille réglée par le super admin, vérifiés ici puis par l'API), remplacement, retrait.
  * onChange(url | null) : prévient la page pour mettre à jour l'utilisateur affiché.
  */
 export default function ProfilePhoto({ user, size = 112, onChange }) {
@@ -28,11 +28,13 @@ export default function ProfilePhoto({ user, size = 112, onChange }) {
     const [busy, setBusy] = useState(false);
     const [preview, setPreview] = useState(null);
     const url = preview ?? avatarUrl(user);
+    // Taille maximale réglée par le super admin (02/11/2026), 3 Mo par défaut
+    const maxMb = usePlatformSettings()["files.photo_max_mb"];
 
     const send = async (file) => {
         if (!file) return;
         if (!TYPES.includes(file.type)) return toast.error("Format non accepté : choisissez une photo JPEG, PNG ou WebP.");
-        if (file.size > MAX) return toast.error("Photo trop lourde : 3 Mo au maximum.");
+        if (file.size > maxMb * 1024 * 1024) return toast.error(`Photo trop lourde : ${maxMb} Mo au maximum.`);
         const local = URL.createObjectURL(file);
         setPreview(local);
         setBusy(true);
@@ -96,7 +98,7 @@ export default function ProfilePhoto({ user, size = 112, onChange }) {
             </div>
             <div className="min-w-0">
                 <p className="text-sm font-medium text-[#1A1814]">Photo de profil</p>
-                <p className="mt-0.5 text-[12.5px] text-[#8A837A]">JPEG, PNG ou WebP, 3 Mo au maximum.</p>
+                <p className="mt-0.5 text-[12.5px] text-[#8A837A]">JPEG, PNG ou WebP, {maxMb} Mo au maximum.</p>
                 <div className="mt-2.5 flex flex-wrap gap-2">
                     <button type="button" onClick={() => input.current?.click()} disabled={busy}
                         className="h-9 rounded-lg border border-[#E6E2DC] px-3.5 text-[13px] font-medium text-[#1A1814] transition hover:border-[#1A1814] disabled:opacity-60">

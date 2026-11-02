@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuthContext } from "../context/AuthContext"
+import { usePlatformSettings } from "../lib/platformSettings"
 import {
     User,
     Mail,
@@ -121,6 +122,7 @@ export default function ProfilePage({ embedded = false }) {
     const isPerson = !["sponsor", "super_pickuppoint"].includes(user.role)
     const birthLocked = !!user.birth_date
     const sexLocked = !!user.sex
+    usePlatformSettings(); // âges réglés par le super admin : nouveau rendu une fois reçus
     const limits = birthDateLimits()
     const errors = {
         name: nameError(form.name, "Le nom complet"),

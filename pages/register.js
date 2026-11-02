@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { usePlatformSettings } from "../lib/platformSettings"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, User, CalendarDays } from "lucide-react"
 import { authService } from "../services/authService"
@@ -26,6 +27,7 @@ export default function RegisterPage() {
     const [alert, setAlert] = useState({ type: "", message: "" })
     const [resendState, setResendState] = useState({ loading: false, message: "" })
 
+    usePlatformSettings(); // âges réglés par le super admin : nouveau rendu une fois reçus
     const limits = birthDateLimits()
     const errors = {
         name: nameError(name, "Le nom complet"),

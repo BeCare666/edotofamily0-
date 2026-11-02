@@ -7,6 +7,7 @@ import { Check, Mail, MapPin, PackageCheck, Send, ShieldCheck, X, Loader2, Chevr
 import PickupPointPicker from "../PickupPointPicker";
 import { deviceMarks } from "../../lib/deviceIdentity";
 import { birthDateError, birthDateLimits, SEX_OPTIONS, sexError } from "../../lib/fieldRules";
+import { usePlatformSettings } from "../../lib/platformSettings";
 
 const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
 const fmt = (d) => new Date(d).toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -123,6 +124,7 @@ export function CampaignRequestFlow({ campaign, onClose, onDone }) {
     const [point, setPoint] = useState(null);
     const [sending, setSending] = useState(false);
     const [done, setDone] = useState(null);
+    usePlatformSettings(); // âges réglés par le super admin : nouveau rendu une fois reçus
     const limits = birthDateLimits();
     const profileErrors = needProfile ? { birthDate: birthDateError(birthDate), sex: sexError(sex) } : { birthDate: "", sex: "" };
     const profileOk = !profileErrors.birthDate && !profileErrors.sex;

@@ -3,9 +3,12 @@
 import { motion } from "framer-motion"
 import { ShieldCheck, Lock, Eye, Heart } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { usePlatformSettings } from "../lib/platformSettings"
 
 export default function PrivacyPage() {
   const router = useRouter()
+  // Durée de conservation des échanges avec l'assistant : réglée par le super admin (90 jours au plus)
+  const aiDays = usePlatformSettings()["ai.log_retention_days"]
 
   // Politique mise à jour le 30/10/2026 selon l'autorisation APDP n° 2026-327/AT/APDP/DST/SC du 25 juin 2026
   // (points a à f) ; chaque point décrit ce que fait réellement la plateforme.
@@ -28,7 +31,7 @@ autorisation n° 2026-327/AT/APDP/DST/SC du 25 juin 2026.`,
 - commandes et paiements : produits, montants, point de retrait choisi, référence du paiement FeexPay (aucun numéro de carte ni code mobile money n'est conservé par E.doto family) ;
 - kits gratuits des campagnes : demande, point de retrait, empreintes techniques de l'appareil servant à limiter une demande par personne ;
 - santé (téléconsultation, adoption d'un contraceptif, suivi) : comptes rendus, notes et rapports, chiffrés dans la base de données ;
-- assistant SSR : questions et réponses, sans nom ni adresse IP, chiffrées et supprimées après 90 jours ;
+- assistant SSR : questions et réponses, sans nom ni adresse IP, chiffrées et supprimées après ${aiDays} jours ;
 - traces de connexion : voir la section « Cookies et traces de connexion ».`,
     },
     {
@@ -51,7 +54,7 @@ Vous consentez librement à la collecte et au transfert des données décrits ic
     {
       title: "Durée de conservation",
       text: `Vos données sont conservées tant que votre compte est actif, puis au plus six (06) mois à compter du moment où il est constaté que vous n'êtes plus actif sur la plateforme ; elles sont ensuite supprimées ou rendues anonymes.
-Les échanges avec l'assistant SSR sont supprimés après 90 jours.
+Les échanges avec l'assistant SSR sont supprimés après ${aiDays} jours.
 Les pièces que la loi oblige à garder plus longtemps (factures, paiements) sont conservées pour la seule durée légale.`,
     },
     {

@@ -12,6 +12,7 @@ import { useChatAI } from "../../context/ChatAIContext";
 import { useAuthContext } from "../../context/AuthContext";
 import { rememberRedirect } from "../../lib/roleHome";
 import { api, clearDraft, dayLabel, downloadIcs, fullLabel, MODE_LABEL, readDraft, saveDraft, timeLabel, token, TZ } from "./tcShared";
+import { usePlatformSettings } from "../../lib/platformSettings";
 
 // Prise de rendez-vous de téléconsultation (19/10/2026), à la manière de Calendly :
 // 1. visio ou appel  2. jour et heure (calendrier réel des médecins)  3. coordonnées  4. confirmation.
@@ -139,6 +140,7 @@ export default function BookingDrawer() {
     const router = useRouter();
     const { bookingOpen, bookingContext, closeBooking, openBooking } = useChatAI();
     const { user } = useAuthContext() || {};
+    const reminderMin = usePlatformSettings()["tc.reminder_minutes"]; // réglé par le super admin
     const [step, setStep] = useState("mode");
     const [mode, setMode] = useState(null);
     const [data, setData] = useState(null);
@@ -603,8 +605,8 @@ export default function BookingDrawer() {
                                             </dl>
                                             <p className="mt-4 text-sm leading-relaxed text-[#57524B]">
                                                 {booked.mode === "video"
-                                                    ? "Le lien de la visio est dans votre e-mail et dans votre dashboard. Vous recevrez un rappel par e-mail moins de 10 minutes avant le début."
-                                                    : `Le médecin vous appellera au ${booked.phone}. Un SMS de rappel vous prévient moins de 10 minutes avant le début.`}
+                                                    ? `Le lien de la visio est dans votre e-mail et dans votre dashboard. Vous recevrez un rappel par e-mail moins de ${reminderMin} minutes avant le début.`
+                                                    : `Le médecin vous appellera au ${booked.phone}. Un SMS de rappel vous prévient moins de ${reminderMin} minutes avant le début.`}
                                             </p>
                                             <div className="mt-6 flex flex-wrap gap-3">
                                                 <button onClick={() => downloadIcs(booked)} className="inline-flex items-center gap-2 rounded-xl border border-[#1A1814] px-5 py-3 text-sm font-semibold text-[#1A1814] transition hover:bg-white">
