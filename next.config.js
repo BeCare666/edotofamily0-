@@ -51,6 +51,10 @@ const nextConfig = {
     async headers() {
         return [{ source: "/(.*)", headers: securityHeaders }];
     },
+    // Ancienne page « Mentions légales & CGV » (octobre 2025) remplacée le 02/11/2026 (APDP, point c)
+    async redirects() {
+        return [{ source: "/cgv", destination: "/mentions-legales", permanent: true }];
+    },
 };
 
 module.exports = nextConfig;

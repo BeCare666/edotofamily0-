@@ -132,7 +132,7 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                         <div>
                             <h4 className="font-semibold text-slate-900 mb-6">Légal</h4>
                             <ul className="space-y-3 text-sm text-slate-600">
-                                <li><button onClick={() => router.push("/cgv")} className="hover:text-pink-500 transition">Mentions légales</button></li>
+                                <li><button onClick={() => router.push("/mentions-legales")} className="hover:text-pink-500 transition">Mentions légales</button></li>
                                 <li><button onClick={() => router.push("/privacy")} className="hover:text-pink-500 transition">Confidentialité</button></li>
                                 <li><button onClick={() => router.push("/credits-photos")} className="hover:text-pink-500 transition">Crédits photos</button></li>
                                 <li><button onClick={() => router.push("/faq")} className="hover:text-pink-500 transition">FAQ</button></li>
