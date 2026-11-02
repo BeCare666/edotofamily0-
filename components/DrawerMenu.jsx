@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import BrandMark from "./BrandMark"
+import UserAvatar from "./UserAvatar";
 import { useAuthContext } from "../context/AuthContext";
 import GoogleFormDrawer from "./GoogleFormDrawer";
 import toast from "react-hot-toast"
@@ -15,7 +16,7 @@ import {
 } from "lucide-react"
 import { SiX } from "react-icons/si"; // icône officielle X
 import { FaFacebookF, FaLinkedinIn, FaTwitter, FaTiktok, FaInstagram, FaYoutube } from "react-icons/fa"
-import { socialItems, useSiteInfo } from "../lib/siteInfo"
+import { socialIcons, useSiteInfo } from "../lib/siteInfo"
 import { useRouter } from "next/navigation"
 
 const links = [
@@ -77,7 +78,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
     tiktok: { icon: <FaTiktok />, color: "#000000" },
     youtube: { icon: <FaYoutube />, color: "#FF0000" },
   }
-  const socialLinks = socialItems(siteInfo).map((s) => ({ ...SOCIAL_STYLE[s.key], url: s.url }))
+  const socialLinks = socialIcons(siteInfo).map((s) => ({ ...SOCIAL_STYLE[s.key], url: s.url }))
   const handleFinalize = () => {
     router.push("/devenir-point-de-retrait");
   };
@@ -112,13 +113,10 @@ export default function DrawerMenu({ isOpen, onClose }) {
               onClick={toggleUserMenu}
               className="w-10 h-10 rounded-full overflow-hidden border border-[#ffb3d9]/40 shadow-sm hover:ring-2 hover:ring-[#FF6EA9]/30 transition-all"
             >
-              <Image
-                src={user?.avatar || "/images/avatar.avif"}
-                alt="user avatar"
-                width={40}
-                height={40}
-                className="object-cover"
-              />
+              {/* Avatar commun au site (02/11/2026) : avant, user.avatar (champ inexistant) affichait toujours une image d'exemple */}
+              {user ? <UserAvatar user={user} size={40} /> : (
+                <Image src="/images/avatar.avif" alt="" width={40} height={40} className="object-cover" />
+              )}
             </button>
 
             {/* DROPDOWN UTILISATEUR */}
@@ -259,20 +257,18 @@ export default function DrawerMenu({ isOpen, onClose }) {
           onClose={() => setOpenForm(false)}
           formUrl="https://docs.google.com/forms/d/e/1FAIpQLScY-R5SkFwByPEDyzW7AxVmEoEc2NSTI4RYYtvlp0w0jhEIjg/viewform?usp=publish-editor"
         />
-        {/* FOOTER / RESEAUX SOCIAUX (« Suivez-nous » masqué tant qu'aucun réseau n'est renseigné) */}
+        {/* FOOTER / RESEAUX SOCIAUX (icônes toujours affichées ; lien actif quand le réseau est renseigné dans l'admin) */}
         <div className="mt-10 border-t border-[#ffd6e8]/50 pt-5 text-center">
-          {socialLinks.length > 0 && (
           <p className="text-xs text-gray-500 mb-3 uppercase tracking-widest">
             Suivez-nous
           </p>
-          )}
           <div className="flex justify-center gap-4 text-gray-600">
             {socialLinks.map((social, i) => (
               <motion.a
                 key={i}
-                href={social.url} // lien réel
-                target="_blank"
-                rel="noopener noreferrer"
+                {...(social.url
+                  ? { href: social.url, target: "_blank", rel: "noopener noreferrer" } // lien réel
+                  : { "aria-disabled": true, title: "Bientôt disponible", role: "img" })}
                 whileHover={{ scale: 1.2 }}
                 transition={{ type: "spring", stiffness: 300 }}
                 className="p-2 rounded-full bg-white/70 shadow-md hover:shadow-lg transition"

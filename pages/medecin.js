@@ -62,7 +62,7 @@ export default function MedecinPage() {
             <SpaceShell
                 space="Espace médecin"
                 roleLabel="Médecin"
-                identity={{ name: me.name, detail: me.email }}
+                identity={{ name: me.name, detail: me.email, user: me }}
                 menu={MENU}
                 view={view === "appointment" ? "appointments" : view}
                 viewKey={view === "appointment" ? `rdv-${openId}` : view}

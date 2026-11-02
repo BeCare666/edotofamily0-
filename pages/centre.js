@@ -229,7 +229,7 @@ export default function CentrePage() {
         if (!router.isReady || !me) return;
         const t = router.query.dossier;
         if (typeof t === "string" && /^[a-f0-9]{48}$/.test(t)) { setDossier({ token: t }); setView("dossier"); }
-    }, [router.isReady, router.query.dossier, me]);
+    }, [router.isReady, router.query.dossier, me?.id]);
 
     const load = useCallback(async () => {
         try {
@@ -237,7 +237,7 @@ export default function CentrePage() {
             setOverview(o); setList(l); setError(null);
         } catch (e) { setError(e.message); }
     }, [status, search]);
-    useEffect(() => { if (me) load(); }, [me, load]);
+    useEffect(() => { if (me) load(); }, [me?.id, load]);
 
     const openToken = useCallback((token) => { setScan(false); setDossier({ token }); setView("dossier"); }, []);
     const openCode = (e) => {
@@ -277,7 +277,7 @@ export default function CentrePage() {
             <SpaceShell
                 space="Espace centre"
                 roleLabel={overview?.center?.organization || "Centre"}
-                identity={{ name: overview?.center?.name || me.name, detail: me.email }}
+                identity={{ name: overview?.center?.name || me.name, detail: me.email, user: me }}
                 menu={MENU.map((m) => ({ ...m, badge: m.key === "referrals" ? overview?.stats?.waiting || 0 : 0 }))}
                 view={view === "dossier" ? "referrals" : view}
                 viewKey={view === "dossier" ? `d-${dossier?.token || dossier?.code}` : view}

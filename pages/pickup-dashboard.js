@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAuthContext } from "../context/AuthContext";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { Loader2 } from "lucide-react";
@@ -20,7 +21,13 @@ const VIEWS = ["overview", "orders", "kits", "history", "profile"];
 // Dashboard du point de retrait : vue d'ensemble, commandes, kits, compte & historique
 export default function PickupDashboardPage() {
     const router = useRouter();
-    const [me, setMe] = useState(null);
+    const [account, setMe] = useState(null);
+    // Photo et nom suivis en direct après un changement dans « Mon profil » (02/11/2026)
+    const auth = useAuthContext() || {};
+    const me = useMemo(
+        () => (account && auth.user && auth.user.id === account.id ? { ...account, name: auth.user.name, profile: auth.user.profile } : account),
+        [account, auth.user]
+    );
     const [denied, setDenied] = useState(null);
     const [view, setView] = useState("overview");
     const [searchInput, setSearchInput] = useState("");
@@ -73,11 +80,11 @@ export default function PickupDashboardPage() {
         } catch { }
     }, []);
     useEffect(() => {
-        if (!me) return;
+        if (!account) return;
         loadNotifications();
         const t = setInterval(loadNotifications, 60000);
         return () => clearInterval(t);
-    }, [me, loadNotifications, refreshKey]);
+    }, [account, loadNotifications, refreshKey]);
 
     const onPeriodChange = (p, d) => {
         setPeriod(p);

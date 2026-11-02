@@ -14,6 +14,7 @@ import { useChatAI } from "../context/ChatAIContext";
 import MyContraception, { nextActionOf } from "../components/contraception/MyContraception";
 import { AdoptionSteps, MethodVisual } from "../components/contraception/ContraShared";
 import { keepSessionDuringVisio } from "../lib/sessionKeeper";
+import UserAvatar from "../components/UserAvatar";
 // « Mes commandes » et les kits gratuits, intégrés au dashboard (21/10/2026)
 const OrdersPanel = dynamic(() => import("../components/orders/OrdersPanel"), { ssr: false });
 // Profil affiché dans le dashboard (30/10/2026), plus sur une page à part
@@ -180,7 +181,7 @@ export default function MonEspacePage() {
         load();
         const h = window.location.hash.replace("#", "");
         if (MENU.some((m) => m.key === h)) setView(h);
-    }, [me, load]);
+    }, [me?.id, load]); // id seulement : un changement de photo ne recharge pas la page
 
     // Après la prise de rendez-vous (tiroir fermé) : étapes et rendez-vous à jour
     useEffect(() => {
@@ -238,7 +239,7 @@ export default function MonEspacePage() {
             <SpaceShell
                 space="Mon dashboard"
                 roleLabel="Mon espace"
-                identity={{ name: me.name, detail: me.email }}
+                identity={{ name: me.name, detail: me.email, user: me }}
                 menu={menu}
                 view={view}
                 onView={changeView}
@@ -363,7 +364,7 @@ export default function MonEspacePage() {
                                 {/* Profil : informations utiles aux rendez-vous et au ciblage des campagnes */}
                                 <Card className="p-5">
                                     <div className="flex items-center gap-3">
-                                        <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#1A1814] text-sm font-semibold text-white">{String(me.name || "?").split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")}</span>
+                                        <UserAvatar user={me} size={44} />
                                         <div className="min-w-0">
                                             <p className="truncate font-medium text-[#1A1814]">{me.name}</p>
                                             <p className="truncate text-[13px] text-[#6B655D]">{me.email}</p>

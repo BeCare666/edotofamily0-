@@ -7,6 +7,7 @@ import { LayoutDashboard, Package, Gift, Wallet, Search, Bell, LogOut, User, Loa
 import { useAuthContext } from "../../context/AuthContext";
 import { api, dateTime, qs } from "./api";
 import DashboardFrame from "../dashboard-ui/DashboardFrame";
+import UserAvatar from "../UserAvatar";
 
 export const MENU = [
     { key: "overview", label: "Vue d’ensemble", icon: LayoutDashboard },
@@ -15,10 +16,6 @@ export const MENU = [
     { key: "history", label: "Compte & historique", icon: Wallet },
     { key: "profile", label: "Mon profil", icon: User },
 ];
-
-function initials(name) {
-    return String(name || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "?";
-}
 
 function useClickOutside(ref, onOutside) {
     useEffect(() => {
@@ -147,7 +144,6 @@ function AvatarMenu({ me }) {
     const router = useRouter();
     const { logout } = useAuthContext() || {};
     useClickOutside(ref, () => setOpen(false));
-    const avatar = me?.profile?.avatar?.url;
     const signOut = async () => {
         try {
             await logout?.();
@@ -159,11 +155,7 @@ function AvatarMenu({ me }) {
     return (
         <div ref={ref} className="relative">
             <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-3 pl-1 pr-1 md:pr-3 py-1 rounded-2xl hover:bg-[#F3F1EE] transition" aria-haspopup="menu" aria-expanded={open}>
-                {avatar ? (
-                    <img src={avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
-                ) : (
-                    <span className="w-10 h-10 rounded-full bg-[#1A1814] text-white text-sm font-semibold flex items-center justify-center">{initials(me?.name)}</span>
-                )}
+                <UserAvatar user={me} size={40} />
                 <span className="hidden md:block text-left">
                     <span className="block text-sm text-[#1A1814] max-w-[160px] truncate">{me?.name}</span>
                     <span className="block text-xs text-[#8A837A]">Point de retrait</span>
@@ -185,7 +177,7 @@ export default function Shell({ me, view, onView, search, onSearch, notification
     return (
         <DashboardFrame
             space="Point de retrait"
-            identity={{ name: me?.name, detail: me?.pickup_address || me?.email }}
+            identity={{ name: me?.name, detail: me?.pickup_address || me?.email, user: me }}
             menu={menu}
             active={view}
             onView={onView}

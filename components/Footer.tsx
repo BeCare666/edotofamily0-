@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import logo from "../public/logo/favicon.png";
 import Image from "next/image"
 import BrandMark from "./BrandMark";
-import { socialItems, telHref, useSiteInfo } from "../lib/siteInfo";
+import { socialIcons, telHref, useSiteInfo } from "../lib/siteInfo";
 
 /* ✅ FIX TS DEFINITIF */
 const MotionDiv = motion.div as React.FC<any>;
@@ -18,7 +18,7 @@ const MotionDiv = motion.div as React.FC<any>;
 type SocialLink = {
     icon: React.ReactNode;
     color: string;
-    url: string;
+    url: string | null;
 };
 
 interface FooterProps {
@@ -39,7 +39,7 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
     const [openCalendly, setOpenCalendly] = React.useState(false);
     const router = useRouter();
     const info = useSiteInfo();
-    const socialLinks: SocialLink[] = socialItems(info).map((s) => ({ ...SOCIAL_STYLE[s.key], url: s.url }));
+    const socialLinks: SocialLink[] = socialIcons(info).map((s) => ({ ...SOCIAL_STYLE[s.key], url: s.url }));
 
     return (
         <>
@@ -69,12 +69,14 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
 
                             {/* Social premium */}
                             <div className="flex gap-4">
-                                {socialLinks.map((social, i) => (
-                                    <a
+                                {socialLinks.map((social, i) => {
+                                    // Réseau pas encore renseigné dans l'admin : icône affichée, sans lien
+                                    const Tag: any = social.url ? "a" : "span";
+                                    const linkProps = social.url ? { href: social.url, target: "_blank", rel: "noopener noreferrer" } : { "aria-disabled": true, title: "Bientôt disponible" };
+                                    return (
+                                    <Tag
                                         key={i}
-                                        href={social.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                        {...linkProps}
                                         className="group"
                                     >
                                         <MotionDiv
@@ -108,8 +110,9 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                                                 {social.icon}
                                             </div>
                                         </MotionDiv>
-                                    </a>
-                                ))}
+                                    </Tag>
+                                    );
+                                })}
                             </div>
                         </div>
 

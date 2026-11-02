@@ -6,8 +6,8 @@ import Image from "next/image";
 import BrandMark from "../BrandMark";
 import emblem from "../../public/logo/favicon.png";
 import { ArrowLeft, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
+import UserAvatar from "../UserAvatar";
 
-const initials = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "?";
 
 // Barre latérale réductible (ordinateur) : choix mémorisé dans ce navigateur seulement
 function useCollapsed(storageKey) {
@@ -76,14 +76,14 @@ export default function DashboardFrame({ space, identity, menu, active, onView, 
                 <p className={`px-6 -mt-1 mb-3 text-[10px] font-medium uppercase tracking-[0.22em] text-[#A8A29A] ${c ? "lg:hidden" : ""}`}>{space}</p>
                 <div className={`mx-4 mb-4 mt-1 px-3 py-2.5 rounded-xl bg-[#F9F8F6] border border-[#EFECE7] ${c ? "lg:mx-auto lg:w-fit lg:p-0 lg:border-0 lg:bg-transparent" : ""}`}>
                     <div className={`flex items-center gap-3 ${c ? "lg:hidden" : ""}`}>
-                        <span className="w-9 h-9 shrink-0 rounded-full bg-[#1A1814] text-white text-xs font-semibold flex items-center justify-center">{initials(identity?.name)}</span>
+                        <UserAvatar user={identity?.user} name={identity?.name} size={36} />
                         <div className="min-w-0">
                             <p className="text-[13px] font-medium text-[#1A1814] truncate">{identity?.name}</p>
                             <p className="text-[11.5px] text-[#8A837A] truncate mt-0.5">{identity?.detail}</p>
                         </div>
                     </div>
-                    <span className={`hidden w-10 h-10 rounded-full bg-[#1A1814] text-white text-[13px] font-semibold items-center justify-center ${c ? "lg:flex" : ""}`} title={identity?.name}>
-                        {initials(identity?.name)}
+                    <span className={`hidden ${c ? "lg:block" : ""}`} title={identity?.name}>
+                        <UserAvatar user={identity?.user} name={identity?.name} size={40} />
                     </span>
                 </div>
 

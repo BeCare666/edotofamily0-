@@ -1,12 +1,10 @@
 "use client";
 import React from "react";
 import { User, ShoppingBag, Star, LogOut, LayoutDashboard } from "lucide-react";
+import UserAvatar from "./UserAvatar";
 
 // Avatar du compte connecté : même présentation que les dashboards admin / point de retrait
 // (photo ou initiales, sans nom à côté). Le clic ouvre les informations ; clic à l'extérieur ou Échap = fermeture.
-const initials = (n?: string | null) =>
-    String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "?";
-
 interface Props {
     user: any;
     onNavigate: (path: string) => void;
@@ -39,7 +37,6 @@ export default function UserAvatarMenu({ user, onNavigate, onLogout, round = fal
         setOpen(false);
         onNavigate(path);
     };
-    const avatar = user?.profile?.avatar?.url;
     // Entrées selon le rôle (19/10/2026) : l'ancien lien « Dashboard » menait à /pickup-dashboard-for-orders
     // (page inexistante) et un sponsor n'avait aucun lien vers son espace.
     const role = user?.role;
@@ -61,25 +58,13 @@ export default function UserAvatarMenu({ user, onNavigate, onLogout, round = fal
                 aria-expanded={open}
                 aria-label="Mon compte"
             >
-                {avatar ? (
-                    <img src={avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
-                ) : (
-                    <span className={`w-10 h-10 rounded-full bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white text-sm font-semibold flex items-center justify-center`}>
-                        {initials(user?.name)}
-                    </span>
-                )}
+                <UserAvatar user={user} size={40} />
             </button>
 
             {open && (
                 <div role="menu" className="dash-pop-in absolute right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-[#FFFDF9] rounded-2xl border border-[#EDE6DC] shadow-2xl overflow-hidden z-[80] p-1.5">
                     <div className="flex items-center gap-3 px-3 py-3 mb-1 rounded-xl bg-[#F6F1EA]">
-                        {avatar ? (
-                            <img src={avatar} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
-                        ) : (
-                            <span className="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white text-sm font-semibold flex items-center justify-center">
-                                {initials(user?.name)}
-                            </span>
-                        )}
+                        <UserAvatar user={user} size={40} />
                         <span className="min-w-0">
                             <span className="block text-sm text-[#1F1B16] truncate">{user?.name || "Mon espace"}</span>
                             <span className="block text-xs text-[#9A8E80] truncate">{user?.email}</span>

@@ -81,7 +81,7 @@ function InDashboard({ children }) {
     <SpaceShell
       space="Mon dashboard"
       roleLabel="Mon espace"
-      identity={{ name: user.name, detail: user.email }}
+      identity={{ name: user.name, detail: user.email, user }}
       menu={YOUTH_MENU}
       view="orders"
       onView={(v) => router.push(`/mon-espace#${v}`)}
