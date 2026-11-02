@@ -13,6 +13,9 @@ import SSRAccessDrawer from "../components/SSRAccessDrawer";
 import Reveal, { PhotoFrame, photoClass } from '../components/home/Reveal';
 import Partners from '../components/home/Partners';
 import servicePhoto from '../public/images/service-bg.jpg';
+import dynamic from 'next/dynamic';
+// Installer l'application (02/11/2026) : guide Android et iPhone, côté navigateur seulement
+const InstallSection = dynamic(() => import('../components/home/InstallSection'), { ssr: false });
 interface HomeProps {
   changeView: (view: ViewState) => void;
 }
@@ -114,6 +117,9 @@ export const Home: React.FC<HomeProps> = ({ changeView }) => {
           </div>
         </div>
       </section>
+
+      {/* Application installable (02/11/2026) */}
+      <InstallSection />
 
       {/* Partenaires techniques et financiers (15/10/2026) */}
       <Partners />

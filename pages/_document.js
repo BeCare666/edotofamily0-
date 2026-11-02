@@ -10,6 +10,14 @@ export default function Document() {
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
                 { /*link for logo or favicon*/}
                 <link rel="icon" href="/logo/favicon.png" />
+                {/* Application installable (02/11/2026) : public/manifest.webmanifest, icônes dans public/app */}
+                <link rel="manifest" href="/manifest.webmanifest" />
+                <link rel="apple-touch-icon" href="/app/apple-touch-icon.png" />
+                <meta name="theme-color" content="#FFFFFF" />
+                <meta name="application-name" content="E.doto family" />
+                <meta name="apple-mobile-web-app-capable" content="yes" />
+                <meta name="apple-mobile-web-app-title" content="E.doto family" />
+                <meta name="apple-mobile-web-app-status-bar-style" content="default" />
                 {/* Police choisie dans l'admin : appliquée avant l'affichage (lib/siteFont.js) */}
                 <script dangerouslySetInnerHTML={{ __html: fontBootScript() }} />
                 <link

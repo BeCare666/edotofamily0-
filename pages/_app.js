@@ -17,6 +17,10 @@ const ChatAIDrawer = dynamic(() => import("../components/ai-chat/ChatAIDrawer"),
 const SSRChoice = dynamic(() => import("../components/teleconsultation/SSRChoice"), { ssr: false });
 const BookingDrawer = dynamic(() => import("../components/teleconsultation/BookingDrawer"), { ssr: false });
 const MobileBottomNav = dynamic(() => import("../components/mobile/MobileBottomNav"), { ssr: false });
+// Application installable (02/11/2026) : invitation sur téléphone + page hors connexion
+const InstallApp = dynamic(() => import("../components/mobile/InstallApp"), { ssr: false });
+import { registerServiceWorker } from "../lib/registerServiceWorker";
+import "../lib/installPrompt"; // capte tôt la proposition d'installation du navigateur (Android)
 const Header = dynamic(() => import("../components/header"), {
   ssr: false,
 });
@@ -32,6 +36,8 @@ export default function MyApp({ Component, pageProps }) {
   }, []);
   // Session fermée après 5 min d'inactivité (29/10/2026) : renouvelée tant que la personne agit
   useEffect(() => startSessionKeeper(), []);
+  // Service worker : seulement la page hors connexion, aucune donnée gardée (public/sw.js)
+  useEffect(() => registerServiceWorker(), []);
   let pathname = usePathname() || ""
   const isHomePage =
     pathname === "/login" ||
@@ -72,6 +78,7 @@ export default function MyApp({ Component, pageProps }) {
         {!isHomePage && <Header />}
         <Component {...pageProps} />
         <CookieConsent />
+        <InstallApp />
         {isHomePagex && <SSRAdvisorButton />}
         <ChatAIDrawer />
         <SSRChoice />
