@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { ShoppingBag, Menu, X, Home, MapPin, Info, CheckCircle, User, Gift, Phone, Target, Flag, FileText, Shield, LogOut, Star, Briefcase, HeartHandshake } from 'lucide-react';
+import { ShoppingBag, Menu, X, Home, MapPin, Info, CheckCircle, User, Gift, Phone, Target, Flag, FileText, Shield, LogOut, Star, Briefcase, HeartHandshake, Scale } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { ViewState } from '../types';
 import { useRouter } from 'next/navigation';
@@ -243,6 +243,14 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView, cartItemCo
                                         >
                                             <Shield size={16} />
                                             Politique de confidentialité
+                                        </button>
+
+                                        <button
+                                            onClick={() => { router.push("/mentions-legales"); setShowUserMenuDesktopx(false); }}
+                                            className="w-full flex items-center gap-3 text-left px-4 py-3 hover:bg-pink-50 transition"
+                                        >
+                                            <Scale size={16} />
+                                            Mentions légales
                                         </button>
 
                                     </div>

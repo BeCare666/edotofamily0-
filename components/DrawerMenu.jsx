@@ -12,7 +12,7 @@ import toast from "react-hot-toast"
 import {
   Home, Info, Phone, Target, Flag, FileText, Shield,
   User, LogOut, ShoppingBag, Star, Briefcase, Gift,
-  HeartHandshake,
+  HeartHandshake, Scale,
 } from "lucide-react"
 import { SiX } from "react-icons/si"; // icône officielle X
 import { FaFacebookF, FaLinkedinIn, FaTwitter, FaTiktok, FaInstagram, FaYoutube } from "react-icons/fa"
@@ -28,6 +28,7 @@ const links = [
   { label: "Nos objectifs", href: "/objectives", icon: <Flag size={18} /> },
   { label: "Termes et conditions", href: "/terms", icon: <FileText size={18} /> },
   { label: "Politique de confidentialité", href: "/privacy", icon: <Shield size={18} /> },
+  { label: "Mentions légales", href: "/mentions-legales", icon: <Scale size={18} /> },
 ]
 
 export default function DrawerMenu({ isOpen, onClose }) {
