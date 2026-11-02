@@ -10,7 +10,8 @@ export const initials = (n) => String(n || "?").split(/\s+/).filter(Boolean).sli
  * Photo de profil (GET /me, quelle que soit sa forme) ; sans photo ou si elle ne se charge pas : initiales sur fond encre.
  * user : l'utilisateur (photo + nom) ; name : nom affiché à la place de user.name (sponsor, centre) ; src : photo déjà connue.
  */
-export default function UserAvatar({ user, name, src, size = 40, className = "" }) {
+// Valeurs par défaut explicites : les fichiers .tsx voient ainsi name et src comme facultatifs (allowJs)
+export default function UserAvatar({ user = null, name = undefined, src = undefined, size = 40, className = "" }) {
     const url = src !== undefined ? src : avatarUrl(user);
     const [failed, setFailed] = useState(false);
     useEffect(() => setFailed(false), [url]);
