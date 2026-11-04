@@ -115,7 +115,8 @@ export default function MobileBottomNav() {
         </div>
       </nav>
 
-      <MenuSheet isOpen={menuOpen} onClose={closeMenu} />
+      {/* Bouton « Assistant SSR » retiré de ce menu (04/11/2026, demande de l'utilisateur) */}
+      <MenuSheet isOpen={menuOpen} onClose={closeMenu} showAssistant={false} />
     </>
   );
 }

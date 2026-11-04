@@ -5,7 +5,8 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { AnimatePresence, motion, useDragControls } from "framer-motion"
 import toast from "react-hot-toast"
-import { ArrowRight, ChevronRight, LayoutDashboard, LogOut, ShoppingBag, Sparkles, User, X } from "lucide-react"
+import { ArrowRight, ChevronRight, LayoutDashboard, LogOut, ShoppingBag, Smartphone, Sparkles, User, X } from "lucide-react"
+import { useShowAndroidApp } from "../../lib/androidApp"
 import UserAvatar from "../UserAvatar"
 import SocialRow from "./SocialRow"
 import { useAuthContext } from "../../context/AuthContext"
@@ -17,7 +18,9 @@ import {
 // Menu du site en panneau qui monte du bas (02/11/2026, maquette validée) : remplace l'ancien tiroir latéral.
 // Utilisé par la barre du bas (téléphone) et par l'en-tête sur tablette.
 // Fermeture : toucher à côté, croix, Échap, glisser vers le bas, ou changement de page.
-export default function MenuSheet({ isOpen, onClose }) {
+// showAssistant (04/11/2026, demande de l'utilisateur) : false depuis la barre du bas du téléphone,
+// où le bouton « Assistant SSR » du menu est retiré ; inchangé depuis l'en-tête sur tablette.
+export default function MenuSheet({ isOpen, onClose, showAssistant = true }) {
     const pathname = usePathname() || ""
     const router = useRouter()
     const { user, logout } = useAuthContext()
@@ -57,6 +60,11 @@ export default function MenuSheet({ isOpen, onClose }) {
     }
     const assistant = () => { onClose(); openChoice() }
     const space = spaceFor(user?.role)
+    // Application Android (04/11/2026) : lien vers /application, seulement sur Android et hors de l'application
+    const showAndroidApp = useShowAndroidApp()
+    const discoverLinks = showAndroidApp
+        ? [...DISCOVER_LINKS, { label: "Télécharger l'application", href: "/application", icon: Smartphone }]
+        : DISCOVER_LINKS
 
     const row = (l) => {
         const Icon = l.icon
@@ -133,7 +141,7 @@ export default function MenuSheet({ isOpen, onClose }) {
                                     </div>
                                 )}
 
-                                <button type="button" onClick={assistant}
+                                {showAssistant && <button type="button" onClick={assistant}
                                     className="relative flex items-center gap-3.5 overflow-hidden rounded-[20px] bg-[linear-gradient(150deg,#D81B60,#8E1247)] p-4 text-left text-white">
                                     <span aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(100%_120%_at_100%_0%,rgba(255,141,187,0.9)_0%,transparent_55%)]" />
                                     <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/20"><Sparkles size={22} /></span>
@@ -142,7 +150,7 @@ export default function MenuSheet({ isOpen, onClose }) {
                                         <span className="block text-xs leading-snug text-white/85">Vos questions sur la santé sexuelle et reproductive</span>
                                     </span>
                                     <ArrowRight size={18} className="relative ml-auto shrink-0" />
-                                </button>
+                                </button>}
 
                                 <section>
                                     <h3 className="mb-2 ml-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[#9A8E80]">Boutique</h3>
@@ -162,7 +170,7 @@ export default function MenuSheet({ isOpen, onClose }) {
 
                                 <section>
                                     <h3 className="mb-2 ml-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[#9A8E80]">Découvrir</h3>
-                                    <div className="overflow-hidden rounded-[18px] border border-[#E9E5DF]">{DISCOVER_LINKS.map(row)}</div>
+                                    <div className="overflow-hidden rounded-[18px] border border-[#E9E5DF]">{discoverLinks.map(row)}</div>
                                 </section>
 
                                 <section>

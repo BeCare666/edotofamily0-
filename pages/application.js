@@ -101,6 +101,18 @@ export default function Application() {
                             <p className="mt-2 break-all font-mono text-[12px] text-[#1A1814]">{SHA256}</p>
                         </div>
                     </div>
+
+                    {/* Deux façons d'installer (04/11/2026, plan étape 9.4) : renvoi vers la façon 2 de l'accueil */}
+                    <div className="mt-3 rounded-2xl border border-[#E9E5DF] bg-white p-5 text-sm text-[#57524B]">
+                        <p className="font-medium text-[#1A1814]">Vous préférez ne rien télécharger ?</p>
+                        <p className="mt-1 leading-relaxed">
+                            Ajoutez simplement l'icône E.doto family sur votre écran d'accueil depuis votre navigateur, sur Android comme sur iPhone.
+                            Le contenu est le même ; une seule des deux façons suffit.
+                        </p>
+                        <a href="/#application" className="mt-2 inline-block font-medium text-[#C2185B] hover:underline">
+                            Voir les deux façons d'installer
+                        </a>
+                    </div>
                 </section>
             </main>
         </>
