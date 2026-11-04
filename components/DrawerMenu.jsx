@@ -12,8 +12,9 @@ import toast from "react-hot-toast"
 import {
   Home, Info, Phone, Target, Flag, FileText, Shield,
   User, LogOut, ShoppingBag, Star, Briefcase, Gift,
-  HeartHandshake, Scale,
+  HeartHandshake, Scale, Smartphone,
 } from "lucide-react"
+import { useShowAndroidApp } from "../lib/androidApp"
 import { SiX } from "react-icons/si"; // icône officielle X
 import { FaFacebookF, FaLinkedinIn, FaTwitter, FaTiktok, FaInstagram, FaYoutube } from "react-icons/fa"
 import { socialIcons, useSiteInfo } from "../lib/siteInfo"
@@ -33,6 +34,11 @@ const links = [
 
 export default function DrawerMenu({ isOpen, onClose }) {
   const [showUserMenu, setShowUserMenu] = useState(false)
+  // Application Android (04/11/2026) : lien vers /application, seulement sur Android et hors de l'application
+  const showAndroidApp = useShowAndroidApp()
+  const menuLinks = showAndroidApp
+    ? [...links, { label: "Télécharger l'application", href: "/application", icon: <Smartphone size={18} /> }]
+    : links
   const [openForm, setOpenForm] = useState(false);
   const [openShop, setOpenShop] = useState(false)
   const router = useRouter()
@@ -233,7 +239,7 @@ export default function DrawerMenu({ isOpen, onClose }) {
                 </div>
               </button>
             </li>
-            {links.map((link) => (
+            {menuLinks.map((link) => (
               <li key={link.href}
                 onClick={onClose}>
                 <Link

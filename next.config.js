@@ -49,7 +49,17 @@ const nextConfig = {
         domains: ["res.cloudinary.com"],
     },
     async headers() {
-        return [{ source: "/(.*)", headers: securityHeaders }];
+        return [
+            { source: "/(.*)", headers: securityHeaders },
+            // Application Android (04/11/2026) : l'APK doit être servi comme fichier Android, et téléchargé
+            {
+                source: "/telechargement/:fichier*",
+                headers: [
+                    { key: "Content-Type", value: "application/vnd.android.package-archive" },
+                    { key: "Content-Disposition", value: "attachment" },
+                ],
+            },
+        ];
     },
     // Ancienne page « Mentions légales & CGV » (octobre 2025) remplacée le 02/11/2026 (APDP, point c)
     async redirects() {

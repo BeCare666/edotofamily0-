@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.edotofamily.app",
+      "sha256_cert_fingerprints": [
+        "62:E8:33:73:C2:DD:32:5D:96:4D:18:04:07:D0:EF:AC:13:1A:59:E9:EC:CE:C0:D3:37:DC:92:EC:EE:35:7D:9E"
+      ]
+    }
+  }
+]

@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import logo from "../public/logo/favicon.png";
 import Image from "next/image"
 import BrandMark from "./BrandMark";
+import { useShowAndroidApp } from "../lib/androidApp";
 import { socialIcons, telHref, useSiteInfo } from "../lib/siteInfo";
 
 /* ✅ FIX TS DEFINITIF */
@@ -39,6 +40,8 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
     const [openCalendly, setOpenCalendly] = React.useState(false);
     const router = useRouter();
     const info = useSiteInfo();
+    // Application Android (04/11/2026) : lien seulement sur Android et hors de l'application
+    const showAndroidApp = useShowAndroidApp();
     const socialLinks: SocialLink[] = socialIcons(info).map((s) => ({ ...SOCIAL_STYLE[s.key], url: s.url }));
 
     return (
@@ -136,6 +139,9 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                                 <li><button onClick={() => router.push("/privacy")} className="hover:text-pink-500 transition">Confidentialité</button></li>
                                 <li><button onClick={() => router.push("/credits-photos")} className="hover:text-pink-500 transition">Crédits photos</button></li>
                                 <li><button onClick={() => router.push("/faq")} className="hover:text-pink-500 transition">FAQ</button></li>
+                                {showAndroidApp && (
+                                    <li><button onClick={() => router.push("/application")} className="hover:text-pink-500 transition">Télécharger l&apos;application</button></li>
+                                )}
                             </ul>
                         </div>
 
