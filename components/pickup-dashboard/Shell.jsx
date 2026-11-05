@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { LayoutDashboard, Package, Gift, Wallet, Search, Bell, LogOut, User, Loader2 } from "lucide-react";
+import { LayoutDashboard, Package, Gift, Wallet, Search, Bell, LogOut, User, Loader2, Settings } from "lucide-react";
 import { useAuthContext } from "../../context/AuthContext";
 import { api, dateTime, qs } from "./api";
 import DashboardFrame from "../dashboard-ui/DashboardFrame";
@@ -14,6 +14,7 @@ export const MENU = [
     { key: "orders", label: "Commandes", icon: Package },
     { key: "kits", label: "Kits de campagne", icon: Gift },
     { key: "history", label: "Compte & historique", icon: Wallet },
+    { key: "settings", label: "Paramètres", icon: Settings },
     { key: "profile", label: "Mon profil", icon: User },
 ];
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import SponsorShell from "../../components/sponsor-dashboard/SponsorShell";
 import { CampaignsView, CampaignView, ExportsView, HomeView } from "../../components/sponsor-dashboard/views";
@@ -10,7 +11,9 @@ import { resetFiltersCache } from "../../components/sponsor-dashboard/filters";
 import { api, token } from "../../components/pickup-dashboard/api";
 import AccessDenied from "../../components/dashboard-ui/AccessDenied";
 
-const VIEWS = ["home", "live", "campaigns", "activity", "points", "cities", "proposals", "exports", "profile"];
+const ProfilePage = dynamic(() => import("../profile"), { ssr: false });
+
+const VIEWS = ["home", "live", "campaigns", "activity", "points", "cities", "proposals", "exports", "settings", "profile"];
 
 // Espace sponsor : campagnes soutenues uniquement, chiffres et graphiques, export validé par l'admin
 export default function SponsorPage() {
@@ -99,6 +102,7 @@ export default function SponsorPage() {
                 {view === "points" && <PointsView />}
                 {view === "cities" && <CitiesView />}
                 {view === "proposals" && <ProposalsView onOpenCampaign={openCampaign} onChanged={loadNotifications} />}
+                {view === "settings" && <ProfilePage embedded part="settings" />}
                 {view === "profile" && <ProfileView sponsor={sponsor} onSaved={() => api("sponsor/me").then(setSponsor).catch(() => { })} />}
             </SponsorShell>
         </>

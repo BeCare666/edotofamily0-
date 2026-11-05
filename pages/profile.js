@@ -19,6 +19,7 @@ import {
     CheckCircle2,
     Loader2,
     Download,
+    HeartHandshake,
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -27,6 +28,7 @@ import { useEffect, useState } from "react"
 import { apiRequest } from "../lib/api" // ✅ On réutilise ton helper existant
 import { authService } from "../services/authService"
 import ProfilePhoto from "../components/profile/ProfilePhoto"
+import PushCard from "../components/push/PushCard"
 import { AuthField, ChoiceField, PasswordField, inputClass } from "../components/auth/AuthShell"
 import {
     ageOn, birthDateError, birthDateLimits, nameError, nameInput, passwordError, passwordInput,
@@ -84,7 +86,10 @@ const PROFILE_IN_DASHBOARD = {
     sponsor: "/sponsor?vue=profile",
 }
 
-export default function ProfilePage({ embedded = false }) {
+// part (05/11/2026, rapports/PLAN_PARAMETRES_COMPTES.md, décision P3) : "info" = Mon profil (photo, informations,
+// état du compte, raccourcis) ; "settings" = Paramètres (notifications des jeunes, lien vers le rappel, partie Compte) ;
+// "all" = page /profile seule, pour les comptes sans espace. onOpenView : ouvre une autre vue de l'espace.
+export default function ProfilePage({ embedded = false, part = "all", onOpenView }) {
     const { user, setUser, logout, loading } = useAuthContext() || {}
     const router = useRouter()
     const [editing, setEditing] = useState(false)
@@ -235,10 +240,60 @@ export default function ProfilePage({ embedded = false }) {
 
     const age = user.birth_date ? ageOn(user.birth_date) : null
 
+    // Partie Compte : dans Paramètres (part "settings") ou en bas de la page /profile seule (part "all")
+    const accountActions = (
+        <div className="overflow-hidden rounded-2xl border border-[#E9E5DF] bg-white">
+                            <button type="button" onClick={() => setShowPasswordModal(true)} className="flex w-full items-center gap-4 border-b border-[#F1EFEB] px-5 py-4 text-left transition hover:bg-[#FBFAF8]">
+                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#57524B]"><KeyRound size={17} strokeWidth={1.8} /></span>
+                                <span className="min-w-0 flex-1">
+                                    <span className="block text-sm font-medium text-[#1A1814]">Changer mon mot de passe</span>
+                                    <span className="block text-[12.5px] text-[#8A837A]">Sécurisez à nouveau votre compte</span>
+                                </span>
+                                <ChevronRight size={16} className="text-[#A8A29A]" />
+                            </button>
+                            <button type="button" onClick={handleLogout} className="flex w-full items-center gap-4 border-b border-[#F1EFEB] px-5 py-4 text-left transition hover:bg-[#FBFAF8]">
+                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#57524B]"><LogOut size={17} strokeWidth={1.8} /></span>
+                                <span className="min-w-0 flex-1">
+                                    <span className="block text-sm font-medium text-[#1A1814]">Se déconnecter</span>
+                                    <span className="block text-[12.5px] text-[#8A837A]">Quitter votre session actuelle</span>
+                                </span>
+                                <ChevronRight size={16} className="text-[#A8A29A]" />
+                            </button>
+                            <button type="button" onClick={handleExport} disabled={loadingExport} className="flex w-full items-center gap-4 border-b border-[#F1EFEB] px-5 py-4 text-left transition hover:bg-[#FBFAF8] disabled:opacity-60">
+                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#57524B]">{loadingExport ? <Loader2 size={17} className="animate-spin" /> : <Download size={17} strokeWidth={1.8} />}</span>
+                                <span className="min-w-0 flex-1">
+                                    <span className="block text-sm font-medium text-[#1A1814]">{loadingExport ? "Préparation..." : "Télécharger mes données"}</span>
+                                    <span className="block text-[12.5px] text-[#8A837A]">Un fichier avec tout ce que nous gardons sur votre compte</span>
+                                </span>
+                                <ChevronRight size={16} className="text-[#A8A29A]" />
+                            </button>
+                            {SELF_DELETE_ROLES.includes(user.role) ? (
+                                <button type="button" onClick={() => setShowDeleteModal(true)} disabled={loadingDelete} className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-[#FDF1EF]">
+                                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FDF1EF] text-[#9B2C2C]"><Trash2 size={17} strokeWidth={1.8} /></span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block text-sm font-medium text-[#9B2C2C]">Supprimer mon compte</span>
+                                        <span className="block text-[12.5px] text-[#8A837A]">Action irréversible : soyez prudent</span>
+                                    </span>
+                                    <ChevronRight size={16} className="text-[#D6B4B0]" />
+                                </button>
+                            ) : (
+                                <a href={`mailto:${RIGHTS_CONTACT}?subject=Suppression de mon compte`} className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-[#FDF1EF]">
+                                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FDF1EF] text-[#9B2C2C]"><Trash2 size={17} strokeWidth={1.8} /></span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block text-sm font-medium text-[#9B2C2C]">Supprimer mon compte</span>
+                                        <span className="block text-[12.5px] text-[#8A837A]">Écrivez à {RIGHTS_CONTACT} : nous réglons d&apos;abord ce qui est en cours</span>
+                                    </span>
+                                    <ChevronRight size={16} className="text-[#D6B4B0]" />
+                                </a>
+                            )}
+                        </div>
+    )
+
     return (
         <main className={embedded ? "" : "min-h-screen bg-[#F9F8F6] px-4 pb-16 pt-8 sm:pt-12"}>
             <div className={embedded ? "max-w-4xl space-y-6" : "mx-auto max-w-4xl space-y-6"}>
                 {/* --- En-tête : photo, nom, rôle --- */}
+                {part !== "settings" && (
                 <section className="rounded-2xl border border-[#E9E5DF] bg-white px-5 py-6 sm:px-8 sm:py-8">
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
                         <ProfilePhoto user={user} onChange={refreshUser} />
@@ -251,7 +306,31 @@ export default function ProfilePage({ embedded = false }) {
                         </div>
                     </div>
                 </section>
+                )}
 
+                {/* --- Paramètres (décisions P1 à P3) --- */}
+                {part === "settings" && (
+                    <div className="max-w-2xl space-y-6">
+                        {user.role === "customer" && (
+                            <>
+                                <PushCard showTopics />
+                                {onOpenView && (
+                                    <button type="button" onClick={() => onOpenView("contraception")} className="flex w-full items-center gap-4 rounded-2xl border border-[#E9E5DF] bg-white px-5 py-4 text-left transition hover:bg-[#FBFAF8]">
+                                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FBEEF3] text-[#C2185B]"><HeartHandshake size={17} strokeWidth={1.8} /></span>
+                                        <span className="min-w-0 flex-1">
+                                            <span className="block text-sm font-medium text-[#1A1814]">Mon rappel contraception</span>
+                                            <span className="block text-[12.5px] text-[#8A837A]">Se règle dans Ma contraception : rythme, heure, arrêt</span>
+                                        </span>
+                                        <ChevronRight size={16} className="text-[#A8A29A]" />
+                                    </button>
+                                )}
+                            </>
+                        )}
+                        {accountActions}
+                    </div>
+                )}
+
+                {part !== "settings" && (
                 <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
                     {/* --- Informations personnelles --- */}
                     <Section
@@ -355,54 +434,10 @@ export default function ProfilePage({ embedded = false }) {
                             </nav>
                         )}
 
-                        {/* --- Sécurité et session --- */}
-                        <div className="overflow-hidden rounded-2xl border border-[#E9E5DF] bg-white">
-                            <button type="button" onClick={() => setShowPasswordModal(true)} className="flex w-full items-center gap-4 border-b border-[#F1EFEB] px-5 py-4 text-left transition hover:bg-[#FBFAF8]">
-                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#57524B]"><KeyRound size={17} strokeWidth={1.8} /></span>
-                                <span className="min-w-0 flex-1">
-                                    <span className="block text-sm font-medium text-[#1A1814]">Changer mon mot de passe</span>
-                                    <span className="block text-[12.5px] text-[#8A837A]">Sécurisez à nouveau votre compte</span>
-                                </span>
-                                <ChevronRight size={16} className="text-[#A8A29A]" />
-                            </button>
-                            <button type="button" onClick={handleLogout} className="flex w-full items-center gap-4 border-b border-[#F1EFEB] px-5 py-4 text-left transition hover:bg-[#FBFAF8]">
-                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#57524B]"><LogOut size={17} strokeWidth={1.8} /></span>
-                                <span className="min-w-0 flex-1">
-                                    <span className="block text-sm font-medium text-[#1A1814]">Se déconnecter</span>
-                                    <span className="block text-[12.5px] text-[#8A837A]">Quitter votre session actuelle</span>
-                                </span>
-                                <ChevronRight size={16} className="text-[#A8A29A]" />
-                            </button>
-                            <button type="button" onClick={handleExport} disabled={loadingExport} className="flex w-full items-center gap-4 border-b border-[#F1EFEB] px-5 py-4 text-left transition hover:bg-[#FBFAF8] disabled:opacity-60">
-                                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F3F1EE] text-[#57524B]">{loadingExport ? <Loader2 size={17} className="animate-spin" /> : <Download size={17} strokeWidth={1.8} />}</span>
-                                <span className="min-w-0 flex-1">
-                                    <span className="block text-sm font-medium text-[#1A1814]">{loadingExport ? "Préparation..." : "Télécharger mes données"}</span>
-                                    <span className="block text-[12.5px] text-[#8A837A]">Un fichier avec tout ce que nous gardons sur votre compte</span>
-                                </span>
-                                <ChevronRight size={16} className="text-[#A8A29A]" />
-                            </button>
-                            {SELF_DELETE_ROLES.includes(user.role) ? (
-                                <button type="button" onClick={() => setShowDeleteModal(true)} disabled={loadingDelete} className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-[#FDF1EF]">
-                                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FDF1EF] text-[#9B2C2C]"><Trash2 size={17} strokeWidth={1.8} /></span>
-                                    <span className="min-w-0 flex-1">
-                                        <span className="block text-sm font-medium text-[#9B2C2C]">Supprimer mon compte</span>
-                                        <span className="block text-[12.5px] text-[#8A837A]">Action irréversible : soyez prudent</span>
-                                    </span>
-                                    <ChevronRight size={16} className="text-[#D6B4B0]" />
-                                </button>
-                            ) : (
-                                <a href={`mailto:${RIGHTS_CONTACT}?subject=Suppression de mon compte`} className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-[#FDF1EF]">
-                                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FDF1EF] text-[#9B2C2C]"><Trash2 size={17} strokeWidth={1.8} /></span>
-                                    <span className="min-w-0 flex-1">
-                                        <span className="block text-sm font-medium text-[#9B2C2C]">Supprimer mon compte</span>
-                                        <span className="block text-[12.5px] text-[#8A837A]">Écrivez à {RIGHTS_CONTACT} : nous réglons d&apos;abord ce qui est en cours</span>
-                                    </span>
-                                    <ChevronRight size={16} className="text-[#D6B4B0]" />
-                                </a>
-                            )}
-                        </div>
+                        {part === "all" && accountActions}
                     </div>
                 </div>
+                )}
             </div>
 
             {/* --- Fenêtre : suppression du compte --- */}

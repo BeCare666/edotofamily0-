@@ -279,8 +279,8 @@ export default function MonEspacePage() {
                             </Card>
                         )}
 
-                        {/* Notifications sur cet appareil (décision D3 : bouton dans Mon espace) */}
-                        <PushCard />
+                        {/* Notifications sur cet appareil (décision D3) : ici tant qu'elles ne sont pas activées, puis dans Paramètres */}
+                        <PushCard onlyUntilOn />
 
                         {/* Chiffres réels du compte */}
                         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -432,7 +432,8 @@ export default function MonEspacePage() {
                     </div>
                 )}
 
-                {view === "profile" && <ProfilePage embedded />}
+                {view === "profile" && <ProfilePage embedded part="info" />}
+                {view === "settings" && <ProfilePage embedded part="settings" onOpenView={changeView} />}
             </SpaceShell>
 
             {cancelling && (

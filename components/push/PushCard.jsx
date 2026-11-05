@@ -3,12 +3,16 @@
 import { Bell, BellOff, Loader2 } from "lucide-react";
 import { Card } from "../pickup-dashboard/ui";
 import { usePush } from "../../lib/push";
+import PushTopics from "./PushTopics";
 
 // Mon espace (04/11/2026, plan notifications étape 2.2, décision D3) : activer ou désactiver les notifications
 // sur cet appareil. Textes discrets sur l'écran verrouillé (décision D2).
-export default function PushCard() {
+// 05/11/2026 (plan Paramètres 1.1) : onlyUntilOn = accueil de Mon espace, la carte disparaît une fois activées ;
+// le réglage se fait alors dans Paramètres (carte sans onlyUntilOn, avec showTopics : choix par sujet, décision P4).
+export default function PushCard({ onlyUntilOn = false, showTopics = false }) {
     const { state, busy, error, enable, disable } = usePush();
     if (state === "loading" || state === "unsupported") return null;
+    if (onlyUntilOn && state === "on") return null;
 
     return (
         <Card className="p-5 sm:p-6">
@@ -39,6 +43,7 @@ export default function PushCard() {
                     </button>
                 ) : null}
             </div>
+            {showTopics && state === "on" && <PushTopics />}
         </Card>
     );
 }

@@ -16,7 +16,7 @@ import ValidateModal from "../components/pickup-dashboard/ValidateModal";
 import { api, todayKeys, token } from "../components/pickup-dashboard/api";
 import AccessDenied from "../components/dashboard-ui/AccessDenied";
 
-const VIEWS = ["overview", "orders", "kits", "history", "profile"];
+const VIEWS = ["overview", "orders", "kits", "history", "settings", "profile"];
 
 // Dashboard du point de retrait : vue d'ensemble, commandes, kits, compte & historique
 export default function PickupDashboardPage() {
@@ -124,7 +124,8 @@ export default function PickupDashboardPage() {
                 {view === "history" && (
                     <HistoryView period={period} date={date} onPeriodChange={onPeriodChange} search={search} refreshKey={refreshKey} />
                 )}
-                {view === "profile" && <ProfilePage embedded />}
+                {view === "profile" && <ProfilePage embedded part="info" />}
+                {view === "settings" && <ProfilePage embedded part="settings" />}
             </Shell>
             {selected && (
                 <ValidateModal

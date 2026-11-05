@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
-import { Home, Megaphone, FileSpreadsheet, Search, Bell, LogOut, CheckCircle2, XCircle, Radio, Activity, MapPin, Building2, Send, Building, Clock } from "lucide-react";
+import { Home, Megaphone, FileSpreadsheet, Search, Bell, LogOut, CheckCircle2, XCircle, Radio, Activity, MapPin, Building2, Send, Building, Clock, Settings } from "lucide-react";
 import { useAuthContext } from "../../context/AuthContext";
 import { dateTime } from "../pickup-dashboard/api";
 import DashboardFrame from "../dashboard-ui/DashboardFrame";
@@ -17,6 +17,8 @@ export const SPONSOR_MENU = [
     { key: "cities", label: "Villes", icon: Building2 },
     { key: "proposals", label: "Demandes de campagne", icon: Send },
     { key: "exports", label: "Exports", icon: FileSpreadsheet },
+    // Paramètres (05/11/2026, rapports/PLAN_PARAMETRES_COMPTES.md, décision P5) : partie Compte
+    { key: "settings", label: "Paramètres", icon: Settings },
     { key: "profile", label: "Mon organisation", icon: Building },
 ];
 
