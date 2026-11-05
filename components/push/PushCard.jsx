@@ -24,7 +24,9 @@ export default function PushCard({ onlyUntilOn = false, showTopics = false }) {
                     <p className="font-medium text-[#1A1814]">Notifications sur cet appareil</p>
                     <p className="mt-1 text-sm leading-relaxed text-[#57524B]">
                         {state === "on"
-                            ? "Activées : commandes, rendez-vous, nouvelles campagnes et votre rappel. Les messages restent discrets sur l’écran verrouillé."
+                            ? (showTopics
+                                ? "Activées sur cet appareil. Choisissez ci-dessous ce que vous recevez ; votre rappel se règle dans Ma contraception. Les messages restent discrets sur l’écran verrouillé."
+                                : "Activées sur cet appareil. Vos choix se règlent dans Paramètres. Les messages restent discrets sur l’écran verrouillé.")
                             : state === "denied"
                                 ? "Bloquées par votre téléphone. Pour les autoriser : réglages du téléphone, Applications (ou Chrome), E.doto family, Notifications."
                                 : "Soyez prévenu(e) quand votre commande avance, avant vos rendez-vous et pour votre rappel. Les messages restent discrets sur l’écran verrouillé."}
