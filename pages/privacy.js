@@ -8,7 +8,11 @@ import { usePlatformSettings } from "../lib/platformSettings"
 export default function PrivacyPage() {
   const router = useRouter()
   // Durée de conservation des échanges avec l'assistant : réglée par le super admin (90 jours au plus)
-  const aiDays = usePlatformSettings()["ai.log_retention_days"]
+  const settings = usePlatformSettings()
+  const aiDays = settings["ai.log_retention_days"]
+  // Nouvelle version (notifications, 04/11/2026) : affichée seulement quand le super admin la met en ligne
+  // (admin, Paramètres avancés, Page Confidentialité) ; sinon la version actuelle reste telle quelle
+  const notificationsVersion = settings["privacy.notifications_published"] === true
 
   // Politique mise à jour le 30/10/2026 selon l'autorisation APDP n° 2026-327/AT/APDP/DST/SC du 25 juin 2026
   // (points a à f) ; chaque point décrit ce que fait réellement la plateforme.
@@ -77,7 +81,8 @@ Prestataires techniques, agissant comme sous-traitants :
 - FeexPay : paiements mobile money et carte ;
 - Groq : réponses de l'assistant SSR (questions transmises sans identité) ;
 - Jitsi (meet.jit.si) : visioconférence des téléconsultations ;
-- OpenStreetMap : carte et calcul d'itinéraire vers les points de retrait.`,
+- OpenStreetMap : carte et calcul d'itinéraire vers les points de retrait.${notificationsVersion ? `
+- service de notification du navigateur (Google pour Android et Chrome, Apple pour iPhone) : acheminement des notifications, sans leur contenu lisible.` : ""}`,
     },
     {
       title: "Transfert des données hors du Bénin",
@@ -92,6 +97,17 @@ Ces transferts sont nécessaires au fonctionnement des services ; vous y consent
 - stockage du navigateur : votre session (fermée après 5 minutes d'inactivité), la reconnaissance de votre appareil après le code reçu par e-mail (30 jours), vos préférences d'affichage.
 Traces côté serveur, pour la sécurité : chaque requête (méthode, adresse masquée, résultat, durée, sans adresse IP) ; l'ouverture d'un dossier de santé et les actions faites dans l'administration (compte, date, adresse IP).`,
     },
+    ...(notificationsVersion
+      ? [
+          {
+            id: "notifications",
+            title: "Notifications",
+            text: `Si vous les activez, E.doto family vous envoie des notifications sur cet appareil : suivi de vos commandes, rendez-vous, nouvelles campagnes et le rappel que vous avez réglé. Les messages restent discrets sur l'écran verrouillé : jamais de produit, de méthode ni de motif de consultation.
+Données gardées : l'adresse d'envoi fournie par votre navigateur et ses clés techniques, rattachées à votre compte ; pour le rappel, le rythme, l'heure et la date que vous avez choisis. Aucun contenu de notification n'est conservé.
+Vous pouvez les désactiver à tout moment dans Mon espace ou dans les réglages du téléphone ; elles sont supprimées avec votre compte.`,
+          },
+        ]
+      : []),
     {
       title: "Sécurité",
       text: `Connexions chiffrées (HTTPS, TLS vers la base), données de santé chiffrées (AES-256), mots de passe stockés sous forme illisible, session fermée après 5 minutes d'inactivité, code reçu par e-mail lors d'une connexion depuis un nouvel appareil.`,

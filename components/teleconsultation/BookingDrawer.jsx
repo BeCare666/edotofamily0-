@@ -13,6 +13,7 @@ import { useAuthContext } from "../../context/AuthContext";
 import { rememberRedirect } from "../../lib/roleHome";
 import { api, clearDraft, dayLabel, downloadIcs, fullLabel, MODE_LABEL, readDraft, saveDraft, timeLabel, token, TZ } from "./tcShared";
 import { usePlatformSettings } from "../../lib/platformSettings";
+import PushOffer from "../push/PushOffer";
 
 // Prise de rendez-vous de téléconsultation (19/10/2026), à la manière de Calendly :
 // 1. visio ou appel  2. jour et heure (calendrier réel des médecins)  3. coordonnées  4. confirmation.
@@ -608,6 +609,8 @@ export default function BookingDrawer() {
                                                     ? `Le lien de la visio est dans votre e-mail et dans votre dashboard. Vous recevrez un rappel par e-mail moins de ${reminderMin} minutes avant le début.`
                                                     : `Le médecin vous appellera au ${booked.phone}. Un SMS de rappel vous prévient moins de ${reminderMin} minutes avant le début.`}
                                             </p>
+                                            {/* Notifications push (04/11/2026, décision D3) : proposition discrète après la réservation */}
+                                            <div className="mt-5"><PushOffer text="Être prévenu(e) sur ce téléphone avant votre rendez-vous ?" /></div>
                                             <div className="mt-6 flex flex-wrap gap-3">
                                                 <button onClick={() => downloadIcs(booked)} className="inline-flex items-center gap-2 rounded-xl border border-[#1A1814] px-5 py-3 text-sm font-semibold text-[#1A1814] transition hover:bg-white">
                                                     <CalendarPlus size={16} /> Ajouter à mon agenda

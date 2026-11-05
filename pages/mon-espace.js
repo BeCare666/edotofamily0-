@@ -15,6 +15,9 @@ import MyContraception, { nextActionOf } from "../components/contraception/MyCon
 import { AdoptionSteps, MethodVisual } from "../components/contraception/ContraShared";
 import { keepSessionDuringVisio } from "../lib/sessionKeeper";
 import UserAvatar from "../components/UserAvatar";
+// Notifications push et rappel contraception (04/11/2026, rapports/PLAN_NOTIFICATIONS_PUSH.md)
+const PushCard = dynamic(() => import("../components/push/PushCard"), { ssr: false });
+const ReminderCard = dynamic(() => import("../components/push/ReminderCard"), { ssr: false });
 // « Mes commandes » et les kits gratuits, intégrés au dashboard (21/10/2026)
 const OrdersPanel = dynamic(() => import("../components/orders/OrdersPanel"), { ssr: false });
 // Profil affiché dans le dashboard (30/10/2026), plus sur une page à part
@@ -276,6 +279,9 @@ export default function MonEspacePage() {
                             </Card>
                         )}
 
+                        {/* Notifications sur cet appareil (décision D3 : bouton dans Mon espace) */}
+                        <PushCard />
+
                         {/* Chiffres réels du compte */}
                         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                             {[
@@ -380,7 +386,13 @@ export default function MonEspacePage() {
                     </div>
                 )}
 
-                {view === "contraception" && <MyContraception requests={contra} onBook={bookFor} onChanged={load} />}
+                {view === "contraception" && (
+                    <div className="space-y-6">
+                        <MyContraception requests={contra} onBook={bookFor} onChanged={load} />
+                        {/* Rappel à rythme libre (décision D4) */}
+                        <ReminderCard />
+                    </div>
+                )}
 
                 {view === "appointments" && (
                     <div>

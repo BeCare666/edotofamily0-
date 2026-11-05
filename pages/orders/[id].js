@@ -30,6 +30,7 @@ import SpaceShell from "../../components/teleconsultation/SpaceShell";
 import { YOUTH_MENU } from "../../components/dashboard-ui/youthMenu";
 import { useAuthContext } from "../../context/AuthContext";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
+const PushOffer = dynamic(() => import("../../components/push/PushOffer"), { ssr: false });
 //import PickupMapModal from "../pickupmap/PickupMapModal";
 const PickupMapModal = dynamic(
   () => import("../../components/pickupmap/PickupMapModal"),
@@ -437,6 +438,10 @@ export default function OrderDetailsPage() {
           </motion.section>
 
           <div className="min-w-0 space-y-5">
+            {/* Notifications push (04/11/2026, décision D3) : proposition discrète une fois la commande payée, avant le retrait */}
+            {order.payment_status === "payment-success" && !withdrawn && (
+              <PushOffer text="Être prévenu(e) sur ce téléphone quand votre commande avance ?" />
+            )}
             {/* Code de retrait (commande payée) */}
             {order.payment_status === "payment-success" && (() => {
               const expiresAt = order.otp_expires_at ? new Date(order.otp_expires_at) : null;
