@@ -32,7 +32,17 @@ self.addEventListener("push", (event) => {
   } catch {
     data = {};
   }
-  const url = typeof data.url === "string" && data.url.startsWith("/") ? data.url : "/";
+  // Adresse du site seulement (06/11/2026) : « //autre-site » ou « /\autre-site » commencent aussi par « / »
+  // et ouvriraient un autre site. L'adresse est lue par le navigateur et gardée seulement si elle reste sur ce site.
+  let url = "/";
+  if (typeof data.url === "string" && data.url.startsWith("/")) {
+    try {
+      const u = new URL(data.url, self.location.origin);
+      if (u.origin === self.location.origin) url = u.pathname + u.search + u.hash;
+    } catch {
+      url = "/";
+    }
+  }
   event.waitUntil(
     self.registration.showNotification(data.title || "E.doto family", {
       body: data.body || "",
