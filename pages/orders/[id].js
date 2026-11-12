@@ -29,6 +29,7 @@ import dynamic from "next/dynamic";
 import SpaceShell from "../../components/teleconsultation/SpaceShell";
 import { YOUTH_MENU } from "../../components/dashboard-ui/youthMenu";
 import { useAuthContext } from "../../context/AuthContext";
+import { availabilityText } from "../../lib/pickupRounds";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 const PushOffer = dynamic(() => import("../../components/push/PushOffer"), { ssr: false });
 //import PickupMapModal from "../pickupmap/PickupMapModal";
@@ -510,6 +511,12 @@ export default function OrderDetailsPage() {
                   <p className="mt-0.5 text-[13px] text-[#8A847D]">
                     {order.pickup_point ? "Point de retrait E.doto family" : order.note ? "Lieu personnalisé" : paid ? "Choisissez-le pour recevoir votre commande." : "Disponible après le paiement de la commande."}
                   </p>
+                  {/* Tournées (12/11/2026, 2.2) : heure de disponibilité au point, puis « Disponible depuis … » */}
+                  {order.pickup_point && paid && !withdrawn && availabilityText(order) && (
+                    <p className={`mt-3 text-[14px] font-medium ${order.available_notified_at ? "text-[#15803D]" : "text-[#161412]"}`}>
+                      {availabilityText(order)}
+                    </p>
+                  )}
                   {canVisit && (
                     <button onClick={() => setOpenMap(true)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#E2DCD5] px-4 py-3 text-sm font-medium text-[#161412] transition hover:border-[#161412]">
                       <Navigation size={15} strokeWidth={1.8} /> Itinéraire vers le point

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { List, Map as MapIcon, Search, LocateFixed, Loader2, MapPinOff, Navigation } from "lucide-react";
 import { NEARBY_RADIUS_KM } from "./map/mapConfig";
 import { formatDistance, formatWithdrawals } from "./map/geo";
+import { nextRoundLabel, useNextRounds } from "../lib/pickupRounds";
 
 const PickupPointsMap = dynamic(() => import("./map/PickupPointsMap"), {
     ssr: false,
@@ -97,6 +98,9 @@ export default function PickupPointPicker({ selectedId, onSelect, city = null })
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
     const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     const noNearby = scope === "nearby" && !loading && !error && points.length === 0;
+    // Tournées (12/11/2026, D9) : heure prévue sous chaque point affiché, et sous la carte pour le point choisi
+    const rounds = useNextRounds([...pageData.map((p) => p.id), selectedId]);
+    const selectedRound = selectedId ? nextRoundLabel(rounds[Number(selectedId)]) : null;
 
     const choose = useCallback((p) => {
         if (p.status === "blocked") return;
@@ -173,6 +177,7 @@ export default function PickupPointPicker({ selectedId, onSelect, city = null })
                     </button>
                 </div>
             ) : view === "map" ? (
+                <>
                 <div className="h-[340px] rounded-2xl overflow-hidden border border-gray-100">
                     <PickupPointsMap
                         points={filtered}
@@ -182,6 +187,8 @@ export default function PickupPointPicker({ selectedId, onSelect, city = null })
                         onSelect={choose}
                     />
                 </div>
+                {selectedRound && <p className="text-sm font-medium text-[#15803D]">{selectedRound}</p>}
+                </>
             ) : (
                 <>
                     <ul className="max-h-80 overflow-y-auto pr-1 space-y-2.5">
@@ -203,6 +210,11 @@ export default function PickupPointPicker({ selectedId, onSelect, city = null })
                                             </span>
                                             {p.pickup_address && <span className="block text-sm text-gray-500 truncate">{p.pickup_address}</span>}
                                             <span className="block text-xs text-gray-500 mt-0.5">{formatWithdrawals(p.withdrawals_count)}</span>
+                                            {!blocked && nextRoundLabel(rounds[Number(p.id)]) && (
+                                                <span className={`block text-xs mt-0.5 font-medium ${rounds[Number(p.id)]?.closed_on ? "text-amber-700" : "text-[#15803D]"}`}>
+                                                    {nextRoundLabel(rounds[Number(p.id)])}
+                                                </span>
+                                            )}
                                         </span>
                                         {p.distance_km != null && (
                                             <span className="shrink-0 text-sm font-semibold text-[#0B57D0]">{formatDistance(p.distance_km * 1000)}</span>

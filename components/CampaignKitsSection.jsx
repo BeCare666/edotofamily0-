@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
 import { Gift, CheckCircle, Clock, Loader2, MapPin } from "lucide-react";
+import { availabilityText } from "../lib/pickupRounds";
 
 const PickupMapModal = dynamic(() => import("./pickupmap/PickupMapModal"), { ssr: false });
 
@@ -97,6 +98,10 @@ export default function CampaignKitsSection() {
                             </div>
 
                             <div className="mt-3 text-sm">
+                                {/* Tournées (12/11/2026, 2.2) */}
+                                {!withdrawn && availabilityText(reg) && (
+                                    <p className={`mb-2 font-medium ${reg.available_notified_at ? "text-green-700" : "text-[#0F172A]"}`}>{availabilityText(reg)}</p>
+                                )}
                                 {withdrawn ? (
                                     <p className="text-green-700 flex items-center gap-2">
                                         <CheckCircle size={18} /> Kit retiré

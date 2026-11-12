@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { BellIcon } from "./navIcons";
 import { useAuthContext } from "../../context/AuthContext";
+import { availabilityShort } from "../../lib/pickupRounds";
 
 // Cloche du site : uniquement des données réelles de l'API.
 //  - tout le monde : campagnes en cours (GET /campaigns/active) ;
@@ -28,6 +29,9 @@ function orderMessage(o) {
     return { title: o.delivery_type === "CUSTOM" ? "Commande livrée" : "Commande retirée", tone: "green" };
   }
   if (o.payment_status === "payment-success") {
+    // Tournées (12/11/2026, 2.3) : « Commande payée · disponible le … à … », puis « Commande disponible au point de retrait »
+    if (o.delivery_type !== "CUSTOM" && o.available_notified_at) return { title: "Commande disponible au point de retrait", tone: "green" };
+    if (o.delivery_type !== "CUSTOM" && availabilityShort(o)) return { title: `Commande payée · ${availabilityShort(o)}`, tone: "pink" };
     return { title: o.delivery_type === "CUSTOM" ? "Commande payée · livraison à venir" : "Commande payée · à retirer", tone: "pink" };
   }
   if (o.payment_status === "payment-failed") return { title: "Paiement échoué", tone: "red" };
@@ -111,7 +115,7 @@ export default function SiteNotificationBell() {
       if (at && new Date(at).getTime() < since) continue;
       const m = orderMessage(o);
       out.push({
-        key: `order-${o.id}-${o.order_status}-${o.payment_status}`,
+        key: `order-${o.id}-${o.order_status}-${o.payment_status}${o.available_at ? `-${o.available_notified_at ? "dispo" : new Date(o.available_at).getTime()}` : ""}`,
         tone: m.tone,
         title: m.title,
         body: `${o.tracking_number || `Commande #${o.id}`} · ${fcfa(o.total)}`,
@@ -123,9 +127,16 @@ export default function SiteNotificationBell() {
       const at = r.picked_up_at || r.created_at;
       if (at && new Date(at).getTime() < since) continue;
       out.push({
-        key: `reg-${r.id}-${r.picked_up ? 1 : 0}`,
-        tone: r.picked_up ? "green" : "pink",
-        title: r.picked_up ? "Kit retiré" : "Inscription confirmée · kit à retirer",
+        key: `reg-${r.id}-${r.picked_up ? 1 : 0}${!r.picked_up && r.available_at ? `-${r.available_notified_at ? "dispo" : new Date(r.available_at).getTime()}` : ""}`,
+        tone: r.picked_up || r.available_notified_at ? "green" : "pink",
+        // Tournées (D4 : mêmes règles que les commandes)
+        title: r.picked_up
+          ? "Kit retiré"
+          : r.available_notified_at
+            ? "Kit disponible au point de retrait"
+            : availabilityShort(r)
+              ? `Inscription confirmée · kit ${availabilityShort(r)}`
+              : "Inscription confirmée · kit à retirer",
         body: `${r.campaign_title}${r.pickup_center_name ? ` · ${r.pickup_center_name}` : ""}`,
         href: "/orders",
         at,

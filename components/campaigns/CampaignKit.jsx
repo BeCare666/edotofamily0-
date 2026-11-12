@@ -8,6 +8,7 @@ import PickupPointPicker from "../PickupPointPicker";
 import { deviceMarks } from "../../lib/deviceIdentity";
 import { birthDateError, birthDateLimits, SEX_OPTIONS, sexError } from "../../lib/fieldRules";
 import { usePlatformSettings } from "../../lib/platformSettings";
+import { availabilityText } from "../../lib/pickupRounds";
 
 const API = process.env.NEXT_PUBLIC_REST_API_ENDPOINT;
 const fmt = (d) => new Date(d).toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -41,8 +42,13 @@ export function kitSteps(reg) {
 export function KitStepsTracker({ reg, onRegenerate, regenerating }) {
     const { steps, expired, withdrawn } = kitSteps(reg);
     const current = steps.findIndex((s) => !s.done);
+    // Tournées (12/11/2026, 2.2) : heure de disponibilité au point, puis « Disponible depuis … »
+    const availability = !withdrawn ? availabilityText(reg) : null;
     return (
         <div>
+            {availability && (
+                <p className={`mb-5 text-center text-[14px] font-medium ${reg.available_notified_at ? "text-[#15803D]" : "text-[#161412]"}`}>{availability}</p>
+            )}
             <ol className="flex items-start">
                 {steps.map((s, i) => {
                     const Icon = s.icon;
@@ -248,7 +254,7 @@ export function CampaignRequestFlow({ campaign, onClose, onDone }) {
                                     Votre code de retrait vient de vous être envoyé par e-mail. Présentez-le à <span className="font-medium text-[#161412]">{done.pickup_center_name || point?.name}</span> pour recevoir votre kit.
                                 </p>
                                 <div className="mx-auto mt-7 max-w-lg rounded-xl border border-[#EDE8E2] p-5">
-                                    <KitStepsTracker reg={{ created_at: new Date().toISOString(), otp_expires_at: done.otp_expires_at, otp_used: 0, picked_up: 0 }} />
+                                    <KitStepsTracker reg={{ created_at: new Date().toISOString(), otp_expires_at: done.otp_expires_at, available_at: done.available_at, otp_used: 0, picked_up: 0 }} />
                                 </div>
                                 <p className="mt-4 text-[12px] text-[#8A847D]">Le suivi reste disponible sur cette page et dans « Mes commandes ».</p>
                                 <button type="button" onClick={onClose} className="mt-6 h-12 w-full rounded-full bg-[#161412] text-sm font-medium text-white sm:w-auto sm:px-12">

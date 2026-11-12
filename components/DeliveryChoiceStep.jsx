@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Store, Bike, LocateFixed, Loader2, ArrowLeft } from "lucide-react";
 import PickupPointPicker from "./PickupPointPicker";
+import { nextRoundLabel, useNextRounds } from "../lib/pickupRounds";
 
 const LocationPickerMap = dynamic(() => import("./map/LocationPickerMap"), {
     ssr: false,
@@ -34,6 +35,8 @@ export default function DeliveryChoiceStep({ productsTotal, onBack, onConfirm, s
     const [description, setDescription] = useState("");
     const [phone, setPhone] = useState("");
     const [quote, setQuote] = useState({ status: "idle", data: null, error: null });
+    // Tournées (12/11/2026, D9) : heure prévue au point choisi (la livraison à domicile n'est pas concernée)
+    const pointRound = nextRoundLabel(useNextRounds([point?.id])[Number(point?.id)]);
 
     const useMyPosition = useCallback(() => {
         if (!navigator.geolocation) {
@@ -132,6 +135,7 @@ export default function DeliveryChoiceStep({ productsTotal, onBack, onConfirm, s
                     {point && (
                         <p className="mt-3 text-sm text-gray-700">
                             Point choisi : <span className="font-semibold">{point.name}</span>
+                            {pointRound && <span className="block text-[#15803D] font-medium">{pointRound}</span>}
                         </p>
                     )}
                 </div>
