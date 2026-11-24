@@ -5,7 +5,6 @@ import { Mail, Phone, MapPin } from "lucide-react";
 import { FaFacebookF, FaLinkedinIn, FaTiktok, FaInstagram, FaYoutube } from "react-icons/fa";
 import { SiX } from "react-icons/si";
 import { useRouter } from "next/navigation";
-import CalendlyDrawer from "./CalendlyDrawer";
 import { motion } from "framer-motion";
 import logo from "../public/logo/favicon.png";
 import Image from "next/image"
@@ -37,7 +36,6 @@ const SOCIAL_STYLE: Record<string, { icon: React.ReactNode; color: string }> = {
 };
 
 export const Footer: React.FC<FooterProps> = ({ changeView }) => {
-    const [openCalendly, setOpenCalendly] = React.useState(false);
     const router = useRouter();
     const info = useSiteInfo();
     // Application Android (04/11/2026) : lien seulement sur Android et hors de l'application
@@ -175,10 +173,6 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                 </div>
             </footer>
 
-            <CalendlyDrawer
-                isOpen={openCalendly}
-                onClose={() => setOpenCalendly(false)}
-            />
         </>
     );
 };

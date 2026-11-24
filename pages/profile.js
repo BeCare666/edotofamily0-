@@ -105,6 +105,11 @@ export default function ProfilePage({ embedded = false, part = "all", onOpenView
     const [pwdTouched, setPwdTouched] = useState(false)
     const [loadingPwd, setLoadingPwd] = useState(false)
 
+    // Âges réglés par le super admin : nouveau rendu une fois reçus. Appelé AVANT le retour anticipé
+    // « Chargement du profil » (23/11/2026) : appelé après, il plantait la page (Paramètres de l'espace
+    // sponsor notamment) au moment où le compte finissait de charger (nombre de hooks différent).
+    usePlatformSettings()
+
     useEffect(() => {
         if (!loading && !user) router.push("/login")
         else if (!embedded && user && PROFILE_IN_DASHBOARD[user.role]) router.replace(PROFILE_IN_DASHBOARD[user.role])
@@ -127,7 +132,6 @@ export default function ProfilePage({ embedded = false, part = "all", onOpenView
     const isPerson = !["sponsor", "super_pickuppoint"].includes(user.role)
     const birthLocked = !!user.birth_date
     const sexLocked = !!user.sex
-    usePlatformSettings(); // âges réglés par le super admin : nouveau rendu une fois reçus
     const limits = birthDateLimits()
     const errors = {
         name: nameError(form.name, "Le nom complet"),

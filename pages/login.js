@@ -41,7 +41,7 @@ export default function LoginPage() {
         password: password ? "" : "Le mot de passe est obligatoire.",
     }
 
-    // Point de retrait en attente : son e-mail n'est peut-être pas confirmé (lien valable 5 min)
+    // Point de retrait en attente : son e-mail n'est peut-être pas confirmé (lien valable 24 h)
     const handleResendVerification = async () => {
         setResendState({ loading: true, message: "" })
         try {

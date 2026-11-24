@@ -57,7 +57,8 @@ export default function MyApp({ Component, pageProps }) {
 
     pathname.startsWith("/admin") ||
     pathname === "/forgot-password" ||
-    pathname === "/succesregister"
+    pathname === "/succesregister" ||
+    pathname === "/confirmation-email"
 
   // Pages sans pied de page : « Mes commandes » et « Campagnes »
   const hideFooter = pathname === "/orders" || pathname === "/campaigns"

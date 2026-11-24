@@ -1,11 +1,9 @@
 import React from "react";
 import { Heart, Baby, Sparkles, User, ShieldCheck, Gift, ShoppingBag } from "lucide-react";
-import CalendlyDrawer from "./CalendlyDrawer";
 import { useRouter } from 'next/navigation'
 
 const Hero: React.FC = () => {
     const router = useRouter()
-    const [openCalendly, setOpenCalendly] = React.useState(false);
     return (
         <section className="relative overflow-hidden pt-3 lg:pt-2">
             {/* Background Decor */}

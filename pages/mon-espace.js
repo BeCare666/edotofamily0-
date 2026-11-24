@@ -68,7 +68,11 @@ function AppointmentCard({ a, onCancel, big = false }) {
                     <Badge tone={statusTone[a.status] || "ink"}>{a.status_label}</Badge>
                 </div>
             </div>
-            <p className="mt-3 text-sm text-[#57524B]">Avec {a.doctor?.name}{a.doctor?.title ? `, ${a.doctor.title}` : ""}</p>
+            <p className="mt-3 text-sm text-[#57524B]">
+                Avec {a.doctor?.name}{a.doctor?.title ? `, ${a.doctor.title}` : ""}
+                {/* Téléconsultation payante (23/11/2026) */}
+                {a.paid && a.price > 0 && <> · Payée {Number(a.price).toLocaleString("fr-FR")} FCFA</>}
+            </p>
             {a.status === "booked" && (
                 <p className="mt-1 text-sm text-[#57524B]">
                     {a.mode === "video" ? "Le lien de la visio s’active 15 minutes avant le début." : `Le médecin vous appellera au ${a.phone}.`}

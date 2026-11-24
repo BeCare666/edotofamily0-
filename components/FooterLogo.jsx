@@ -5,30 +5,29 @@ import DrawerMenu from "./DrawerMenu";
 import Image from "next/image";
 import Logo from "../public/logo/logo.png";
 import CalendarIcon from "../public/icons/calendar.jpg";
-import CalendlyDrawer from "./CalendlyDrawer";
+import { useChatAI } from "../context/ChatAIContext";
 export default function FooterLogo() {
   const [openMenu, setOpenMenu] = useState(false);
-  const [openCalendly, setOpenCalendly] = useState(false);
+  const { openBooking } = useChatAI();
 
   return (
     <>
       {/* --- Drawers --- */}
       <DrawerMenu isOpen={openMenu} onClose={() => setOpenMenu(false)} />
-      <CalendlyDrawer isOpen={openCalendly} onClose={() => setOpenCalendly(false)} />
 
       {/* --- Floating Button Group (bottom-right) <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-10">--- */}
 
       <div className="fixed bottom-[35px] left-1/2 transform -translate-x-1/2 flex flex-row items-center gap-3 z-10">
-        {/* --- Calendly Button --- */}
+        {/* --- Prise de rendez-vous (23/11/2026, plus de Calendly) --- */}
         <motion.button
-          onClick={() => setOpenCalendly(true)}
+          onClick={() => openBooking()}
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.95 }}
           className="w-[56px] h-[56px] rounded-full bg-white  backdrop-blur-xl shadow-lg border border-[#FF6EA9]/30 flex items-center justify-center hover:shadow-2xl transition-all"
         >
           <Image
             src={CalendarIcon}
-            alt="Calendly"
+            alt="Prendre rendez-vous"
             className="w-7 h-7 opacity-80 hover:opacity-100 transition-all"
           />
         </motion.button>

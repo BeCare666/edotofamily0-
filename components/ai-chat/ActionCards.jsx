@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { CalendarCheck, Gift, HeartHandshake, Phone, ArrowUpRight, MapPin } from "lucide-react";
+import { useChatAI } from "../../context/ChatAIContext";
 
 const appear = {
     initial: { opacity: 0, y: 10, scale: 0.98 },
@@ -10,12 +11,14 @@ const appear = {
     transition: { type: "spring", stiffness: 320, damping: 28 },
 };
 
-function CalendlyButton({ url, t, variant = "solid" }) {
+// Rendez-vous (23/11/2026) : plus de lien Calendly, le bouton ouvre la prise de rendez-vous du site
+// (créneaux des médecins E.doto family), comme « Prendre rendez-vous » dans Mon espace.
+function BookingButton({ t, variant = "solid" }) {
+    const { openBooking } = useChatAI();
     return (
-        <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
+        <button
+            type="button"
+            onClick={() => openBooking()}
             className={
                 variant === "solid"
                     ? "inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#FF6EA9] to-[#f0468f] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(255,110,169,0.7)] transition hover:shadow-[0_10px_28px_-8px_rgba(255,110,169,0.9)] hover:brightness-105 active:scale-[0.98]"
@@ -24,8 +27,7 @@ function CalendlyButton({ url, t, variant = "solid" }) {
         >
             <CalendarCheck size={16} />
             {t.expertCta}
-            <ArrowUpRight size={14} className="opacity-80" />
-        </a>
+        </button>
     );
 }
 
@@ -41,7 +43,7 @@ function ExpertCard({ action, t }) {
                 <div className="min-w-0 flex-1">
                     <p className="font-semibold text-slate-900">{t.expertTitle}</p>
                     <p className="mt-0.5 text-sm text-slate-500">{t.expertText}</p>
-                    <div className="mt-3"><CalendlyButton url={action.url} t={t} /></div>
+                    <div className="mt-3"><BookingButton t={t} /></div>
                 </div>
             </div>
         </motion.div>
@@ -65,7 +67,7 @@ function EmergencyCard({ action, t }) {
                     ))}
                 </div>
             )}
-            <div className="mt-3"><CalendlyButton url={action.calendlyUrl} t={t} variant="outline" /></div>
+            <div className="mt-3"><BookingButton t={t} variant="outline" /></div>
         </motion.div>
     );
 }
@@ -143,7 +145,7 @@ export default function ActionCards({ actions, t }) {
     return (
         <div className="mt-3 space-y-3">
             {actions.map((a, i) => {
-                if (a.type === "calendly") return <ExpertCard key={i} action={a} t={t} />;
+                if (a.type === "booking" || a.type === "calendly") return <ExpertCard key={i} action={a} t={t} />;
                 if (a.type === "emergency") return <EmergencyCard key={i} action={a} t={t} />;
                 if (a.type === "products" && a.items?.length) return <ProductsCard key={i} action={a} t={t} />;
                 if (a.type === "campaigns" && a.items?.length) return <CampaignsCard key={i} action={a} t={t} />;

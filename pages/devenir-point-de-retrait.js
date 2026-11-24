@@ -140,7 +140,7 @@ export default function PickupPointRegisterPage() {
                     <CheckCircle2 size={44} strokeWidth={1.5} className="mx-auto mb-4 text-[#2F5D3A]" />
                     <h1 className="mb-4 text-xl font-semibold text-[#1A1814]">Demande enregistrée</h1>
                     <ol className="mb-6 space-y-2 rounded-xl border border-[#EFECE7] bg-[#F9F8F6] p-4 text-left text-sm text-[#57524B]">
-                        <li><strong>1.</strong> Confirmez votre adresse e-mail grâce au lien reçu à <strong>{email}</strong> (valable 5 minutes).</li>
+                        <li><strong>1.</strong> Confirmez votre adresse e-mail grâce au lien reçu à <strong>{email}</strong> (valable 24 heures).</li>
                         <li><strong>2.</strong> Notre équipe vérifie votre point de retrait.</li>
                         <li><strong>3.</strong> Une fois validé, vous pourrez vous connecter à votre espace partenaire.</li>
                     </ol>

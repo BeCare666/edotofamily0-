@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    ArrowLeft, ArrowRight, CalendarPlus, Check, ChevronLeft, ChevronRight, Clock3, Globe2, Loader2, LockKeyhole, Phone, ShieldCheck, Stethoscope, Video, X,
+    ArrowLeft, ArrowRight, CalendarPlus, Check, ChevronLeft, ChevronRight, Clock3, Globe2, Loader2, LockKeyhole, Phone, ShieldCheck, Stethoscope, Video, Wallet, X,
 } from "lucide-react";
 import Image from "next/image";
 import emblem from "../../public/logo/favicon.png";
@@ -14,6 +14,15 @@ import { rememberRedirect } from "../../lib/roleHome";
 import { api, clearDraft, dayLabel, downloadIcs, fullLabel, MODE_LABEL, readDraft, saveDraft, timeLabel, token, TZ } from "./tcShared";
 import { usePlatformSettings } from "../../lib/platformSettings";
 import PushOffer from "../push/PushOffer";
+import dynamic from "next/dynamic";
+
+// Téléconsultation payante (23/11/2026) : prix réglé par le super admin (tc.price_fcfa, 0 = gratuite)
+const TcFeexPay = dynamic(() => import("./TcFeexPay"), { ssr: false });
+const fcfa = (n) => `${Number(n).toLocaleString("fr-FR")} FCFA`;
+// Paiement reçu mais pas encore utilisé (créneau pris entre-temps, page fermée…) : gardé pour ne pas repayer
+const paidKey = (uid) => `edoto-tc-paid:${uid}`;
+const readPaid = (uid) => { try { return uid ? localStorage.getItem(paidKey(uid)) || null : null; } catch { return null; } };
+const writePaid = (uid, ref) => { try { if (!uid) return; if (ref) localStorage.setItem(paidKey(uid), ref); else localStorage.removeItem(paidKey(uid)); } catch { } };
 
 // Prise de rendez-vous de téléconsultation (19/10/2026), à la manière de Calendly :
 // 1. visio ou appel  2. jour et heure (calendrier réel des médecins)  3. coordonnées  4. confirmation.
@@ -141,7 +150,9 @@ export default function BookingDrawer() {
     const router = useRouter();
     const { bookingOpen, bookingContext, closeBooking, openBooking } = useChatAI();
     const { user } = useAuthContext() || {};
-    const reminderMin = usePlatformSettings()["tc.reminder_minutes"]; // réglé par le super admin
+    const settings = usePlatformSettings();
+    const reminderMin = settings["tc.reminder_minutes"]; // réglé par le super admin
+    const price = Math.max(0, Number(settings["tc.price_fcfa"]) || 0);
     const [step, setStep] = useState("mode");
     const [mode, setMode] = useState(null);
     const [data, setData] = useState(null);
@@ -155,6 +166,10 @@ export default function BookingDrawer() {
     const [reason, setReason] = useState("");
     const [sending, setSending] = useState(false);
     const [booked, setBooked] = useState(null);
+    const [payment, setPayment] = useState(null); // { amount, reference } : FeexPay ouvert
+    const [paidRef, setPaidRef] = useState(null); // transaction payée, pas encore utilisée
+
+    useEffect(() => { setPaidRef(readPaid(user?.id)); }, [user?.id]);
 
     const reset = useCallback(() => {
         setStep("mode"); setMode(null); setData(null); setDay(null); setPick(null); setSlot(null); setError(""); setBooked(null); setReason("");
@@ -266,23 +281,53 @@ export default function BookingDrawer() {
         router.push("/login");
     };
 
-    const confirm = async () => {
+    const bookingBody = () => ({ mode, starts_at: slot.start, doctor_id: slot.doctor_id, phone: phone.trim(), reason: reason.trim(), contraception_request_id: bookingContext?.contraceptionRequestId });
+
+    const failed = (e) => {
+        if (e.status === 409) {
+            setError(e.message); setPick(null); setSlot(null); setStep("date"); load(mode);
+        } else if (e.status === 401) {
+            goLogin();
+        } else setError(e.message);
+    };
+
+    // Réservation ; ref = transaction FeexPay quand la consultation est payante
+    const book = async (ref) => {
         setSending(true); setError("");
         try {
             const res = await api("teleconsultation/me/appointments", {
                 method: "POST",
-                body: JSON.stringify({ mode, starts_at: slot.start, doctor_id: slot.doctor_id, phone: phone.trim(), reason: reason.trim(), contraception_request_id: bookingContext?.contraceptionRequestId }),
+                body: JSON.stringify({ ...bookingBody(), ...(ref ? { payment_reference: ref } : {}) }),
             });
+            if (ref) { writePaid(user?.id, null); setPaidRef(null); }
             setBooked(res); setStep("done");
         } catch (e) {
-            if (e.status === 409) {
-                setError(e.message); setPick(null); setSlot(null); setStep("date"); load(mode);
-            } else if (e.status === 401) {
-                goLogin();
-            } else setError(e.message);
+            // Paiement refusé (402) : la transaction n'est pas gardée, sauf « en cours de confirmation »
+            if (ref && e.status === 402 && !/en cours/i.test(e.message || "")) { writePaid(user?.id, null); setPaidRef(null); }
+            failed(e);
         } finally {
             setSending(false);
         }
+    };
+
+    const confirm = async () => {
+        if (paidRef || price <= 0) return book(paidRef);
+        // Consultation payante : créneau et règles vérifiés AVANT de payer, prix lu sur le serveur
+        setSending(true); setError("");
+        try {
+            const check = await api("teleconsultation/me/appointments/check", { method: "POST", body: JSON.stringify(bookingBody()) });
+            if (!(Number(check?.price) > 0)) { setSending(false); return book(null); }
+            setPayment({ amount: Number(check.price), reference: `TC-${user?.id}-${Date.now()}` });
+        } catch (e) {
+            setSending(false);
+            failed(e);
+        }
+    };
+
+    const onPaid = (ref) => {
+        setPayment(null);
+        writePaid(user?.id, ref); setPaidRef(ref);
+        book(ref);
     };
 
     const isCustomer = !user || user.role === "customer";
@@ -307,6 +352,7 @@ export default function BookingDrawer() {
                     </li>
                 )}
                 <li className="flex items-center gap-3"><Globe2 size={16} className="text-[#1A1814]" /> Heure du Bénin (UTC+1)</li>
+                <li className="flex items-center gap-3 font-medium text-[#1A1814]"><Wallet size={16} /> {price > 0 ? `${fcfa(price)} la consultation` : "Gratuit"}</li>
                 {slot?.doctor && (
                     <li className="flex items-center gap-3 text-[#1A1814]">
                         <Stethoscope size={16} /> {slot.doctor.name}
@@ -572,14 +618,25 @@ export default function BookingDrawer() {
                                                         />
                                                         <span className="mt-1 flex justify-between text-xs text-[#8A837A]"><span>Lu uniquement par le médecin.</span><span>{reason.length}/300</span></span>
                                                     </label>
+                                                    {paidRef ? (
+                                                        <p className="flex items-start gap-2 rounded-2xl border border-[#CFE3D4] bg-[#EEF6F0] px-4 py-3 text-sm text-[#2F5D3A]">
+                                                            <Check size={16} className="mt-0.5 shrink-0" /> Paiement reçu : il sera utilisé pour ce rendez-vous, sans repayer.
+                                                        </p>
+                                                    ) : price > 0 && (
+                                                        <p className="flex items-start gap-2 rounded-2xl border border-[#E9E5DF] bg-white px-4 py-3 text-sm text-[#57524B]">
+                                                            <Wallet size={16} className="mt-0.5 shrink-0 text-[#1A1814]" />
+                                                            <span>Consultation : <strong className="text-[#1A1814]">{fcfa(price)}</strong>, réglée par Mobile Money (FeexPay). Le rendez-vous est réservé dès que le paiement est confirmé.</span>
+                                                        </p>
+                                                    )}
                                                     <button
                                                         onClick={confirm}
-                                                        disabled={sending || (mode === "phone" && !phoneOk)}
+                                                        disabled={sending || !!payment || (mode === "phone" && !phoneOk)}
                                                         className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#1A1814] py-4 text-sm font-semibold text-white transition hover:bg-black disabled:opacity-50"
                                                     >
-                                                        {sending && <Loader2 size={16} className="animate-spin" />}
-                                                        Confirmer le rendez-vous
+                                                        {(sending || payment) && <Loader2 size={16} className="animate-spin" />}
+                                                        {price > 0 && !paidRef ? `Payer ${fcfa(price)} et confirmer` : "Confirmer le rendez-vous"}
                                                     </button>
+                                                    {payment && <TcFeexPay payment={payment} onPaid={onPaid} onClose={() => { setPayment(null); setSending(false); }} />}
                                                 </div>
                                             )}
                                         </motion.div>
@@ -597,6 +654,7 @@ export default function BookingDrawer() {
                                                     ["Mode", MODE_LABEL[booked.mode]],
                                                     ["Professionnel", `${booked.doctor?.name}${booked.doctor?.title ? `, ${booked.doctor.title}` : ""}`],
                                                     ["Référence", booked.reference],
+                                                    ...(booked.paid ? [["Montant payé", fcfa(booked.price)]] : []),
                                                 ].map(([k, v]) => (
                                                     <div key={k} className="flex items-start justify-between gap-4 px-5 py-3.5">
                                                         <dt className="text-sm text-[#8A837A]">{k}</dt>
