@@ -102,6 +102,8 @@ function Avatar({ sponsor, onProfile }) {
 }
 
 export default function SponsorShell({ sponsor, view, viewKey, onView, search, onSearch, notifications, children }) {
+    // Compte connecté (photo de profil dans la barre latérale). Manquait : la page plantait pour tout sponsor (25/11/2026)
+    const auth = useAuthContext() || {};
     const menu = SPONSOR_MENU.map((m) => ({
         ...m,
         badge: m.key === "exports" ? notifications?.exports_count ?? notifications?.count ?? 0 : m.key === "proposals" ? notifications?.proposals_count || 0 : 0,
