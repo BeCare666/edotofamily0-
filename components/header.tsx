@@ -108,6 +108,7 @@ export const Header: React.FC = () => {
     const closeSheet = React.useCallback(() => setSheetOpen(false), []);
 
     const active = {
+        home: pathname === "/",
         shop: pathname.startsWith("/category") || pathname.startsWith("/product"),
         campaigns: pathname.toLowerCase().startsWith("/campaigns"),
         contraception: pathname.startsWith("/contraception"),
@@ -115,7 +116,7 @@ export const Header: React.FC = () => {
     };
 
     const item = (on: boolean, open = false) =>
-        `relative z-[1] inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-[14px] font-medium transition-colors xl:px-4 ${on ? "text-[#C2185B]" : open ? "text-[#1A1814]" : "text-[#4A443E] hover:text-[#1A1814]"}`;
+        `relative z-[1] inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-2 text-[13.5px] font-medium transition-colors xl:px-3.5 xl:text-[14px] ${on ? "text-[#C2185B]" : open ? "text-[#1A1814]" : "text-[#4A443E] hover:text-[#1A1814]"}`;
     const dot = <span aria-hidden className="absolute bottom-0 left-1/2 h-[3px] w-[18px] -translate-x-1/2 rounded-full bg-[#C2185B]" />;
     const chevron = (open: boolean) => <ChevronDown size={14} className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`} />;
     const eyebrow = "px-2.5 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-[#9A8E80]";
@@ -146,7 +147,7 @@ export const Header: React.FC = () => {
                     ? "border-[#E9E5DF] bg-white/85 shadow-[0_10px_30px_-24px_rgba(26,24,20,0.4)] backdrop-blur-xl backdrop-saturate-150"
                     : "border-transparent bg-transparent"}`}
             >
-                <div className={`relative mx-auto flex max-w-7xl items-center gap-6 px-4 transition-[height] duration-300 sm:px-6 lg:px-8 ${scrolled ? "h-16" : "h-16 md:h-[76px]"}`}>
+                <div className={`relative mx-auto flex max-w-7xl items-center gap-4 px-4 xl:gap-6 transition-[height] duration-300 sm:px-6 lg:px-8 ${scrolled ? "h-16" : "h-16 md:h-[76px]"}`}>
                     <Link href="/" aria-label="Accueil E.doto family" className="flex shrink-0 items-center">
                         <BrandMark />
                     </Link>
@@ -156,6 +157,13 @@ export const Header: React.FC = () => {
                         onPointerLeave={() => setPill((p) => ({ ...p, visible: false }))}>
                         <span aria-hidden className="pointer-events-none absolute top-1/2 z-0 h-10 -translate-y-1/2 rounded-full bg-[#1A1814]/[0.05] transition-[left,width,opacity] duration-300 ease-[cubic-bezier(.3,.7,.2,1)]"
                             style={{ left: pill.left, width: pill.width, opacity: pill.visible ? 1 : 0 }} />
+
+                        {/* Accueil (26/11/2026, demande de l'utilisateur) */}
+                        <Link href="/" className={item(active.home)} aria-current={active.home ? "page" : undefined}
+                            onPointerEnter={(e) => { movePill(e); if (e.pointerType === "mouse") later(() => setPanel(null), 120); }}>
+                            Accueil
+                            {active.home && dot}
+                        </Link>
 
                         <Link href="/campaigns" className={item(active.campaigns)} aria-current={active.campaigns ? "page" : undefined}
                             onPointerEnter={(e) => { movePill(e); if (e.pointerType === "mouse") later(() => setPanel(null), 120); }}>
@@ -226,7 +234,7 @@ export const Header: React.FC = () => {
                                 <Link href="/register" className="hidden h-10 items-center rounded-full px-3.5 text-[14px] font-medium text-[#1A1814] transition hover:bg-[#1A1814]/[0.05] whitespace-nowrap 2xl:inline-flex">
                                     Créer un compte
                                 </Link>
-                                <button onClick={handleLogin} className="hidden h-10 shrink-0 items-center whitespace-nowrap rounded-full bg-[#1A1814] px-5 text-[14px] font-medium text-white transition hover:bg-[#2B2722] md:inline-flex">
+                                <button onClick={handleLogin} className="hidden h-10 shrink-0 items-center whitespace-nowrap rounded-full bg-[#1A1814] px-4 xl:px-5 text-[14px] font-medium text-white transition hover:bg-[#2B2722] md:inline-flex">
                                     Connexion
                                 </button>
                             </>

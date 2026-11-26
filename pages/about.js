@@ -3,15 +3,16 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import Reveal, { PhotoFrame, photoClass } from "../components/home/Reveal"
-import Parcours from "../components/home/Parcours"
-import Reseau from "../components/home/Reseau"
-import Why from "../components/Why"
+import ParcoursScroll from "../components/home/vitrine/ParcoursScroll"
+import ReseauVitrine from "../components/home/vitrine/ReseauVitrine"
+import Engagements from "../components/home/vitrine/Engagements"
 import Partners from "../components/home/Partners"
-import aproposPhoto from "../public/images/site/contraception-hero.jpg"
+import aproposPhoto from "../public/images/site/contraception-detail.jpg"
 
 // « Qui sommes-nous » (26/11/2026, repositionnement écosystème, rapports/PROPOSITION_ECOSYSTEME_EDOTO_FAMILY.md).
 // Remplace l'ancienne page « bien-être féminin » et regroupe Notre mission, Nos objectifs et Services
-// (ces adresses redirigent ici, next.config.js). Sections parcours, réseau et engagements partagées avec l'accueil.
+// (ces adresses redirigent ici, next.config.js). Sections parcours, réseau et engagements partagées avec la vitrine
+// (aucune photo répétée sur la page).
 export default function QuiSommesNous() {
   return (
     <main className="bg-white text-[#161412]">
@@ -27,7 +28,7 @@ export default function QuiSommesNous() {
         </Reveal>
         <Reveal delay={0.12}>
           <PhotoFrame className="aspect-[4/5]">
-            <Image src={aproposPhoto} alt="" fill priority placeholder="blur" sizes="(min-width: 1024px) 40vw, 100vw" className={`${photoClass} object-[30%_50%]`} />
+            <Image src={aproposPhoto} alt="" fill priority placeholder="blur" sizes="(min-width: 1024px) 40vw, 100vw" className={`${photoClass} object-[50%_20%]`} />
           </PhotoFrame>
         </Reveal>
       </section>
@@ -46,9 +47,9 @@ export default function QuiSommesNous() {
         </div>
       </section>
 
-      <Parcours />
-      <Reseau />
-      <Why />
+      <ParcoursScroll />
+      <ReseauVitrine />
+      <Engagements />
       <Partners />
 
       <section className="bg-[#FCFAF8]">

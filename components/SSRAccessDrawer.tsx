@@ -113,10 +113,11 @@ const SSRAccessDrawer = () => {
   };
 
   // Ordre du parcours (26/11/2026) : kits gratuits, contraception, médecin, Assistant, puis produits.
+  // Photos propres au tiroir : aucune n'est reprise ailleurs sur la vitrine (règle « pas deux fois la même image »).
   const items: Access[] = [
     {
       key: "kits",
-      photo: "/images/site/drawer-kits.jpg",
+      photo: "/images/campagnes_uac.png",
       icon: Gift,
       title: "Bénéficier de kits gratuits",
       text: "Campagnes disponibles près de vous",
@@ -126,7 +127,7 @@ const SSRAccessDrawer = () => {
     {
       // Contraception (21/10/2026) : catalogue des méthodes et adoption en 7 étapes
       key: "contraception",
-      photo: "/images/site/drawer-contraception.jpg",
+      photo: "/images/pil-.png",
       icon: HeartHandshake,
       title: "Choisir ma contraception",
       text: "Méthodes modernes, accompagnement en 7 étapes",
@@ -135,7 +136,7 @@ const SSRAccessDrawer = () => {
     {
       // Entrée directe vers la téléconsultation (26/11/2026)
       key: "doctor",
-      photo: "/images/site/services.jpg",
+      photo: "/images/service-bg.jpg",
       icon: CalendarHeart,
       title: "Consulter un médecin",
       text: "En visio ou par appel, au créneau choisi",
