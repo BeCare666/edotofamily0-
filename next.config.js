@@ -63,7 +63,14 @@ const nextConfig = {
     },
     // Ancienne page « Mentions légales & CGV » (octobre 2025) remplacée le 02/11/2026 (APDP, point c)
     async redirects() {
-        return [{ source: "/cgv", destination: "/mentions-legales", permanent: true }];
+        return [
+            { source: "/cgv", destination: "/mentions-legales", permanent: true },
+            // Repositionnement écosystème (26/11/2026) : pages fusionnées dans « Qui sommes-nous ».
+            // Redirections temporaires tant que la nouvelle page n'est pas validée.
+            { source: "/mission", destination: "/about", permanent: false },
+            { source: "/objectives", destination: "/about", permanent: false },
+            { source: "/services", destination: "/about", permanent: false },
+        ];
     },
 };
 

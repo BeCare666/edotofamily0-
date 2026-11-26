@@ -1,150 +1,74 @@
+"use client";
+
 import React from "react";
-import { Heart, Baby, Sparkles, User, ShieldCheck, Gift, ShoppingBag } from "lucide-react";
-import { useRouter } from 'next/navigation'
+import Image from "next/image";
+import { ArrowRight, Gift } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Reveal, { PhotoFrame, photoClass } from "./home/Reveal";
+import heroPhoto from "../public/images/campagnes_uac.png";
+
+// Repositionnement écosystème (26/11/2026, rapports/PROPOSITION_ECOSYSTEME_EDOTO_FAMILY.md) :
+// le hero présente le parcours complet du jeune, plus seulement l'accès aux produits.
+// Avant : « Accès simple, confidentiel et immédiat aux produits SSR », bouton « Visiter nos produits »,
+// halos colorés et orbite « Soins, Maternité, Fertilité… ».
+// « Commencer mon parcours » ouvre le tiroir d'accès (SSRAccessDrawer) par l'événement edoto:open-access.
+export const OPEN_ACCESS_EVENT = "edoto:open-access";
+
+const STEPS = ["Comprendre", "Consulter", "Être orienté", "Obtenir", "Être suivi"];
 
 const Hero: React.FC = () => {
-    const router = useRouter()
+    const router = useRouter();
+    const openAccess = () => window.dispatchEvent(new Event(OPEN_ACCESS_EVENT));
+
     return (
-        <section className="relative overflow-hidden pt-3 lg:pt-2">
-            {/* Background Decor */}
-            <div className="blob bg-pink-200 w-96 h-96 rounded-full top-0 -left-20 mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
-            <div className="blob bg-purple-200 w-96 h-96 rounded-full bottom-0 right-0 mix-blend-multiply filter blur-3xl opacity-30"></div>
+        <section className="bg-white">
+            <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] items-center gap-12 px-5 pb-20 pt-6 sm:px-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16 lg:pb-28 lg:pt-10">
+                <Reveal>
+                    <p className="text-[13px] font-medium text-[#B8336A]">Santé sexuelle et reproductive des jeunes, au Bénin</p>
+                    <h1 className="mt-5 text-[38px] font-normal leading-[1.05] tracking-[-0.04em] text-[#161412] sm:text-[56px] lg:text-[64px]">
+                        De la première question à la prise en charge, E.doto family vous accompagne.
+                    </h1>
+                    <p className="mt-7 max-w-xl text-[16px] leading-[1.8] text-[#6B645D]">
+                        S’informer, parler à un médecin, être orienté vers un centre de santé, recevoir un kit gratuit ou retirer un produit près de chez vous : tout se fait au même endroit, en toute confidentialité.
+                    </p>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="grid lg:grid-cols-2 gap-12 items-center">
-                    {/* Text Content */}
-                    <div className="text-center lg:text-left space-y-8 relative z-20">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-50 border border-pink-100 text-pink-600 text-sm font-medium">
-                            <Sparkles size={16} />
-                            <span>La référence de l’accès SSR en Afrique</span>
-                        </div>
-
-                        <h1 className="lg:text-4xl font-bold text-slate-900 w-full">
-                            Accès simple, confidentiel et immédiat aux produits{" "}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
-                                SSR
-                            </span>.
-                        </h1>
-
-                        <p className="text-sm text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                            E.doto family démocratise l’accès aux produits et services de santé sexuelle et reproductive au Bénin.
-                            Localisez les campagnes gratuites, commandez vos produits en toute discrétion et récupérez-les dans un point de proximité sans jugement, sans stress et en toute confidentialité.
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-
-                            {/* 🚀 Bouton Campagnes */}
-                            <button
-                                onClick={() => router.push('/campaigns')}
-                                className="justify-center lg:justify-start
-                        group relative px-8 py-4 rounded-full font-semibold
-                        bg-gradient-to-r from-pink-500 to-pink-600 text-white
-                        shadow-[0_4px_14px_rgba(255,0,128,0.35)]
-                        hover:shadow-[0_6px_20px_rgba(255,0,128,0.45)]
-                        hover:-translate-y-0.5
-                        transition-all duration-300 ease-out
-                        flex items-center gap-3
-                        "
-                            >
-                                <Gift className="w-5 h-5 transition-transform group-hover:rotate-12" />
-                                <span>Nos campagnes</span>
-
-                                {/* Light Shine */}
-                                <span className="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
-                            </button>
-
-                            {/* 🛍️ Bouton Produits */}
-                            <button
-                                onClick={() => router.push('/category/categories_id=3')}
-                                className=" justify-center lg:justify-start
-                        group relative px-8 py-4 rounded-full font-semibold
-                        bg-white text-slate-700 border border-slate-200
-                        hover:border-pink-300 hover:bg-white/90
-                        shadow-[0_4px_14px_rgba(0,0,0,0.06)]
-                        hover:shadow-[0_6px_20px_rgba(0,0,0,0.09)]
-                        hover:-translate-y-0.5
-                        transition-all duration-300 ease-out
-                        flex items-center gap-3
-                        "
-                            >
-                                <ShoppingBag className="w-5 h-5 text-pink-500 transition-transform group-hover:-translate-y-0.5" />
-                                <span>Visiter nos produits</span>
-
-                                {/* Subtle Shine */}
-                                <span className="absolute inset-0 rounded-full bg-pink-100/10 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
-                            </button>
-
-                        </div>
-
+                    <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+                        <button
+                            type="button"
+                            onClick={openAccess}
+                            className="group inline-flex items-center justify-center gap-2.5 rounded-full bg-[#1A1814] px-7 py-4 text-[15px] font-medium text-white transition hover:bg-[#C2185B]"
+                        >
+                            Commencer mon parcours
+                            <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => router.push("/campaigns")}
+                            className="inline-flex items-center justify-center gap-2.5 rounded-full border border-[#E7DFD8] bg-white px-7 py-4 text-[15px] font-medium text-[#161412] transition hover:border-[#C2185B] hover:text-[#C2185B]"
+                        >
+                            <Gift size={17} strokeWidth={1.7} />
+                            Kits gratuits près de moi
+                        </button>
                     </div>
 
-                    {/* Circular Interactive Visual */}
-                    <div className="hidden md:flex lg:flex relative flex items-center justify-center h-[400px] lg:h-[600px] w-full pause-hover">
+                    <ol className="mt-12 flex flex-wrap gap-x-5 gap-y-2 border-t border-[#ECE6E0] pt-6 text-[13px] text-[#8A827A]">
+                        {STEPS.map((s, i) => (
+                            <li key={s} className="flex items-center gap-2">
+                                <span className="tabular-nums text-[#D6457F]">{i + 1}</span>
+                                {s}
+                            </li>
+                        ))}
+                    </ol>
+                </Reveal>
 
-                        {/* Static Center Circle */}
-                        <div className="absolute z-20 w-48 h-48 lg:w-64 lg:h-64 rounded-full bg-gradient-to-br from-pink-100 to-white shadow-2xl flex items-center justify-center border-4 border-white">
-                            <div className="text-center p-4">
-                                <span className="block text-4xl mb-2 animate-bounce">🌸</span>
-                                <h3 className="text-pink-900 font-bold text-lg lg:text-xl leading-tight">
-                                    Univers<br />Jeune
-                                </h3>
-                            </div>
-                        </div>
-
-                        {/* Orbit Container */}
-                        <div className="absolute inset-0 flex items-center justify-center animate-spin-slow z-10">
-                            {/* Orbit Circles */}
-                            <div className="absolute w-[280px] h-[280px] lg:w-[450px] lg:h-[450px] border border-pink-200 rounded-full"></div>
-                            <div className="absolute w-[350px] h-[350px] lg:w-[550px] lg:h-[550px] border border-dashed border-pink-100 rounded-full opacity-50"></div>
-
-                            {/* Orbiting Items */}
-                            <OrbitItem icon={Heart} label="Soins" angle={-90} color="bg-rose-100 text-rose-600" />
-                            <OrbitItem icon={Baby} label="Maternité" angle={-18} color="bg-blue-100 text-blue-600" />
-                            <OrbitItem icon={Sparkles} label="Fertilité" angle={54} color="bg-purple-100 text-purple-600" />
-                            <OrbitItem icon={ShieldCheck} label="Intimité" angle={126} color="bg-emerald-100 text-emerald-600" />
-                            <OrbitItem icon={User} label="Bien-être" angle={198} color="bg-orange-100 text-orange-600" />
-                        </div>
-                    </div>
-                </div>
+                <Reveal delay={0.12}>
+                    <PhotoFrame className="aspect-[4/5] lg:aspect-[4/5]">
+                        <Image src={heroPhoto} alt="" fill priority placeholder="blur" sizes="(min-width: 1024px) 40vw, 100vw" className={`${photoClass} object-[30%_50%]`} />
+                    </PhotoFrame>
+                </Reveal>
             </div>
         </section>
     );
 };
 
 export default Hero;
-
-/* ---------------------- ORBIT ITEM ---------------------------- */
-
-const OrbitItem = ({
-    icon: Icon,
-    label,
-    angle,
-    color,
-}: {
-    icon: any;
-    label: string;
-    angle: number;
-    color: string;
-}) => {
-    return (
-        <div
-            className="absolute top-1/2 left-1/2 w-0 h-0 flex items-center justify-center z-30"
-            style={{ transform: `rotate(${angle}deg)` }}
-        >
-            <div className="translate-x-[140px] lg:translate-x-[225px]">
-                <div style={{ transform: `rotate(${-angle}deg)` }}>
-                    <div className="animate-reverse-spin-slow">
-                        <div className="w-20 h-20 lg:w-24 lg:h-24 flex flex-col items-center justify-center gap-1 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-100 hover:scale-110 hover:shadow-pink-200 transition-all cursor-pointer">
-                            <div className={`p-2 rounded-full ${color}`}>
-                                <Icon size={20} className="lg:w-6 lg:h-6" />
-                            </div>
-                            <span className="text-[10px] lg:text-xs font-bold text-slate-700">
-                                {label}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};

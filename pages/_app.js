@@ -74,6 +74,10 @@ export default function MyApp({ Component, pageProps }) {
       <ChatAIProvider>
       <Head>
         <title>E.doto family</title>
+        {/* Repositionnement écosystème (26/11/2026) : description pour les moteurs de recherche et le partage */}
+        <meta key="description" name="description" content="E.doto family : s’informer, consulter un médecin, être orienté vers un centre partenaire et obtenir kits gratuits et produits près de chez soi, en toute confidentialité." />
+        <meta key="og:title" property="og:title" content="E.doto family : santé sexuelle et reproductive des jeunes" />
+        <meta key="og:description" property="og:description" content="De la première question à la prise en charge : information, consultation, orientation et accès aux produits, en toute confidentialité." />
       </Head>
       <Layout>
         {!isHomePage && <Header />}

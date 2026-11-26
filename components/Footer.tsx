@@ -11,6 +11,7 @@ import Image from "next/image"
 import BrandMark from "./BrandMark";
 import { useShowAndroidApp } from "../lib/androidApp";
 import { socialIcons, telHref, useSiteInfo } from "../lib/siteInfo";
+import { useChatAI } from "../context/ChatAIContext";
 
 /* ✅ FIX TS DEFINITIF */
 const MotionDiv = motion.div as React.FC<any>;
@@ -38,6 +39,7 @@ const SOCIAL_STYLE: Record<string, { icon: React.ReactNode; color: string }> = {
 export const Footer: React.FC<FooterProps> = ({ changeView }) => {
     const router = useRouter();
     const info = useSiteInfo();
+    const { openBooking } = useChatAI() as { openBooking: (ctx?: unknown) => void };
     // Application Android (04/11/2026) : lien seulement sur Android et hors de l'application
     const showAndroidApp = useShowAndroidApp();
     const socialLinks: SocialLink[] = socialIcons(info).map((s) => ({ ...SOCIAL_STYLE[s.key], url: s.url }));
@@ -53,7 +55,7 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
 
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-14 mb-14">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-14 mb-14">
 
                         {/* Branding */}
                         <div className="space-y-5">
@@ -64,8 +66,8 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                             </div>
 
                             <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
-                                Votre partenaire de confiance pour la santé sexuelle et reproductive.
-                                Nous facilitons l’accès aux produits essentiels avec discrétion et sécurité.
+                                Le parcours santé sexuelle et reproductive des jeunes : information, consultation,
+                                orientation et accès aux produits, en toute confidentialité.
                             </p>
 
                             {/* Social premium */}
@@ -117,15 +119,26 @@ export const Footer: React.FC<FooterProps> = ({ changeView }) => {
                             </div>
                         </div>
 
-                        {/* Navigation */}
+                        {/* Mon parcours (26/11/2026, repositionnement écosystème) */}
                         <div>
-                            <h4 className="font-semibold text-slate-900 mb-6">Navigation</h4>
+                            <h4 className="font-semibold text-slate-900 mb-6">Mon parcours</h4>
                             <ul className="space-y-3 text-sm text-slate-600">
-                                <li><button onClick={() => router.push("/")} className="hover:text-pink-500 transition">Accueil</button></li>
-                                <li><button onClick={() => router.push("/category/categories_id=3")} className="hover:text-pink-500 transition">Boutique</button></li>
-                                <li><button onClick={() => router.push("/compaigns")} className="hover:text-pink-500 transition">Campagnes</button></li>
-                                <li><button onClick={() => router.push("/about")} className="hover:text-pink-500 transition">À propos</button></li>
-                                <li><button onClick={() => router.push("/sponsor/inscription")} className="hover:text-pink-500 transition">Devenir sponsor</button></li>
+                                <li><button onClick={() => router.push("/campaigns")} className="hover:text-pink-500 transition">Kits gratuits</button></li>
+                                <li><button onClick={() => router.push("/contraception")} className="hover:text-pink-500 transition">Contraception</button></li>
+                                <li><button onClick={() => openBooking()} className="hover:text-pink-500 transition">Consulter un médecin</button></li>
+                                <li><button onClick={() => router.push("/category/categories_id=all")} className="hover:text-pink-500 transition">Boutique</button></li>
+                                <li><button onClick={() => router.push("/mon-espace")} className="hover:text-pink-500 transition">Mon espace</button></li>
+                            </ul>
+                        </div>
+
+                        {/* Rejoindre le réseau */}
+                        <div>
+                            <h4 className="font-semibold text-slate-900 mb-6">Rejoindre le réseau</h4>
+                            <ul className="space-y-3 text-sm text-slate-600">
+                                <li><button onClick={() => router.push("/sponsor/inscription")} className="hover:text-pink-500 transition">Financer une campagne</button></li>
+                                <li><button onClick={() => router.push("/devenir-point-de-retrait")} className="hover:text-pink-500 transition">Devenir point de retrait</button></li>
+                                <li><button onClick={() => router.push("/contact")} className="hover:text-pink-500 transition">Professionnel de santé</button></li>
+                                <li><button onClick={() => router.push("/about")} className="hover:text-pink-500 transition">Qui sommes-nous</button></li>
                             </ul>
                         </div>
 

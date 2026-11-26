@@ -68,11 +68,11 @@ export function BellIcon({ className }) {
   );
 }
 
-export function UserRoundIcon({ className }) {
+export function UserRoundIcon({ filled = false, className = "" }) {
   return (
     <svg {...base} className={className}>
-      <circle cx="12" cy="8.6" r="3.6" />
-      <path d="M5 19.6a7 7 0 0 1 14 0" />
+      <circle cx="12" cy="8.6" r="3.6" fill={filled ? "currentColor" : "none"} fillOpacity={filled ? 0.14 : 0} />
+      <path d="M5 19.6a7 7 0 0 1 14 0" fill={filled ? "currentColor" : "none"} fillOpacity={filled ? 0.14 : 0} />
     </svg>
   );
 }

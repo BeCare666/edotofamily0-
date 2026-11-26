@@ -5,14 +5,14 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { AnimatePresence, motion, useDragControls } from "framer-motion"
 import toast from "react-hot-toast"
-import { ArrowRight, ChevronRight, LayoutDashboard, LogOut, ShoppingBag, Smartphone, Sparkles, User, X } from "lucide-react"
+import { ArrowRight, CalendarHeart, ChevronRight, LayoutDashboard, LogOut, ShoppingBag, Smartphone, Sparkles, User, X } from "lucide-react"
 import { useShowAndroidApp } from "../../lib/androidApp"
 import UserAvatar from "../UserAvatar"
 import SocialRow from "./SocialRow"
 import { useAuthContext } from "../../context/AuthContext"
 import { useChatAI } from "../../context/ChatAIContext"
 import {
-    DISCOVER_LINKS, JOIN_LINKS, LEGAL_LINKS, categoryHref, categoryIcon, spaceFor, useCategories,
+    ALL_PRODUCTS_HREF, DISCOVER_LINKS, JOIN_LINKS, LEGAL_LINKS, categoryHref, categoryIcon, spaceFor, useCategories,
 } from "../../lib/siteNav"
 
 // Menu du site en panneau qui monte du bas (02/11/2026, maquette validée) : remplace l'ancien tiroir latéral.
@@ -24,7 +24,7 @@ export default function MenuSheet({ isOpen, onClose, showAssistant = true }) {
     const pathname = usePathname() || ""
     const router = useRouter()
     const { user, logout } = useAuthContext()
-    const { openChoice } = useChatAI()
+    const { openChoice, openBooking } = useChatAI()
     const categories = useCategories()
     // Glisser vers le bas depuis la poignée ou le titre (pas depuis la liste, qui doit défiler)
     const drag = useDragControls()
@@ -59,6 +59,8 @@ export default function MenuSheet({ isOpen, onClose, showAssistant = true }) {
         }
     }
     const assistant = () => { onClose(); openChoice() }
+    // Entrée directe vers la téléconsultation (26/11/2026, repositionnement écosystème)
+    const booking = () => { onClose(); openBooking() }
     const space = spaceFor(user?.role)
     // Application Android (04/11/2026) : lien vers /application, seulement sur Android et hors de l'application
     const showAndroidApp = useShowAndroidApp()
@@ -70,7 +72,7 @@ export default function MenuSheet({ isOpen, onClose, showAssistant = true }) {
         const Icon = l.icon
         const current = pathname === l.href
         return (
-            <Link key={l.href} href={l.href} aria-current={current ? "page" : undefined}
+            <Link key={l.label} href={l.href} aria-current={current ? "page" : undefined}
                 className={`flex items-center gap-3 border-t border-[#F1EDE8] px-4 py-3.5 text-[14px] first:border-t-0 transition ${current ? "bg-[#FBEEF3] font-medium text-[#C2185B]" : "text-[#1A1814] active:bg-[#F9F8F6]"}`}>
                 <Icon size={18} className="shrink-0 text-[#C2185B]" />
                 {l.label}
@@ -152,6 +154,16 @@ export default function MenuSheet({ isOpen, onClose, showAssistant = true }) {
                                     <ArrowRight size={18} className="relative ml-auto shrink-0" />
                                 </button>}
 
+                                <button type="button" onClick={booking}
+                                    className="flex items-center gap-3.5 rounded-[20px] border border-[#E9E5DF] bg-white p-4 text-left">
+                                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FBEEF3] text-[#C2185B]"><CalendarHeart size={21} /></span>
+                                    <span className="min-w-0">
+                                        <span className="block text-[15px] font-semibold text-[#1A1814]">Consulter un médecin</span>
+                                        <span className="block text-xs leading-snug text-[#6B645D]">En visio ou par appel, au créneau choisi</span>
+                                    </span>
+                                    <ArrowRight size={18} className="ml-auto shrink-0 text-[#1A1814]" />
+                                </button>
+
                                 <section>
                                     <h3 className="mb-2 ml-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[#9A8E80]">Boutique</h3>
                                     <div className="flex flex-wrap gap-2">
@@ -165,6 +177,10 @@ export default function MenuSheet({ isOpen, onClose, showAssistant = true }) {
                                                 </Link>
                                             )
                                         })}
+                                        <Link href={ALL_PRODUCTS_HREF}
+                                            className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-[#E9E5DF] px-3.5 py-2 text-[13px] font-medium text-[#6B645D]">
+                                            Tous les produits <ArrowRight size={14} />
+                                        </Link>
                                     </div>
                                 </section>
 
@@ -182,7 +198,7 @@ export default function MenuSheet({ isOpen, onClose, showAssistant = true }) {
                                     <h3 className="mb-1 ml-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[#9A8E80]">Légal</h3>
                                     <div className="grid grid-cols-2 gap-x-3 px-1">
                                         {LEGAL_LINKS.map((l) => (
-                                            <Link key={l.href} href={l.href} className={`py-1.5 text-[13px] ${pathname === l.href ? "font-medium text-[#C2185B]" : "text-[#6B645D]"}`}>{l.label}</Link>
+                                            <Link key={l.label} href={l.href} className={`py-1.5 text-[13px] ${pathname === l.href ? "font-medium text-[#C2185B]" : "text-[#6B645D]"}`}>{l.label}</Link>
                                         ))}
                                     </div>
                                 </section>

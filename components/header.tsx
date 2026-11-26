@@ -20,7 +20,8 @@ import {
 } from "../lib/siteNav";
 
 // En-tête du site (02/11/2026, maquette validée).
-// PC (lg et plus) : Boutique (grand menu), Campagnes (point vert si une campagne est en cours), Contraception,
+// PC (lg et plus), ordre du parcours depuis le 26/11/2026 : Kits gratuits (point vert si une campagne est en cours),
+// Contraception, Consulter un médecin, Boutique (grand menu),
 // E.doto family (Découvrir, Rejoindre, Légal, coordonnées) ; à droite Assistant SSR, cloche, compte.
 // Tablette (md à lg) : Assistant SSR, cloche, compte et bouton Menu (même panneau que sur téléphone).
 // Téléphone : cloche et compte ; la navigation est dans la barre du bas (MobileBottomNav).
@@ -35,7 +36,7 @@ export const Header: React.FC = () => {
     const router = useRouter();
     const pathname = usePathname() || "";
     const { user, logout } = useAuthContext();
-    const { openChoice } = useChatAI();
+    const { openChoice, openBooking } = useChatAI();
     const categories = useCategories();
     const liveCount = useLiveCampaigns();
     const info = useSiteInfo();
@@ -122,7 +123,7 @@ export const Header: React.FC = () => {
         const Icon = l.icon;
         const current = pathname === l.href;
         return (
-            <Link key={l.href} href={l.href} aria-current={current ? "page" : undefined}
+            <Link key={l.label} href={l.href} aria-current={current ? "page" : undefined}
                 className={`group flex items-center gap-3 rounded-xl px-2.5 py-2.5 text-[14px] transition ${current ? "bg-[#FBEEF3] text-[#C2185B]" : "text-[#3E3832] hover:bg-[#F9F8F6] hover:text-[#1A1814]"}`}>
                 <Icon size={17} className={`shrink-0 transition-colors ${current ? "text-[#C2185B]" : "text-[#9A8E80] group-hover:text-[#C2185B]"}`} />
                 {l.label}
@@ -156,15 +157,9 @@ export const Header: React.FC = () => {
                         <span aria-hidden className="pointer-events-none absolute top-1/2 z-0 h-10 -translate-y-1/2 rounded-full bg-[#1A1814]/[0.05] transition-[left,width,opacity] duration-300 ease-[cubic-bezier(.3,.7,.2,1)]"
                             style={{ left: pill.left, width: pill.width, opacity: pill.visible ? 1 : 0 }} />
 
-                        <button type="button" className={item(active.shop, panel === "shop")} aria-expanded={panel === "shop"} aria-haspopup="true"
-                            onClick={() => toggle("shop")} onPointerEnter={(e) => { movePill(e); hoverOpen("shop")(e); }} onPointerLeave={hoverClose}>
-                            Boutique {chevron(panel === "shop")}
-                            {active.shop && dot}
-                        </button>
-
                         <Link href="/campaigns" className={item(active.campaigns)} aria-current={active.campaigns ? "page" : undefined}
                             onPointerEnter={(e) => { movePill(e); if (e.pointerType === "mouse") later(() => setPanel(null), 120); }}>
-                            Campagnes
+                            Kits gratuits
                             {liveCount > 0 && (
                                 <span className="relative ml-0.5 flex h-2 w-2" title={`${liveCount} campagne${liveCount > 1 ? "s" : ""} en cours`}>
                                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22C55E] opacity-60" />
@@ -181,6 +176,21 @@ export const Header: React.FC = () => {
                             {active.contraception && dot}
                         </Link>
 
+                        {/* Téléconsultation (26/11/2026) : ouvre directement la prise de rendez-vous */}
+                        <button type="button" className={item(false)} onClick={() => openBooking()}
+                            onPointerEnter={(e) => { movePill(e); if (e.pointerType === "mouse") later(() => setPanel(null), 120); }}>
+                            {/* Libellé court entre 1024 et 1280 px pour que la barre tienne sur une ligne */}
+                            <span className="xl:hidden">Médecin</span>
+                            <span className="hidden xl:inline">Consulter un médecin</span>
+                        </button>
+
+                        <button type="button" className={item(active.shop, panel === "shop")} aria-expanded={panel === "shop"} aria-haspopup="true"
+                            onClick={() => toggle("shop")} onPointerEnter={(e) => { movePill(e); hoverOpen("shop")(e); }} onPointerLeave={hoverClose}>
+                            Boutique {chevron(panel === "shop")}
+                            {active.shop && dot}
+                        </button>
+
+
                         <button type="button" className={item(active.about, panel === "about")} aria-expanded={panel === "about"} aria-haspopup="true"
                             onClick={() => toggle("about")} onPointerEnter={(e) => { movePill(e); hoverOpen("about")(e); }} onPointerLeave={hoverClose}>
                             E.doto family {chevron(panel === "about")}
@@ -191,9 +201,9 @@ export const Header: React.FC = () => {
                     <div className="ml-auto flex items-center gap-2 md:gap-2.5">
                         {/* Assistant SSR : même choix que le bouton flottant (assistant ou rendez-vous) */}
                         <button type="button" onClick={openChoice} aria-label="Assistant SSR"
-                            className="hidden h-10 items-center gap-2 rounded-full border-[1.5px] border-transparent pl-1.5 pr-1.5 text-[14px] font-medium text-[#C2185B] transition [background:linear-gradient(#fff,#fff)_padding-box,linear-gradient(120deg,#FF6EA9,#C2185B_60%,#7B1FA2)_border-box] hover:-translate-y-px hover:shadow-[0_10px_22px_-14px_rgba(194,24,91,0.7)] md:inline-flex lg:pr-4">
+                            className="hidden h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border-[1.5px] border-transparent pl-1.5 pr-1.5 text-[14px] font-medium text-[#C2185B] transition [background:linear-gradient(#fff,#fff)_padding-box,linear-gradient(120deg,#FF6EA9,#C2185B_60%,#7B1FA2)_border-box] hover:-translate-y-px hover:shadow-[0_10px_22px_-14px_rgba(194,24,91,0.7)] md:inline-flex xl:pr-4">
                             <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white"><Sparkles size={15} /></span>
-                            <span className="hidden lg:inline">Assistant SSR</span>
+                            <span className="hidden xl:inline">Assistant SSR</span>
                         </button>
 
                         <SiteNotificationBell />
@@ -213,10 +223,10 @@ export const Header: React.FC = () => {
                                     className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#FF6EA9] to-[#C2185B] text-white shadow-[0_4px_14px_-4px_rgba(194,24,91,0.45)] ring-2 ring-white md:hidden">
                                     <UserRoundIcon className="h-5 w-5" />
                                 </button>
-                                <Link href="/register" className="hidden h-10 items-center rounded-full px-3.5 text-[14px] font-medium text-[#1A1814] transition hover:bg-[#1A1814]/[0.05] xl:inline-flex">
+                                <Link href="/register" className="hidden h-10 items-center rounded-full px-3.5 text-[14px] font-medium text-[#1A1814] transition hover:bg-[#1A1814]/[0.05] whitespace-nowrap 2xl:inline-flex">
                                     Créer un compte
                                 </Link>
-                                <button onClick={handleLogin} className="hidden h-10 items-center rounded-full bg-[#1A1814] px-5 text-[14px] font-medium text-white transition hover:bg-[#2B2722] md:inline-flex">
+                                <button onClick={handleLogin} className="hidden h-10 shrink-0 items-center whitespace-nowrap rounded-full bg-[#1A1814] px-5 text-[14px] font-medium text-white transition hover:bg-[#2B2722] md:inline-flex">
                                     Connexion
                                 </button>
                             </>

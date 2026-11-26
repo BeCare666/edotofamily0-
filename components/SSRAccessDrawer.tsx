@@ -2,12 +2,12 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion, MotionProps } from "framer-motion";
-import { ArrowUpRight, Gift, HeartHandshake, LockKeyhole, MessageCircleHeart, ShoppingBag, X } from "lucide-react";
+import { ArrowUpRight, CalendarHeart, Gift, HeartHandshake, LockKeyhole, MessageCircleHeart, ShoppingBag, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useChatAI } from "../context/ChatAIContext";
 const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes en ms
 
-// Drawer d'accueil (refonte 19/10/2026) : trois accès en cartes photo, rendu premium.
+// Drawer d'accueil (refonte 19/10/2026) : accès en cartes photo, rendu premium ; cinq accès depuis le 26/11/2026.
 // « Poser une question à l'Assistant SSR » ouvre le choix « Assistant virtuel » ou « Prendre rendez-vous ».
 const spring = { type: "spring" as const, stiffness: 260, damping: 32, mass: 0.9 };
 // Transtypage : types de React 19 et framer-motion 10 incompatibles sans lui (même méthode que home/Reveal.tsx)
@@ -74,7 +74,7 @@ const SSRAccessDrawer = () => {
   const [open, setOpen] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   // Le drawer ne se réaffiche pas par-dessus le chat, le choix ou la prise de rendez-vous.
-  const { isOpen: chatOpen, choiceOpen, bookingOpen, openChoice } = useChatAI();
+  const { isOpen: chatOpen, choiceOpen, bookingOpen, openChoice, openBooking } = useChatAI();
   const busyRef = useRef(false);
   busyRef.current = chatOpen || choiceOpen || bookingOpen;
   useEffect(() => {
@@ -92,6 +92,13 @@ const SSRAccessDrawer = () => {
     };
   }, []);
 
+  // Bouton « Commencer mon parcours » du hero (26/11/2026) : rouvre le tiroir à la demande
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener("edoto:open-access", onOpen);
+    return () => window.removeEventListener("edoto:open-access", onOpen);
+  }, []);
+
   // Échap pour fermer
   useEffect(() => {
     if (!open) return;
@@ -105,15 +112,8 @@ const SSRAccessDrawer = () => {
     fn();
   };
 
+  // Ordre du parcours (26/11/2026) : kits gratuits, contraception, médecin, Assistant, puis produits.
   const items: Access[] = [
-    {
-      key: "products",
-      photo: "/images/woman-soft-bg.jpg",
-      icon: ShoppingBag,
-      title: "Visiter nos produits",
-      text: "Commandez en toute discrétion",
-      onClick: go(() => router.push("/category/categories_id=3")),
-    },
     {
       key: "kits",
       photo: "/images/site/drawer-kits.jpg",
@@ -133,12 +133,29 @@ const SSRAccessDrawer = () => {
       onClick: go(() => router.push("/contraception")),
     },
     {
+      // Entrée directe vers la téléconsultation (26/11/2026)
+      key: "doctor",
+      photo: "/images/site/services.jpg",
+      icon: CalendarHeart,
+      title: "Consulter un médecin",
+      text: "En visio ou par appel, au créneau choisi",
+      onClick: go(() => openBooking()),
+    },
+    {
       key: "assistant",
       photo: "/images/site/drawer-assistant.jpg",
       icon: MessageCircleHeart,
-      title: "Poser une question à l'Assistant SSR",
-      text: "Réponses automatiques, anonymes et confidentielles",
+      title: "Poser une question",
+      text: "À l'Assistant SSR, réponses anonymes et confidentielles",
       onClick: go(openChoice),
+    },
+    {
+      key: "products",
+      photo: "/images/woman-soft-bg.jpg",
+      icon: ShoppingBag,
+      title: "Commander un produit",
+      text: "En toute discrétion, retrait près de chez vous",
+      onClick: go(() => router.push("/category/categories_id=all")),
     },
   ];
 
@@ -162,7 +179,7 @@ const SSRAccessDrawer = () => {
             key="ssr-access-drawer"
             role="dialog"
             aria-modal="true"
-            aria-label="Accès SSR sécurisé"
+            aria-label="Commencer mon parcours"
             className="fixed inset-x-0 bottom-0 z-50 flex justify-center"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
@@ -188,14 +205,14 @@ const SSRAccessDrawer = () => {
               >
                 <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-[#E9E5DF] bg-white px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-[#C2185B]">
                   <LockKeyhole size={13} />
-                  Accès SSR sécurisé
+                  Accès confidentiel
                 </span>
                 <h2 className="mt-4 font-serif text-[24px] leading-[1.15] text-[#1A1814] sm:text-[32px]">
-                  Accès simple, confidentiel et immédiat aux produits SSR
+                  Par où voulez-vous commencer ?
                 </h2>
               </MotionDiv>
 
-              <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-2 sm:gap-4 lg:grid-cols-5">
                 {items.map((a, i) => (
                   <AccessCard key={a.key} a={a} index={i} />
                 ))}
