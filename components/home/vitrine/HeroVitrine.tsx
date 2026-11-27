@@ -6,14 +6,15 @@ import { useRouter } from "next/navigation";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowUpRight, CalendarHeart, Gift, MessageCircleHeart, ShoppingBag } from "lucide-react";
 import { useChatAI } from "../../../context/ChatAIContext";
-import portrait from "../../../public/images/campagnes_uac.png";
+import visuel from "../../../public/images/site/hero-sante-sexuelle.webp";
 
 // Hero de la vitrine, version éditoriale (26/11/2026, deuxième version à la demande de l'utilisateur :
 // « un truc de haut gamme »). Retirés : étiquettes flottantes, collage de deux photos, pastille.
 // Composition : texte à gauche, une seule photo pleine hauteur collée au bord droit de l'écran,
 // qui se dévoile de bas en haut puis se pose lentement. Mouvements coupés si l'appareil le demande.
 // L'ancien hero « De la première question à la prise en charge » reste dans components/Hero.tsx.
-// 27/11/2026 : photo de distribution de kits (jugée plus sérieuse), boutons de même hauteur, services en bloc 2 × 2.
+// 27/11/2026 : boutons de même hauteur, services en bloc 2 × 2 ; visuel « Des questions sur ta santé sexuelle ? »
+// fourni par l'utilisateur (hero-sante-sexuelle.webp), affiché entier à droite.
 const MDiv = motion.div as unknown as React.FC<any>;
 const MSpan = motion.span as unknown as React.FC<any>;
 const ease = [0.16, 1, 0.3, 1];
@@ -34,7 +35,7 @@ export default function HeroVitrine() {
     const ref = useRef<HTMLElement>(null);
     const reduce = useReducedMotion();
     const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-    const imgY = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "12%"]);
+    const imgY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 40]);
     const textY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -60]);
 
     const { openChoice, openBooking } = useChatAI() as { openChoice: () => void; openBooking: (ctx?: unknown) => void };
@@ -48,22 +49,20 @@ export default function HeroVitrine() {
 
     return (
         <section ref={ref} className="relative overflow-hidden bg-[#F8F4EF]">
-            <div className="lg:min-h-[calc(100vh-76px)]">
-                {/* Photo : pleine largeur sur téléphone, moitié droite pleine hauteur sur ordinateur */}
-                <MDiv
-                    className="relative h-[62vh] min-h-[420px] w-full overflow-hidden lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[46%]"
-                    initial={{ clipPath: reduce ? "inset(0% 0 0 0)" : "inset(100% 0 0 0)" }}
-                    animate={{ clipPath: "inset(0% 0 0 0)" }}
-                    transition={{ duration: 1.6, ease, delay: 0.1 }}
-                >
-                    <MDiv className="absolute inset-x-0 -inset-y-[6%]" style={{ y: imgY }}
-                        initial={{ scale: reduce ? 1 : 1.18 }} animate={{ scale: 1 }} transition={{ duration: 2.6, ease, delay: 0.1 }}>
-                        <Image src={portrait} alt="" fill priority placeholder="blur" sizes="(min-width: 1024px) 46vw, 100vw" className="object-cover object-[28%_50%]" />
+            <div className="flex flex-col lg:block lg:min-h-[calc(100vh-76px)]">
+                {/* Visuel fourni par l'utilisateur (27/11/2026, rapports/lydia.webp) : affiché entier, sans recadrage,
+                    car il contient du texte. Téléphone : sous le texte ; ordinateur : colonne de droite, centré. */}
+                <div className="relative order-2 px-5 pb-16 sm:px-8 lg:absolute lg:inset-y-0 lg:right-0 lg:flex lg:w-[48%] lg:items-center lg:px-0 lg:pb-0 lg:pr-[max(2rem,calc((100vw-80rem)/2+2rem))]">
+                    <MDiv className="relative w-full overflow-hidden rounded-[28px] border-[6px] border-white bg-white shadow-[0_40px_90px_-50px_rgba(20,17,15,0.55)]"
+                        initial={{ opacity: 0, y: reduce ? 0 : 40, scale: reduce ? 1 : 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 1.4, ease, delay: 0.2 }} style={{ y: imgY }}>
+                        <Image src={visuel} alt="Des questions sur ta santé sexuelle ? Pose tes questions, reçois des conseils adaptés." priority placeholder="blur"
+                            sizes="(min-width: 1024px) 44vw, 100vw" className="h-auto w-full" />
                     </MDiv>
-                </MDiv>
+                </div>
 
                 {/* Texte */}
-                <MDiv style={{ y: textY }} className="relative mx-auto flex max-w-7xl flex-col justify-center px-5 pb-20 pt-14 sm:px-8 lg:min-h-[calc(100vh-76px)] lg:py-20">
+                <MDiv style={{ y: textY }} className="relative order-1 mx-auto flex w-full max-w-7xl flex-col justify-center px-5 pb-20 pt-14 sm:px-8 lg:min-h-[calc(100vh-76px)] lg:py-20">
                     <div className="lg:max-w-[52%] lg:pr-12">
                         <MDiv className="flex items-center gap-4 text-[13px] tracking-[0.02em] text-[#7A7067]"
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.5 }}>
