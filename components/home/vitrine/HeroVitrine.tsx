@@ -51,17 +51,16 @@ export default function HeroVitrine() {
             <div className="flex flex-col lg:block lg:min-h-[calc(100vh-76px)]">
                 {/* Visuel fourni par l'utilisateur (27/11/2026, rapports/lydia01.webp, format portrait).
                     Téléphone : remplit tout l'espace entre l'en-tête (64 px) et la barre du bas (4,5 rem).
-                    Ordinateur : moitié droite pleine hauteur sous l'en-tête, ancré en haut (titre de l'affiche jamais coupé). */}
+                    Ordinateur : colonne de droite pleine hauteur, largeur calculée au format de l'image (2:3) : image entière, sans recadrage. */}
                 <MDiv
-                    className="relative order-1 h-[calc(100svh-64px-4.5rem-env(safe-area-inset-bottom))] min-h-[420px] w-full overflow-hidden md:h-[70vh] lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[46%]"
+                    className="relative order-1 h-[calc(100svh-64px-4.5rem-env(safe-area-inset-bottom))] min-h-[420px] w-full overflow-hidden md:h-[70vh] lg:absolute lg:inset-y-0 lg:right-0 lg:aspect-[2/3] lg:h-auto lg:w-auto lg:max-w-[48%] lg:min-h-0"
                     initial={{ clipPath: reduce ? "inset(0% 0 0 0)" : "inset(100% 0 0 0)" }}
                     animate={{ clipPath: "inset(0% 0 0 0)" }}
                     transition={{ duration: 1.6, ease, delay: 0.1 }}
                 >
-                    <MDiv className="absolute inset-0" initial={{ scale: reduce ? 1 : 1.08 }} animate={{ scale: 1 }} transition={{ duration: 2.4, ease, delay: 0.1 }}>
-                        <Image src={visuel} alt="Des questions sur ta santé sexuelle ? Une conseillère E.doto family te répond." fill priority placeholder="blur"
-                            sizes="(min-width: 1024px) 46vw, 100vw" className="object-cover object-top" />
-                    </MDiv>
+                    {/* Pas de zoom d'entrée (net dès l'affichage) ; qualité maximale pour le texte de l'affiche */}
+                    <Image src={visuel} alt="Des questions sur ta santé sexuelle ? Une conseillère E.doto family te répond." fill priority quality={95}
+                        sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover object-top" />
                 </MDiv>
 
                 {/* Texte */}
