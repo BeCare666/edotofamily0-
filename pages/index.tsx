@@ -3,7 +3,8 @@ import { ViewState } from '../types';
 import Impact from '../components/Zimpact';
 import SSRAccessDrawer from "../components/SSRAccessDrawer";
 import Partners from '../components/home/Partners';
-import HeroVitrine from '../components/home/vitrine/HeroVitrine';
+import HeroConseil from '../components/home/vitrine/HeroConseil';
+import ServicesBande from '../components/home/vitrine/ServicesBande';
 import Ruban from '../components/home/vitrine/Ruban';
 import ParcoursScroll from '../components/home/vitrine/ParcoursScroll';
 import CircuitKit from '../components/home/vitrine/CircuitKit';
@@ -26,7 +27,9 @@ interface HomeProps {
 export const Home: React.FC<HomeProps> = () => {
   return (
     <>
-      <HeroVitrine />
+      {/* Hero « Des questions sur la contraception ? » (27/11/2026, d'après l'affiche fournie) ; HeroVitrine.tsx conservé */}
+      <HeroConseil />
+      <ServicesBande />
       <Ruban />
       <ParcoursScroll />
       {/* Boutique (26/11/2026) : vrais produits, images des produits eux-mêmes */}
