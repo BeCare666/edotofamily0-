@@ -13,7 +13,7 @@ const MLi = motion.li as unknown as React.FC<any>;
 const ease = [0.22, 1, 0.36, 1];
 
 const NODES = [
-    { icon: HandCoins, title: "Un sponsor finance", text: "Une entreprise ou une organisation décrit sa campagne : villes, dates, nombre de kits." },
+    { icon: HandCoins, title: "Un sponsor finance", text: "Une entreprise ou une organisation finance des kits, et si elle le souhaite un produit de la boutique ou des téléconsultations, pour le public de son choix." },
     { icon: ClipboardList, title: "La campagne est créée", text: "L’équipe E.doto family étudie la demande, puis ouvre la campagne sur la plateforme." },
     { icon: MapPin, title: "Vous demandez votre kit", text: "Vous choisissez le point de retrait le plus proche. Une seule demande par personne et par campagne." },
     { icon: KeyRound, title: "Vous le retirez", text: "Le point de retrait vous remet votre kit contre votre code, en toute discrétion." },

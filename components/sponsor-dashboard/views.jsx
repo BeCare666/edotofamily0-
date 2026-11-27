@@ -146,6 +146,12 @@ export function CampaignsView({ search, onOpenCampaign }) {
                                                 <div className="mt-5 flex justify-between text-sm"><span className="text-[#6B655D]">Kits retirés</span><span className="text-[#1A1814] font-medium">{c.withdrawn} / {c.objective_kits}</span></div>
                                                 <div className="h-2 rounded-full bg-[#EFECE7] mt-2 overflow-hidden"><div className="dash-grow h-full rounded-full bg-[#FF6EA9]" style={{ width: `${rate}%` }} /></div>
                                                 <div className="mt-4 flex justify-between text-xs text-[#8A837A]"><span>{c.registrations} inscrit(s)</span><span>Votre contribution : {fcfa(c.contribution)}</span></div>
+                                                {(c.funded?.product || c.funded?.teleconsultation) && (
+                                                    <div className="mt-4 grid gap-1.5 border-t border-[#EFECE7] pt-4 text-sm">
+                                                        {c.funded.product && <div className="flex justify-between gap-3"><span className="text-[#6B655D]">{c.funded.product.name} offert</span><span className="text-[#1A1814] font-medium">{c.funded.product.attributed} / {c.funded.product.quantity}</span></div>}
+                                                        {c.funded.teleconsultation && <div className="flex justify-between gap-3"><span className="text-[#6B655D]">Téléconsultations offertes</span><span className="text-[#1A1814] font-medium">{c.funded.teleconsultation.booked} / {c.funded.teleconsultation.quantity}</span></div>}
+                                                    </div>
+                                                )}
                                             </Card>
                                         </button>
                                     );
@@ -203,6 +209,16 @@ export function CampaignView({ id, onBack, onExportsChanged }) {
                     hint={i.days_remaining === null ? "Entre l’inscription et le retrait" : `Délai moyen de retrait : ${i.average_delay_days === null ? "aucun retrait" : `${String(i.average_delay_days).replace(".", ",")} j`}`}
                     tone="sage" icon={i.days_remaining === null ? Clock : CalendarClock} />
             </div>
+
+            {/* Produit et téléconsultations offerts par la campagne (26/11/2026) : nombres seulement */}
+            {(c.funded?.product || c.funded?.teleconsultation) && (
+                <div className="dash-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {c.funded.product && <StatCard label={`${c.funded.product.name} offert`} value={`${c.funded.product.attributed} / ${c.funded.product.quantity}`} hint="Unités attribuées sur unités financées" tone="rose" icon={Package} />}
+                    {c.funded.product && <StatCard label="Produits offerts retirés" value={c.funded.product.withdrawn} hint="Remis au point de retrait contre le code" tone="sand" icon={Target} />}
+                    {c.funded.teleconsultation && <StatCard label="Téléconsultations offertes" value={`${c.funded.teleconsultation.booked} / ${c.funded.teleconsultation.quantity}`} hint={c.funded.teleconsultation.city_only ? `Réservées à ${c.cities.join(", ")}` : "Ouvertes à toutes les villes"} tone="ink" icon={Megaphone} />}
+                    {c.funded.teleconsultation && <StatCard label="Consultations réalisées" value={c.funded.teleconsultation.completed} hint="Aucune information médicale n’est partagée" tone="sage" icon={CalendarClock} />}
+                </div>
+            )}
 
             <div className="dash-stagger grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <Card className="p-6 xl:col-span-2">

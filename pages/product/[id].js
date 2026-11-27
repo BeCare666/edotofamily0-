@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import OrderProgressBar from "../../components/OrderProgressBar";
 import DeliveryChoiceStep from "../../components/DeliveryChoiceStep";
 import { safeHtml } from "../../lib/safeHtml";
+import SponsoredProductOffer from "../../components/SponsoredProductOffer";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 // pour feexpay
 //import("@feexpay/react-sdk").then(console.log);
@@ -260,6 +261,9 @@ export default function ProductDetails() {
                                 {formatPrice(product.sale_price)} FCFA
                             </span>
                         </div>
+
+                        {/* Produit offert par une campagne (26/11/2026) : 0 FCFA si la personne est ciblée */}
+                        <SponsoredProductOffer product={product} />
 
                         {/* ✅ Boutons */}
                         <div className="flex flex-wrap gap-4 mt-2">

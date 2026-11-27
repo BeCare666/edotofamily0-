@@ -21,6 +21,7 @@ import dynamic from "next/dynamic";
 import OrderProgressBar from "../../components/OrderProgressBar";
 import DeliveryChoiceStep from "../../components/DeliveryChoiceStep";
 import { safeHtml } from "../../lib/safeHtml";
+import { useSponsoredProducts } from "../../lib/sponsored";
 const FeexPayModal = dynamic(() => import("../../components/FeexPayModal"), { ssr: false });
 /**
  * Category page — JavaScript (no TypeScript)
@@ -48,6 +49,8 @@ function Pill({ children, className = "" }) {
 
 export default function CategoryPage() {
   const router = useRouter();
+  // Produits offerts par une campagne (26/11/2026) : badge sur la carte, 0 FCFA sur la fiche pour le public ciblé
+  const sponsored = useSponsoredProducts();
 
   // Filtres : uniquement sur des données réelles de la table products
   // (nom, prix payé = prix promo sinon prix, « originaire du pays », date d'ajout).
@@ -631,6 +634,7 @@ export default function CategoryPage() {
                   const price = p.raw.price != null ? Number(p.raw.price) : null;
                   const sale = p.raw.sale_price != null ? Number(p.raw.sale_price) : null;
                   const promo = sale != null && price != null && sale < price;
+                  const offer = sponsored[Number(p.raw?.id ?? p.id)];
                   return (
                     <article
                       key={p.id}
@@ -647,6 +651,11 @@ export default function CategoryPage() {
                           />
                         ) : (
                           <span className="flex items-center justify-center w-full h-full text-[#B8AC9E] text-sm">Pas d’image</span>
+                        )}
+                        {offer && (
+                          <span className="absolute top-3 right-3 bg-white text-[#C2185B] text-xs font-medium px-3 py-1 rounded-full shadow">
+                            Offert par un sponsor
+                          </span>
                         )}
                         {promo && (
                           <span className="absolute top-3 left-3 bg-[#C2185B] text-white text-xs font-medium px-3 py-1 rounded-full shadow">
@@ -665,6 +674,11 @@ export default function CategoryPage() {
                           <span className="text-lg font-semibold text-[#1F1B16] tabular-nums">{formatPrice(sale ?? price)} FCFA</span>
                           {promo && <span className="text-sm text-[#B8AC9E] line-through tabular-nums">{formatPrice(price)} FCFA</span>}
                         </div>
+                        {offer && (
+                          <p className="-mt-2 mb-4 text-xs leading-snug text-[#C2185B]">
+                            {offer.offered_by} : 0 FCFA pour le public ciblé. Voir les détails.
+                          </p>
+                        )}
 
                         <div className="flex items-center gap-2">
                           <button

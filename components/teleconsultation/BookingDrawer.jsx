@@ -13,6 +13,7 @@ import { useAuthContext } from "../../context/AuthContext";
 import { rememberRedirect } from "../../lib/roleHome";
 import { api, clearDraft, dayLabel, downloadIcs, fullLabel, MODE_LABEL, readDraft, saveDraft, timeLabel, token, TZ } from "./tcShared";
 import { usePlatformSettings } from "../../lib/platformSettings";
+import { loadTcFunding } from "../../lib/sponsored";
 import PushOffer from "../push/PushOffer";
 import dynamic from "next/dynamic";
 
@@ -152,7 +153,33 @@ export default function BookingDrawer() {
     const { user } = useAuthContext() || {};
     const settings = usePlatformSettings();
     const reminderMin = settings["tc.reminder_minutes"]; // réglé par le super admin
-    const price = Math.max(0, Number(settings["tc.price_fcfa"]) || 0);
+    const basePrice = Math.max(0, Number(settings["tc.price_fcfa"]) || 0);
+    // Consultation offerte par une campagne (26/11/2026) : 0 FCFA si la personne est ciblée ; le serveur revérifie
+    const [tcOffer, setTcOffer] = useState(null);
+    // Consultation offerte réservée aux villes d'une campagne : position partagée par la personne (comme un kit)
+    const [tcPos, setTcPos] = useState(null);
+    const [locating, setLocating] = useState(false);
+    useEffect(() => {
+        if (!bookingOpen || !user) { setTcOffer(null); setTcPos(null); return undefined; }
+        let alive = true;
+        loadTcFunding().then((o) => alive && setTcOffer(o));
+        return () => { alive = false; };
+    }, [bookingOpen, user]);
+    const shareTcPosition = () => {
+        if (!navigator.geolocation) { setTcOffer((o) => ({ ...o, message: "La géolocalisation n'est pas disponible sur cet appareil." })); return; }
+        setLocating(true);
+        navigator.geolocation.getCurrentPosition(
+            async (p) => {
+                const pos = { lat: p.coords.latitude, lng: p.coords.longitude };
+                setTcPos(pos);
+                setTcOffer(await loadTcFunding(pos));
+                setLocating(false);
+            },
+            () => { setLocating(false); setTcOffer((o) => ({ ...o, message: "Position refusée : la consultation offerte ne peut pas être vérifiée." })); },
+            { enableHighAccuracy: true, timeout: 15000 },
+        );
+    };
+    const price = tcOffer?.eligible ? 0 : basePrice;
     const [step, setStep] = useState("mode");
     const [mode, setMode] = useState(null);
     const [data, setData] = useState(null);
@@ -281,7 +308,7 @@ export default function BookingDrawer() {
         router.push("/login");
     };
 
-    const bookingBody = () => ({ mode, starts_at: slot.start, doctor_id: slot.doctor_id, phone: phone.trim(), reason: reason.trim(), contraception_request_id: bookingContext?.contraceptionRequestId });
+    const bookingBody = () => ({ mode, starts_at: slot.start, doctor_id: slot.doctor_id, phone: phone.trim(), reason: reason.trim(), contraception_request_id: bookingContext?.contraceptionRequestId, ...(tcPos ? { lat: tcPos.lat, lng: tcPos.lng } : {}) });
 
     const failed = (e) => {
         if (e.status === 409) {
@@ -352,7 +379,18 @@ export default function BookingDrawer() {
                     </li>
                 )}
                 <li className="flex items-center gap-3"><Globe2 size={16} className="text-[#1A1814]" /> Heure du Bénin (UTC+1)</li>
-                <li className="flex items-center gap-3 font-medium text-[#1A1814]"><Wallet size={16} /> {price > 0 ? `${fcfa(price)} la consultation` : "Gratuit"}</li>
+                <li className="flex items-center gap-3 font-medium text-[#1A1814]"><Wallet size={16} /> {price > 0 ? `${fcfa(price)} la consultation` : tcOffer?.eligible && basePrice > 0 ? `${(tcOffer.offered_by || "Offerte par un sponsor").replace(/^Offert /, "Offerte ")}, 0 FCFA` : "Gratuit"}</li>
+                {basePrice > 0 && tcOffer && !tcOffer.eligible && (tcOffer.reason === "position_required" || tcOffer.reason === "not_in_city") && (
+                    <li className="rounded-2xl border border-[#F3C9DA] bg-[#FBEEF3] px-4 py-3 text-[13px] leading-snug text-[#3E3832]">
+                        {tcOffer.message}
+                        {tcOffer.reason === "position_required" && (
+                            <button type="button" onClick={shareTcPosition} disabled={locating}
+                                className="mt-2 flex items-center gap-2 rounded-full bg-[#1A1814] px-4 py-2 text-xs font-semibold text-white disabled:opacity-60">
+                                {locating && <Loader2 size={13} className="animate-spin" />} Partager ma position
+                            </button>
+                        )}
+                    </li>
+                )}
                 {slot?.doctor && (
                     <li className="flex items-center gap-3 text-[#1A1814]">
                         <Stethoscope size={16} /> {slot.doctor.name}

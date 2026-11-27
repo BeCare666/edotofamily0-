@@ -7,9 +7,11 @@ import HeroVitrine from '../components/home/vitrine/HeroVitrine';
 import Ruban from '../components/home/vitrine/Ruban';
 import ParcoursScroll from '../components/home/vitrine/ParcoursScroll';
 import CircuitKit from '../components/home/vitrine/CircuitKit';
+import BoutiqueVitrine from '../components/home/vitrine/BoutiqueVitrine';
 import ReseauVitrine from '../components/home/vitrine/ReseauVitrine';
 import Engagements from '../components/home/vitrine/Engagements';
 import AppelFinal from '../components/home/vitrine/AppelFinal';
+import VisionProduits from '../components/home/vitrine/VisionProduits';
 import dynamic from 'next/dynamic';
 // Installer l'application (02/11/2026) : guide Android et iPhone, côté navigateur seulement
 const InstallSection = dynamic(() => import('../components/home/InstallSection'), { ssr: false });
@@ -27,10 +29,14 @@ export const Home: React.FC<HomeProps> = () => {
       <HeroVitrine />
       <Ruban />
       <ParcoursScroll />
+      {/* Boutique (26/11/2026) : vrais produits, images des produits eux-mêmes */}
+      <BoutiqueVitrine />
       <CircuitKit />
       <ReseauVitrine />
       <Engagements />
       <Impact />
+      {/* « Une vision durable & humaine », illustration animée des produits (remise le 26/11/2026) */}
+      <VisionProduits />
 
       {/* Application installable (02/11/2026) */}
       <InstallSection />
