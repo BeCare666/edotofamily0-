@@ -4,21 +4,30 @@ import React, { useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import portrait from "../../../public/images/site/contraception-detail.jpg";
+import { ArrowRight, ArrowUpRight, CalendarHeart, Gift, MessageCircleHeart, ShoppingBag } from "lucide-react";
+import { useChatAI } from "../../../context/ChatAIContext";
+import portrait from "../../../public/images/campagnes_uac.png";
 
 // Hero de la vitrine, version éditoriale (26/11/2026, deuxième version à la demande de l'utilisateur :
 // « un truc de haut gamme »). Retirés : étiquettes flottantes, collage de deux photos, pastille.
 // Composition : texte à gauche, une seule photo pleine hauteur collée au bord droit de l'écran,
 // qui se dévoile de bas en haut puis se pose lentement. Mouvements coupés si l'appareil le demande.
 // L'ancien hero « De la première question à la prise en charge » reste dans components/Hero.tsx.
+// 27/11/2026 : photo de distribution de kits (jugée plus sérieuse), boutons de même hauteur, services en bloc 2 × 2.
 const MDiv = motion.div as unknown as React.FC<any>;
 const MSpan = motion.span as unknown as React.FC<any>;
 const ease = [0.16, 1, 0.3, 1];
 
 const LINES = ["Votre santé", "intime mérite", "un vrai parcours."];
 
-const SERVICES = ["Assistant SSR", "Téléconsultation", "Centres partenaires", "Kits gratuits", "Points de retrait"];
+// Quatre portes d'entrée réelles de la plateforme (27/11/2026 : bloc premium à la place de la simple liste)
+type Service = { icon: React.ElementType; title: string; text: string; go: "assistant" | "booking" | "kits" | "shop" };
+const SERVICES: Service[] = [
+    { icon: MessageCircleHeart, title: "Assistant SSR", text: "Réponses anonymes, à toute heure", go: "assistant" },
+    { icon: CalendarHeart, title: "Téléconsultation", text: "Un médecin en visio ou par appel", go: "booking" },
+    { icon: Gift, title: "Kits gratuits", text: "Offerts par nos sponsors", go: "kits" },
+    { icon: ShoppingBag, title: "Boutique discrète", text: "Retrait avec un code, près de chez vous", go: "shop" },
+];
 
 export default function HeroVitrine() {
     const router = useRouter();
@@ -28,7 +37,14 @@ export default function HeroVitrine() {
     const imgY = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "12%"]);
     const textY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -60]);
 
+    const { openChoice, openBooking } = useChatAI() as { openChoice: () => void; openBooking: (ctx?: unknown) => void };
     const openAccess = () => window.dispatchEvent(new Event("edoto:open-access"));
+    const go = (g: Service["go"]) => {
+        if (g === "assistant") openChoice();
+        else if (g === "booking") openBooking();
+        else if (g === "kits") router.push("/campaigns");
+        else router.push("/category/categories_id=all");
+    };
 
     return (
         <section ref={ref} className="relative overflow-hidden bg-[#F8F4EF]">
@@ -42,7 +58,7 @@ export default function HeroVitrine() {
                 >
                     <MDiv className="absolute inset-x-0 -inset-y-[6%]" style={{ y: imgY }}
                         initial={{ scale: reduce ? 1 : 1.18 }} animate={{ scale: 1 }} transition={{ duration: 2.6, ease, delay: 0.1 }}>
-                        <Image src={portrait} alt="" fill priority placeholder="blur" sizes="(min-width: 1024px) 46vw, 100vw" className="object-cover object-[50%_22%]" />
+                        <Image src={portrait} alt="" fill priority placeholder="blur" sizes="(min-width: 1024px) 46vw, 100vw" className="object-cover object-[28%_50%]" />
                     </MDiv>
                 </MDiv>
 
@@ -72,29 +88,39 @@ export default function HeroVitrine() {
                                 Information fiable, médecins, centres de santé partenaires, kits gratuits et points de retrait de quartier : E.doto family réunit tout un réseau autour de vous, en toute confidentialité.
                             </p>
 
-                            <div className="mt-11 flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-9">
+                            {/* Deux boutons de même hauteur, alignés (27/11/2026) */}
+                            <div className="mt-11 grid grid-cols-1 gap-3 sm:flex sm:items-center">
                                 <button type="button" onClick={openAccess}
-                                    className="group inline-flex items-center gap-3 whitespace-nowrap rounded-full bg-[#14110F] py-[18px] pl-8 pr-6 text-[15px] font-medium text-white transition-colors duration-500 hover:bg-[#B8336A]">
+                                    className="group inline-flex h-14 items-center justify-between gap-4 whitespace-nowrap rounded-full bg-[#14110F] pl-7 pr-2 text-[15px] font-medium text-white transition-colors duration-500 hover:bg-[#B8336A] sm:justify-start">
                                     Commencer mon parcours
-                                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-transform duration-500 group-hover:translate-x-1">
-                                        <ArrowRight size={16} />
+                                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#14110F] transition-transform duration-500 group-hover:translate-x-0.5">
+                                        <ArrowRight size={17} />
                                     </span>
                                 </button>
                                 <button type="button" onClick={() => router.push("/campaigns")}
-                                    className="group relative whitespace-nowrap text-[15px] font-medium text-[#14110F]">
+                                    className="group inline-flex h-14 items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-[#14110F]/15 bg-white px-7 text-[15px] font-medium text-[#14110F] transition-colors duration-500 hover:border-[#B8336A] hover:text-[#B8336A]">
+                                    <Gift size={17} strokeWidth={1.6} className="text-[#B8336A]" />
                                     Kits gratuits près de moi
-                                    <span aria-hidden className="absolute -bottom-1.5 left-0 h-px w-full origin-left bg-[#14110F] transition-transform duration-500 group-hover:scale-x-0" />
                                 </button>
                             </div>
                         </MDiv>
 
-                        <MDiv className="mt-16 flex flex-wrap gap-x-6 gap-y-2 border-t border-[#E4DBD2] pt-6 text-[12.5px] tracking-[0.02em] text-[#8A8077]"
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 1.3 }}>
-                            {SERVICES.map((s, i) => (
-                                <span key={s} className="flex items-center gap-6">
-                                    {s}
-                                    {i < SERVICES.length - 1 && <span aria-hidden className="h-1 w-1 rounded-full bg-[#C9BDB1]" />}
-                                </span>
+                        {/* Portes d'entrée : bloc premium 2 × 2, chaque case ouvre la fonction réelle */}
+                        <MDiv className="mt-14 grid grid-cols-1 overflow-hidden rounded-[24px] border border-[#E6DCD2] bg-white sm:grid-cols-2"
+                            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.1, delay: 1.2, ease }}>
+                            {SERVICES.map((sv, i) => (
+                                <button key={sv.title} type="button" onClick={() => go(sv.go)}
+                                    className={`group flex items-center gap-4 px-5 py-5 text-left transition-colors duration-300 hover:bg-[#FBF5F1]
+                                        ${i % 2 === 0 ? "sm:border-r" : ""} ${i < 2 ? "border-b" : i === 2 ? "border-b sm:border-b-0" : ""} border-[#EEE5DC]`}>
+                                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#FBEEF3] text-[#B8336A] transition-colors duration-300 group-hover:bg-[#B8336A] group-hover:text-white">
+                                        <sv.icon size={19} strokeWidth={1.6} />
+                                    </span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block text-[15px] font-medium text-[#14110F]">{sv.title}</span>
+                                        <span className="mt-0.5 block text-[13px] leading-snug text-[#8A8077]">{sv.text}</span>
+                                    </span>
+                                    <ArrowUpRight size={16} className="shrink-0 text-[#C9BDB1] transition-all duration-300 group-hover:rotate-45 group-hover:text-[#B8336A]" />
+                                </button>
                             ))}
                         </MDiv>
                     </div>

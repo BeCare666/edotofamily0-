@@ -1,45 +1,49 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform, MotionValue } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
+import { EyeOff, Gift, LockKeyhole, MapPin, Stethoscope } from "lucide-react";
 
-// « Nos engagements » (26/11/2026) : cinq engagements que la plateforme tient réellement
-// (anonymat de l'Assistant, données de santé chiffrées, rien sur le téléphone, points de retrait, téléconsultation,
-// fiches d'après le manuel de l'OMS, kits financés et suivis). Chaque phrase s'éclaire au défilement.
-const MSpan = motion.span as unknown as React.FC<any>;
+// « Nos engagements » (27/11/2026, deuxième version : moins de texte, rendu en cartes).
+// Cinq engagements tenus par la plateforme : Assistant anonyme, données de santé chiffrées et rien sur le
+// téléphone, points de retrait et téléconsultation, fiches d'après le manuel de l'OMS et médecins,
+// kits et produits financés par des sponsors.
+const MDiv = motion.div as unknown as React.FC<any>;
+const ease = [0.22, 1, 0.36, 1];
 
 const ITEMS = [
-    { key: "Sans jugement.", rest: "Vos questions restent anonymes." },
-    { key: "Confidentiel.", rest: "Vos données de santé sont chiffrées, et rien n’est gardé sur votre téléphone." },
-    { key: "Proche.", rest: "Un point de retrait dans votre quartier, une consultation sans vous déplacer." },
-    { key: "Encadré.", rest: "Des contraceptifs présentés d’après le manuel de l’OMS, des consultations assurées par des médecins." },
-    { key: "Gratuit quand c’est possible.", rest: "Des kits financés par des sponsors, dont chaque remise est suivie." },
+    { icon: EyeOff, title: "Sans jugement", text: "Vos questions restent anonymes." },
+    { icon: LockKeyhole, title: "Confidentiel", text: "Données de santé chiffrées." },
+    { icon: MapPin, title: "Proche de vous", text: "Un point de retrait dans votre quartier." },
+    { icon: Stethoscope, title: "Encadré", text: "Manuel de l’OMS et vrais médecins." },
+    { icon: Gift, title: "Offert", text: "Kits et produits financés par des sponsors." },
 ];
 
-function Line({ progress, index, total, item }: { progress: MotionValue<number>; index: number; total: number; item: (typeof ITEMS)[number] }) {
-    const reduce = useReducedMotion();
-    const start = index / total;
-    const end = start + 1 / total;
-    const opacity = useTransform(progress, [start, end], [reduce ? 1 : 0.18, 1]);
-    return (
-        <MSpan style={{ opacity }} className="block">
-            <span className="text-[#B8336A]">{item.key}</span> {item.rest}
-        </MSpan>
-    );
-}
-
 export default function Engagements() {
-    const ref = useRef<HTMLDivElement>(null);
-    const { scrollYProgress } = useScroll({ target: ref, offset: ["start 80%", "end 45%"] });
-
     return (
-        <section className="bg-white" aria-labelledby="engagements-title">
-            <div className="mx-auto max-w-6xl px-5 py-24 sm:px-8 lg:py-40">
-                <p className="text-[14px] text-[#8A827A]">Ce que nous garantissons</p>
-                <h2 id="engagements-title" className="mt-3 text-[44px] font-normal leading-[1.02] tracking-[-0.04em] text-[#161412] sm:text-[60px]">Nos engagements</h2>
-                <div ref={ref} className="mt-16 grid gap-10 text-[26px] font-normal leading-[1.35] tracking-[-0.02em] text-[#161412] sm:text-[36px] lg:text-[44px]">
+        <section className="bg-[#F8F4EF]" aria-labelledby="engagements-title">
+            <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:py-32">
+                <MDiv initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.9, ease }}
+                    className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                    <h2 id="engagements-title" className="text-[44px] font-light leading-[1.02] tracking-[-0.045em] text-[#14110F] sm:text-[60px]">
+                        Nos <span className="text-[#B8336A]">engagements</span>
+                    </h2>
+                    <p className="max-w-sm text-[16px] leading-[1.7] text-[#6B645D]">Ce que E.doto family garantit à chaque jeune, à chaque étape.</p>
+                </MDiv>
+
+                <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                     {ITEMS.map((it, i) => (
-                        <Line key={it.key} progress={scrollYProgress} index={i} total={ITEMS.length} item={it} />
+                        <MDiv key={it.title} initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }}
+                            transition={{ duration: 0.8, delay: i * 0.07, ease }}
+                            className="group flex flex-col justify-between gap-10 rounded-[26px] border border-[#ECE2D8] bg-white p-7 transition-[transform,border-color] duration-500 hover:-translate-y-1 hover:border-[#E3C3D1] lg:min-h-[260px]">
+                            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FBEEF3] text-[#B8336A] transition-colors duration-500 group-hover:bg-[#B8336A] group-hover:text-white">
+                                <it.icon size={23} strokeWidth={1.5} />
+                            </span>
+                            <div>
+                                <h3 className="text-[22px] font-normal leading-[1.2] tracking-[-0.02em] text-[#14110F]">{it.title}</h3>
+                                <p className="mt-2 text-[14.5px] leading-[1.6] text-[#7A7067]">{it.text}</p>
+                            </div>
+                        </MDiv>
                     ))}
                 </div>
             </div>

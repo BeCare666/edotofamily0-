@@ -70,14 +70,14 @@ export default function BoutiqueVitrine() {
                 </MDiv>
 
                 {categories.length > 0 && (
-                    <div className="mt-10 flex flex-wrap gap-2.5">
+                    <div className="mt-10 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap">
                         {categories.map((c) => {
                             const Icon = categoryIcon(c.slug);
                             return (
                                 <Link key={c.id} href={categoryHref(c.id)}
-                                    className="inline-flex items-center gap-2 rounded-full border border-[#E7DFD8] bg-white py-2 pl-2 pr-4 text-[14px] text-[#161412] transition-colors hover:border-[#C2185B] hover:text-[#C2185B]">
-                                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FBEEF3] text-[#C2185B]"><Icon size={15} /></span>
-                                    {c.name}
+                                    className="flex min-w-0 items-center gap-2.5 rounded-2xl border border-[#E7DFD8] bg-white py-2.5 pl-2.5 pr-3 text-[14px] text-[#161412] transition-colors hover:border-[#C2185B] hover:text-[#C2185B] sm:rounded-full sm:pr-4">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FBEEF3] text-[#C2185B]"><Icon size={15} /></span>
+                                    <span className="truncate">{c.name}</span>
                                 </Link>
                             );
                         })}

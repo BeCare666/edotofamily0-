@@ -6,11 +6,9 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import MenuSheet from "../nav/MenuSheet";
 import { useLiveCampaigns } from "../../lib/siteNav";
-import { CampaignNavIcon, ContraceptionNavIcon, HomeNavIcon, MenuNavIcon, UserRoundIcon } from "./navIcons";
-import { useAuthContext } from "../../context/AuthContext";
-import { spaceFor } from "../../lib/siteNav";
+import { CampaignNavIcon, ContraceptionNavIcon, HomeNavIcon, MenuNavIcon, ProductsNavIcon } from "./navIcons";
 
-// Barre de navigation mobile (sous md) : Accueil, Kits gratuits, Contraception, Mon espace (26/11/2026), Menu.
+// Barre de navigation mobile (sous md) : Accueil, Kits gratuits, Contraception, Nos produits (27/11/2026), Menu.
 // Le point « en direct » sur Campagnes vient de l'API (GET /campaigns/active/count, lib/siteNav.js) : il n'apparaît
 // que si au moins une campagne est réellement en cours (statut calculé par dates, heure du Bénin).
 // Menu (02/11/2026, maquette validée) : panneau qui monte du bas (components/nav/MenuSheet.jsx).
@@ -18,9 +16,6 @@ export default function MobileBottomNav() {
   const pathname = usePathname() || "";
   const [menuOpen, setMenuOpen] = useState(false);
   const liveCount = useLiveCampaigns();
-  const { user } = useAuthContext();
-  // « Mon espace » (26/11/2026) : l'espace du compte selon son rôle ; sans compte, la connexion.
-  const space = user ? spaceFor(user.role) : { path: "/login" };
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   const items = [
@@ -41,12 +36,12 @@ export default function MobileBottomNav() {
       active: pathname.startsWith("/contraception"),
     },
     {
-      // Remplace « Produits » (26/11/2026) : les produits restent dans le Menu et sur l'accueil
-      key: "space",
-      label: "Mon espace",
-      href: space.path,
-      icon: UserRoundIcon,
-      active: pathname === space.path || pathname.startsWith("/orders"),
+      // « Nos produits » (27/11/2026, demande de l'utilisateur) à la place de « Mon espace »
+      key: "products",
+      label: "Nos produits",
+      href: "/category/categories_id=all",
+      icon: ProductsNavIcon,
+      active: pathname.startsWith("/category") || pathname.startsWith("/product"),
     },
   ];
 

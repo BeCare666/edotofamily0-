@@ -4,7 +4,7 @@ import Head from "next/head";
 // comme l'exigent les licences Creative Commons (CC BY, CC BY-SA).
 // 26/11/2026 : emplacements mis à jour pour la nouvelle vitrine ; objectifs-recadree.jpg = recadrage sans le bandeau.
 const CREDITS = [
-    { where: "Accueil, réseau « Points de retrait »", file: "/images/site/drawer-kits.jpg", author: "Surv1v4l1st", license: "CC BY-SA 4.0", source: "https://commons.wikimedia.org/wiki/File:Emergency_Hygiene_Kits,_Men_%26_Women.jpg" },
+    { where: "Accueil, accès « Bénéficier de kits gratuits »", file: "/images/site/drawer-kits.jpg", author: "Surv1v4l1st", license: "CC BY-SA 4.0", source: "https://commons.wikimedia.org/wiki/File:Emergency_Hygiene_Kits,_Men_%26_Women.jpg" },
     { where: "Accueil, accès « Assistant SSR »", file: "/images/site/drawer-assistant.jpg", author: "Amira Guebsi", license: "CC BY-SA 4.0", source: "https://commons.wikimedia.org/wiki/File:Interf%C3%A9rence_Tunisia,_Lights_at_the_Medina.jpg" },
     { where: "Accueil et Qui sommes-nous, réseau « Centres de santé partenaires »", file: "/images/site/drawer-contraception.jpg", author: "USAID in Africa", license: "Domaine public", source: "https://commons.wikimedia.org/wiki/File:Family_planning_methods_(8329687815).jpg" },
     { where: "Assistant SSR, choix assistant ou rendez-vous ; accueil, parcours « Comprendre »", file: "/images/site/choix-assistant.jpg", author: "Adam Jones, Ph.D.", license: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Young_Woman_-_Abomey_-_Benin.jpg" },

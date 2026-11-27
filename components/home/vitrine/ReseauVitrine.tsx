@@ -4,10 +4,9 @@ import React from "react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, KeyRound } from "lucide-react";
 import photoMedecins from "../../../public/images/site/services.jpg";
 import photoCentres from "../../../public/images/site/drawer-contraception.jpg";
-import photoPoints from "../../../public/images/site/drawer-kits.jpg";
 import photoSponsors from "../../../public/images/site/apropos-sante.jpg";
 
 // « Un réseau, pas seulement une application » (26/11/2026) : les quatre acteurs qui ont réellement
@@ -16,7 +15,7 @@ import photoSponsors from "../../../public/images/site/apropos-sante.jpg";
 const MDiv = motion.div as unknown as React.FC<any>;
 const ease = [0.22, 1, 0.36, 1];
 
-type Actor = { title: string; text: string; space: string; photo: StaticImageData; position: string; span: string; aspect: string; link: { label: string; href: string } };
+type Actor = { title: string; text: string; space: string; photo: StaticImageData | null; position: string; span: string; aspect: string; link: { label: string; href: string } };
 
 const ACTORS: Actor[] = [
     {
@@ -43,7 +42,7 @@ const ACTORS: Actor[] = [
         title: "Points de retrait",
         text: "Des commerces de quartier qui vous remettent kits et produits, avec un simple code.",
         space: "Remise par code, suivi des retraits et jours d’ouverture.",
-        photo: photoPoints,
+        photo: null, // panneau typographique : la photo des kits sert au menu d'accès (pas de photo répétée)
         position: "object-[50%_50%]",
         span: "lg:col-span-5",
         aspect: "aspect-[4/3] lg:aspect-auto lg:h-[460px]",
@@ -83,8 +82,17 @@ export default function ReseauVitrine() {
                         <MDiv key={a.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }}
                             transition={{ duration: 0.9, delay: (i % 2) * 0.1, ease }} className={`group ${a.span}`}>
                             <div className={`relative overflow-hidden rounded-[30px] bg-[#F1ECE6] ${a.aspect}`}>
-                                <Image src={a.photo} alt="" fill placeholder="blur" sizes="(min-width: 1024px) 50vw, (min-width: 640px) 50vw, 100vw"
-                                    className={`object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.05] ${a.position}`} />
+                                {a.photo ? (
+                                    <Image src={a.photo} alt="" fill placeholder="blur" sizes="(min-width: 1024px) 50vw, (min-width: 640px) 50vw, 100vw"
+                                        className={`object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.05] ${a.position}`} />
+                                ) : (
+                                    <div className="absolute inset-0 flex flex-col justify-between bg-[#F3E7DF] p-8 sm:p-10">
+                                        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#B8336A]"><KeyRound size={24} strokeWidth={1.5} /></span>
+                                        <p className="max-w-sm text-[30px] font-light leading-[1.15] tracking-[-0.03em] text-[#14110F] sm:text-[38px]">
+                                            Votre code, <span className="text-[#B8336A]">et c’est tout.</span>
+                                        </p>
+                                    </div>
+                                )}
                                 <span className="absolute bottom-4 left-4 right-4 hidden rounded-2xl sm:block border border-white/60 bg-white/95 px-4 py-3 text-[13px] leading-snug text-[#3E3832] sm:right-auto sm:max-w-[340px]">
                                     <span className="font-medium text-[#C2185B]">Son espace : </span>{a.space}
                                 </span>

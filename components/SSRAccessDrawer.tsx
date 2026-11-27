@@ -117,7 +117,7 @@ const SSRAccessDrawer = () => {
   const items: Access[] = [
     {
       key: "kits",
-      photo: "/images/campagnes_uac.png",
+      photo: "/images/site/drawer-kits.jpg",
       icon: Gift,
       title: "Bénéficier de kits gratuits",
       text: "Campagnes disponibles près de vous",
